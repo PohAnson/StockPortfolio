@@ -9,3 +9,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
+
+h1 {
+  @apply m-8 text-4xl text-center;
+}
+input {
+  @apply p-2 border rounded-full border-blue-700 drop-shadow;
+}
