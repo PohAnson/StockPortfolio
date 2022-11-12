@@ -10,9 +10,12 @@ function MyApp({ Component, pageProps }) {
         <meta name="description" content="Stock Portfolio" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex flex-col min-h-screen text-black bg-blue-50 md:flex-row">
+      <div
+        className="flex flex-col min-h-screen text-black md:flex-row"
+        style={{ backgroundColor: "#f8fbff" }}
+      >
         <SideBar />
-        <div className="flex-1 md:m-auto md:w-4/5">
+        <div className="flex-1">
           <Component {...pageProps} />
         </div>
       </div>

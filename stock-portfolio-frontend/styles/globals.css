@@ -13,6 +13,23 @@ body {
 h1 {
   @apply m-8 text-4xl text-center;
 }
-input {
-  @apply p-2 border rounded-full border-blue-700 drop-shadow;
+input,
+.button {
+  @apply inline-block p-2 border rounded-full border-blue-700 drop-shadow;
+}
+
+.button:hover {
+  @apply shadow-md bg-slate-200;
+}
+
+th {
+  @apply border-x p-2 text-start text-gray-700 md:text-lg;
+}
+
+td {
+  @apply px-2 border border-gray-200;
+}
+
+.button {
+  @apply p-2 border;
 }

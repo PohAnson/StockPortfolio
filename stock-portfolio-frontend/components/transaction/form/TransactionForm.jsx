@@ -6,14 +6,13 @@ import TradePriceField from "./fields/TradePriceField";
 import TradeVolumeField from "./fields/TradeVolumeField";
 import { useRouter } from "next/router";
 
-export default function TransactionForm() {
-  const router = useRouter();
+export default function TransactionForm({ showMessage }) {
   // init useState for all fields
-  const [tradeDate, setTradeDate] = useState("");
-  const [tradeType, setTradeType] = useState("");
+  const [tradeDate, setTradeDate] = useState(null);
+  const [tradeType, setTradeType] = useState(null);
   const [selectedStock, setSelectedStock] = useState({});
-  const [tradePrice, setTradePrice] = useState("");
-  const [tradeVolume, setTradeVolume] = useState("");
+  const [tradePrice, setTradePrice] = useState(null);
+  const [tradeVolume, setTradeVolume] = useState(null);
 
   function submitForm(e) {
     e.preventDefault();
@@ -26,16 +25,16 @@ export default function TransactionForm() {
     };
 
     // format the date
-    let [year, month, date] = formData.date.split("-");
-    formData.date = `${date}/${month}/${year}`;
+    if (formData.date != null) {
+      let [year, month, date] = formData.date.split("-");
+      formData.date = `${date}/${month}/${year}`;
+    }
 
     fetch("/api/transaction", {
       method: "post",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
-    });
-
-    // router.push({ pathname: "/transaction" });
+    }).then((r) => showMessage(r.status, r.json()));
   }
   return (
     <>
