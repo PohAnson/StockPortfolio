@@ -48,9 +48,9 @@ export default function TransactionPage() {
 }
 
 function Transaction({ data }) {
-  let { type_: type, code, name, date, price, volume } = data;
+  let { type_: type, code, name, date, price, volume, _id } = data;
   return (
-    <tr key={code} className="odd:bg-gray-50 even:bg-white">
+    <tr key={_id} className="odd:bg-gray-50 even:bg-white">
       <td>{date}</td>
       <td>
         <div
