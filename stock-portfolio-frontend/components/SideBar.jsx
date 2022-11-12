@@ -32,11 +32,13 @@ export default function SideBar() {
 
 function NavItem(props) {
   return (
-    <Link href={props.href}>
-      <li className="flex flex-row items-center p-2 m-1 transition rounded-lg select-none hover:bg-slate-100 hover:cursor-pointer">
-        {props.icon}
-        <p className="whitespace-nowrap">{props.name}</p>
-      </li>
+    <Link href={props.href} passHref>
+      <a>
+        <li className="flex flex-row items-center p-2 m-1 transition rounded-lg select-none hover:bg-slate-100 hover:cursor-pointer">
+          {props.icon}
+          <p className="whitespace-nowrap">{props.name}</p>
+        </li>
+      </a>
     </Link>
   );
 }
