@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from typing import Union
-from .database import db
+from .database.stock_code_name_dict import stock_code_name_dict
 
 
 class Transaction:
@@ -12,16 +12,18 @@ class Transaction:
         type_: str,
         price: float,
         volume: int,
+        _id=None,
     ):
         self.date: datetime = date
         self.code: str = code
         self.type_: str = type_
         self.price: float = price
         self.volume: int = volume
+        self._id = _id
 
     def __repr__(self):
-        return(
-            f"Transaction({self.date}, {self.code}, "
+        return (
+            f"Transaction {self._id if self._id is not None else ''}({self.date}, {self.code}, "
             f"{self.type_}, {self.price}, {self.volume})"
         )
 
@@ -51,7 +53,7 @@ class Transaction:
 
     @code.setter
     def code(self, code):
-        if db.stockdb.find_stock(code) is None:
+        if code not in stock_code_name_dict.keys():
             raise ValueError(f"Invalid Code of {code}")
         self._code = code
 
@@ -94,6 +96,14 @@ class Transaction:
 
     @classmethod
     def from_dict(cls, _dict) -> "Transaction":
+        print(_dict)
+        # check if all the required fields is present
+        fields = ["date", "code", "type_", "price", "volume"]
+        missing_field = list(
+            filter(lambda field: field not in _dict or _dict[field] is None, fields)
+        )
+        if len(missing_field) != 0:
+            raise ValueError(f"Missing fields: {', '.join(missing_field)}")
         return cls(**_dict)
 
     def to_dict(self) -> dict:
@@ -103,4 +113,11 @@ class Transaction:
             "type_": self.type_,
             "price": self.price,
             "volume": self.volume,
+            "_id": self._id,
         }
+
+    def jsonify(self):
+        data = self.to_dict()
+        data["date"] = data["date"].strftime("%d/%m/%Y")
+        data["name"] = stock_code_name_dict[self.code]
+        return data

@@ -1,5 +1,6 @@
 from typing import Union
 from pymongo import MongoClient
+from ..transaction import Transaction
 from threading import Lock
 import secrets
 import string
@@ -9,7 +10,7 @@ class TransactionDb:
     def __init__(self, client: MongoClient):
         self.coll = client["test_data"]["transactions"]
 
-    def insert_transaction(self, data) -> dict:
+    def insert_one_transaction(self, data) -> dict:
         """Insert a transaction into database
 
         Args:
@@ -23,18 +24,20 @@ class TransactionDb:
         self.coll.insert_one(data)
         return data
 
+    def find_all_transaction(self) -> list:
+        data = [Transaction.from_dict(record) for record in self.coll.find({})]
+        return data
+
     @staticmethod
     def generate_transaction_id():
-        return "".join(
-            secrets.choice(string.ascii_lowercase) for _ in range(7)
-        )
+        return "".join(secrets.choice(string.ascii_lowercase) for _ in range(7))
 
 
 class StockDb:
     def __init__(self, client: MongoClient):
         self.coll = client["data"]["stock_data"]
 
-    def find_stock(self, stock_code: str) -> Union[dict, None]:
+    def find_one_stock(self, stock_code: str) -> Union[dict, None]:
         """Return the information about a particular stock.
 
         Args:
@@ -63,6 +66,18 @@ class MongoDb:
 
     def __init__(self) -> None:
         return
+
+    def __getattr__(self, __name: str):
+        if "transaction" in __name:
+            func = getattr(self.transactiondb, __name)
+        elif "stock" in __name:
+            func = getattr(self.stockdb, __name)
+        else:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' has no attribute '{__name}'"
+            )
+
+        return func
 
     @property
     def transactiondb(self):
