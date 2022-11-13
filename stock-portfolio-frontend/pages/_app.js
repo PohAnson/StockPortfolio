@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }) {
         style={{ backgroundColor: "#f8fbff" }}
       >
         <SideBar />
-        <div className="flex-1">
+        <div className="flex flex-col flex-1">
           <Component {...pageProps} />
         </div>
       </div>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import LoadingPage from "../../components/Loading";
 
 export default function TransactionPage() {
-  const [transactionData, setTransactionData] = useState(undefined);
+  const [transactionData, setTransactionData] = useState(null);
 
   useEffect(() => {
     fetch("/api/transaction")
@@ -10,10 +11,9 @@ export default function TransactionPage() {
       .then(setTransactionData);
   }, []);
   useEffect(() => console.log(transactionData), [transactionData]);
-  let loading = "loading";
   let table = (
     <div className="overflow-auto">
-      <table className="w-4/5 m-auto text-xs bg-white rounded md:text-base">
+      <table className="text-xs md:text-base">
         <thead>
           <tr className="border-b-2 border-b-gray-300">
             <th className="md:w-32">Date (D/M/Y)</th>
@@ -25,7 +25,7 @@ export default function TransactionPage() {
           </tr>
         </thead>
         <tbody>
-          {transactionData == undefined ||
+          {transactionData == null ||
             transactionData.map((data, index) => (
               <Transaction key={data._id} data={data} index={index} />
             ))}
@@ -37,12 +37,12 @@ export default function TransactionPage() {
     <>
       <h1>Transaction History</h1>
       <Link href="/transaction/new">
-        <p className="button" style={{ margin: "0 10% 1rem" }}>
+        <p className="button mx-[10%] mb-4 w-min whitespace-nowrap">
           New Transaction
         </p>
       </Link>
 
-      {transactionData == undefined ? loading : table}
+      {transactionData == null ? <LoadingPage /> : table}
     </>
   );
 }

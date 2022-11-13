@@ -22,6 +22,10 @@ input,
   @apply shadow-md bg-slate-200;
 }
 
+table {
+  @apply w-4/5 m-auto  bg-white rounded;
+}
+
 th {
   @apply border-x p-2 text-start text-gray-700 md:text-lg;
 }
