@@ -27,6 +27,12 @@ class Transaction:
             f"{self.type_}, {self.price}, {self.volume})"
         )
 
+    def __hash__(self) -> int:
+        _id_num_str = ''
+        for c in self._id:
+            _id_num_str += str(ord(c))
+        return int(_id_num_str)
+
     @property
     def date(self):
         return self._date
@@ -96,11 +102,12 @@ class Transaction:
 
     @classmethod
     def from_dict(cls, _dict) -> "Transaction":
-        print(_dict)
         # check if all the required fields is present
         fields = ["date", "code", "type_", "price", "volume"]
         missing_field = list(
-            filter(lambda field: field not in _dict or _dict[field] is None, fields)
+            filter(
+                lambda field: field not in _dict or _dict[field] is None,
+                fields)
         )
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
