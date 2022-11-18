@@ -67,7 +67,7 @@ function Transaction({ data }) {
         <p className="font-bold ">{name}</p>
         <p className="text-sm text-gray-700">{code}</p>
       </td>
-      <td>{price}</td>
+      <td>{price.toFixed(3)}</td>
       <td>{volume}</td>
       <td>{(parseFloat(price) * parseInt(volume)).toFixed(2)}</td>
     </tr>

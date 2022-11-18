@@ -82,6 +82,5 @@ class Ledger:
     def to_json(self) -> list[dict[str, Any]]:
         ledger_json = []
         for rec in self.stock_recs.values():
-            if rec.volume != 0:
-                ledger_json.append(rec.to_dict())
+            ledger_json.append(rec.to_dict())
         return ledger_json
