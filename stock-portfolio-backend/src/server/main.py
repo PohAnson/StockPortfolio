@@ -7,6 +7,12 @@ from model.stock_ledger import Ledger
 app = Flask(__name__)
 
 
+def get_ledger():
+    ledger = Ledger()
+    ledger.add_transactions(db.find_all_transaction())
+    return ledger
+
+
 @app.route("/")
 @app.route("/api")
 def api_root():
@@ -34,9 +40,19 @@ def post_transaction():
 
 @app.route("/api/portfolio")
 def get_portfolio():
-    ledger = Ledger()
-    ledger.add_transactions(db.find_all_transaction())
-    return jsonify(ledger.to_json())
+    ledger = get_ledger()
+
+    return jsonify([rec for rec in ledger.to_json() if rec["volume"] != 0])
+
+
+@app.route("/api/pnl")
+def get_pnl():
+    # get the net profit and loss data
+    ledger = get_ledger()
+    # pnl is only when no outstanding volume of stock is left,
+    # not shown even if it is bought again
+    print(ledger.to_json())
+    return jsonify([rec for rec in ledger.to_json() if rec["volume"] == 0])
 
 
 app.run(debug=True)
