@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LoadingPage from "../components/Loading";
 
 export default function NetPage() {
   let [pnlData, setPnlData] = useState(null);
@@ -23,7 +24,6 @@ export default function NetPage() {
       </table>
     </div>
   );
-
   return (
     <>
       <h1>Net Profit/Loss</h1>
