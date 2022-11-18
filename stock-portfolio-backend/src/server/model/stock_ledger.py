@@ -32,6 +32,7 @@ class _StockRecord:
         total_cost = 0
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
+            total_cost += self.calculate_broker_fees(value)
             if transaction.type_ == "buy":
                 total_cost += value
             elif transaction.type_ == "sell":
@@ -52,6 +53,17 @@ class _StockRecord:
             "cost": self.cost,
             "avg_price": self.avg_price,
         }
+
+    @staticmethod
+    def calculate_broker_fees(value):
+        commision = max(25, 0.28 / 100 * value)
+        clearing = round(0.0325 / 100 * value, 2)
+        trading_access = round(0.0075 / 100 * value, 2)
+        settlement_instruction = 0.35
+        sub_sum = sum(
+            [commision, clearing, trading_access, settlement_instruction])
+        tax = round(7 / 100 * sub_sum, 2)
+        return sum([sub_sum, tax])
 
 
 class Ledger:
