@@ -1,6 +1,7 @@
 from typing import Any
 from .transaction import Transaction
-from .database.stock_code_name_dict import stock_code_name_dict
+from .stock_code_name_dict import stock_code_name_dict
+from ..data_structure import SortedSet
 
 
 class _StockRecord:
@@ -8,7 +9,8 @@ class _StockRecord:
 
     def __init__(self, code: str) -> None:
         self.code = code
-        self.transaction_set: set[Transaction] = set()
+
+        self.transaction_set: set[Transaction] = SortedSet("date")
 
     @property
     def avg_price(self):
@@ -69,6 +71,12 @@ class _StockRecord:
 class Ledger:
     def __init__(self) -> None:
         self.stock_recs: dict["str", _StockRecord] = {}  # code: rec
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __str__(self) -> str:
+        return str(self.to_json())
 
     def add_transaction(self, transaction: Transaction) -> None:
         if transaction.code not in self.stock_recs:

@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
-from model.database import db
-from model.transaction import Transaction
-from model.stock_ledger import Ledger
+from server.model.database import db
+from server.model.transaction import Transaction
+from server.model.stock_ledger import Ledger
 
 
 app = Flask(__name__)

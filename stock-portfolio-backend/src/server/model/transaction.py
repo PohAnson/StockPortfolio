@@ -1,7 +1,8 @@
+from __future__ import annotations
 import json
 from datetime import datetime
 from typing import Union
-from .database.stock_code_name_dict import stock_code_name_dict
+from .stock_code_name_dict import stock_code_name_dict
 
 
 class Transaction:
@@ -27,8 +28,28 @@ class Transaction:
             f"{self.type_}, {self.price}, {self.volume})"
         )
 
+    def __eq__(self, __o: Union[str, Transaction]) -> bool:
+        """Check if 2 transactions are equal. (they have the same id)
+
+        Args:
+            __o (Union[str, Transaction]): the str id or the transaction obj.
+
+        Returns:
+            bool: true if they are equal
+        """
+        if isinstance(__o, str):
+            return self._id == __o
+        elif isinstance(__o, Transaction):
+            return self._id == __o._id
+
+    def __getitem__(self, key):
+        if key in ["date", "code", "type_", "price", "volume", "_id"]:
+            return self.__getattribute__(key)
+        else:
+            raise LookupError(f"Invalid key {key} is given.")
+
     def __hash__(self) -> int:
-        _id_num_str = ''
+        _id_num_str = ""
         for c in self._id:
             _id_num_str += str(ord(c))
         return int(_id_num_str)
@@ -105,9 +126,7 @@ class Transaction:
         # check if all the required fields is present
         fields = ["date", "code", "type_", "price", "volume"]
         missing_field = list(
-            filter(
-                lambda field: field not in _dict or _dict[field] is None,
-                fields)
+            filter(lambda field: field not in _dict or _dict[field] is None, fields)
         )
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
