@@ -2,7 +2,7 @@
 import sys
 import os
 
-backend_code_dir = os.getenv('BACKEND_CODE_DIR', r'.')
+backend_code_dir = os.getenv("BACKEND_CODE_DIR", r".")
 
 try:
     # add the src dir to path
