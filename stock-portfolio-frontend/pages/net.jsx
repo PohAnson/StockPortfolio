@@ -33,7 +33,7 @@ export default function NetPage() {
 }
 
 function Row({ data }) {
-  let { code, name, cost: earning } = data;
+  let { code, name, pnl } = data;
 
   return (
     <tr key={code} className="odd:bg-gray-50 even:bg-white">
@@ -41,7 +41,7 @@ function Row({ data }) {
         <p className="font-bold ">{name}</p>
         <p className="text-sm text-gray-700">{code}</p>
       </td>
-      <td>{-earning.toFixed(2)}</td>
+      <td>{pnl.toFixed(2)}</td>
     </tr>
   );
 }

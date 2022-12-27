@@ -20,6 +20,11 @@ class _StockRecord:
 
     @property
     def volume(self) -> int:
+        """Current volume
+
+        Returns:
+            int: Number of vol of shares.
+        """
         total_vol = 0
         for transaction in self.transaction_set:
             if transaction.type_ == "buy":
@@ -28,6 +33,29 @@ class _StockRecord:
                 total_vol -= transaction.volume
 
         return total_vol
+
+    def tabulate(self) -> dict[str, Any]:
+        """Single pass to tabulate the transactions.
+
+        Returns:
+            dict[str, Any]: contains key: "volume", "cost", "pnl"
+        """
+        total_cost = 0
+        total_volume = 0
+        pnl = 0  # the net profit/loss when vol is zero, +ve is profit
+        for transaction in self.transaction_set:
+            value = transaction.price * transaction.volume
+            total_cost += self.calculate_broker_fees(value)
+            if transaction.type_ == "buy":
+                total_cost += value
+                total_volume += transaction.volume
+            elif transaction.type_ == "sell":
+                total_cost -= value
+                total_volume -= transaction.volume
+            if total_volume == 0:
+                pnl -= total_cost
+                total_cost = 0
+        return {"volume": total_volume, "cost": total_cost, "pnl": pnl}
 
     @property
     def cost(self) -> float:
@@ -48,12 +76,14 @@ class _StockRecord:
         self.transaction_set.add(transaction)
 
     def to_dict(self) -> dict[str, Any]:
+        tabulated_data = self.tabulate()
         return {
             "code": self.code,
             "name": stock_code_name_dict[self.code],
-            "volume": self.volume,
-            "cost": self.cost,
+            "volume": tabulated_data["volume"],
+            "cost": tabulated_data["cost"],
             "avg_price": self.avg_price,
+            "pnl": tabulated_data["pnl"],
         }
 
     @staticmethod

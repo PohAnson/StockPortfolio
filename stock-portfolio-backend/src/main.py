@@ -49,8 +49,6 @@ def get_portfolio():
 def get_pnl():
     # get the net profit and loss data
     ledger = get_ledger()
-    # pnl is only when no outstanding volume of stock is left,
-    # not shown even if it is bought again
     return jsonify([rec for rec in ledger.to_json() if rec["volume"] == 0])
 
 
