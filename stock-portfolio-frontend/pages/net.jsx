@@ -19,7 +19,8 @@ export default function NetPage() {
           </tr>
         </thead>
         <tbody>
-          {pnlData == null || pnlData.map((data) => <Row data={data} />)}
+          {pnlData == null ||
+            pnlData.map((data) => <Row key={data.code} data={data} />)}
         </tbody>
       </table>
     </div>

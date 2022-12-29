@@ -8,7 +8,6 @@ export default function PortfolioPage() {
       .then((r) => r.json())
       .then(setPortfolioData);
   }, []);
-  useEffect(() => console.log(portfolioData), [portfolioData]);
   let table = (
     <div className="overflow-auto">
       <table>
@@ -22,7 +21,7 @@ export default function PortfolioPage() {
         </thead>
         <tbody>
           {portfolioData == null ||
-            portfolioData.map((data) => <Row data={data} />)}
+            portfolioData.map((data) => <Row key={data.code} data={data} />)}
         </tbody>
       </table>
     </div>
@@ -38,7 +37,7 @@ export default function PortfolioPage() {
 function Row({ data }) {
   let { code, name, avg_price: price, volume, cost } = data;
   return (
-    <tr key={code} className="odd:bg-gray-50 even:bg-white">
+    <tr className="odd:bg-gray-50 even:bg-white">
       <td>
         <p className="font-bold ">{name}</p>
         <p className="text-sm text-gray-700">{code}</p>
