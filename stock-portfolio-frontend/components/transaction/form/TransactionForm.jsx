@@ -4,7 +4,6 @@ import { useState } from "react";
 import TradeDateField from "./fields/TradeDateField";
 import TradePriceField from "./fields/TradePriceField";
 import TradeVolumeField from "./fields/TradeVolumeField";
-import { useRouter } from "next/router";
 
 export default function TransactionForm({ showMessage }) {
   // init useState for all fields

@@ -1,52 +1,9 @@
-from typing import Union
-from pymongo import MongoClient
-from ..transaction import Transaction
 from threading import Lock
-import secrets
-import string
 
-
-class TransactionDb:
-    def __init__(self, client: MongoClient):
-        self.coll = client["test_data"]["transactions"]
-
-    def insert_one_transaction(self, data) -> dict:
-        """Insert a transaction into database
-
-        Args:
-            data (Transaction): the transaction object to be inserted
-
-        Returns:
-            dict: the data inserted into the database
-        """
-        data = data.to_dict()
-        data["_id"] = self.generate_transaction_id()
-        self.coll.insert_one(data)
-        return data
-
-    def find_all_transaction(self) -> list:
-        data = [Transaction.from_dict(record) for record in self.coll.find({})]
-        return data
-
-    @staticmethod
-    def generate_transaction_id():
-        return "".join(secrets.choice(string.ascii_lowercase) for _ in range(7))
-
-
-class StockDb:
-    def __init__(self, client: MongoClient):
-        self.coll = client["data"]["stock_data"]
-
-    def find_one_stock(self, stock_code: str) -> Union[dict, None]:
-        """Return the information about a particular stock.
-
-        Args:
-            stock_code (str): the stock code to search by
-
-        Returns:
-            Union[dict, None]: return None if invalid code is given.
-        """
-        return self.coll.find_one({"_id": stock_code})
+from pymongo import MongoClient
+from .stockdb import StockDb
+from .transactiondb import TransactionDb
+from .userdb import UserDb
 
 
 class MongoDb:
@@ -61,6 +18,7 @@ class MongoDb:
                 instance._client = MongoClient()
                 instance.__transactiondb = TransactionDb(instance._client)
                 instance.__stockdb = StockDb(instance._client)
+                instance.__userdb = UserDb(instance._client)
                 cls._instance = instance
         return cls._instance
 
@@ -72,6 +30,8 @@ class MongoDb:
             func = getattr(self.transactiondb, __name)
         elif "stock" in __name:
             func = getattr(self.stockdb, __name)
+        elif "user" in __name:
+            func = getattr(self.userdb, __name)
         else:
             raise AttributeError(
                 f"'{self.__class__.__name__}' has no attribute '{__name}'"
@@ -86,3 +46,7 @@ class MongoDb:
     @property
     def stockdb(self):
         return self.__stockdb
+
+    @property
+    def userdb(self):
+        return self.__userdb

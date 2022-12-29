@@ -6,7 +6,6 @@ export default async function handler(req, res) {
       process.env.SERVER_URL + "/api/transaction"
     ).then((r) => [r.status, r.json()]);
   } else if (req.method == "POST") {
-    console.log(req.body);
     [statusCode, json] = await fetch(
       process.env.SERVER_URL + "/api/transaction",
       {

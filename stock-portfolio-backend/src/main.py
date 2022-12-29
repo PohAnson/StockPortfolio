@@ -1,8 +1,9 @@
+from argon2.exceptions import VerifyMismatchError
 from flask import Flask, jsonify, request
-from server.model.database import db
-from server.model.transaction import Transaction
-from server.model.stock_ledger import Ledger
 
+from server.model.database import db
+from server.model.stock_ledger import Ledger
+from server.model.transaction import Transaction
 
 app = Flask(__name__)
 
@@ -50,6 +51,35 @@ def get_pnl():
     # get the net profit and loss data
     ledger = get_ledger()
     return jsonify([rec for rec in ledger.to_json() if rec["volume"] == 0])
+
+
+@app.route("/api/login", methods=["POST"])
+def post_login():
+    user_data = request.json
+    try:
+        if db.authenticate_one_user(user_data):
+            result = db.find_one_user(user_data["username"])
+            result["_id"] = str(result["_id"])
+
+    except ValueError as e:
+        print(e)
+        return jsonify({"error": str(e)}), 406
+    except VerifyMismatchError as e:
+        print(e)
+        return jsonify({"error": "Incorrect Password"}), 401
+    return result, 200
+
+
+@app.route("/api/signup", methods=["POST"])
+def post_signup():
+    user_data = request.json
+    try:
+        db.insert_one_user(user_data)
+    except ValueError as e:
+        print(e)
+        return jsonify({"error": str(e)}), 406
+
+    return jsonify({'ok': True}), 200
 
 
 app.run(debug=True)

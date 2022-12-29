@@ -2,6 +2,7 @@ import {
   BriefcaseIcon,
   DocumentIcon,
   PresentationChartBarIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
@@ -9,7 +10,7 @@ export default function SideBar() {
   const iconClassStyle = "w-4 sm:w-6 m-1 sm:mx-2 text-gray-400";
   return (
     <nav className="bg-white shadow md:w-60">
-      <ul className="flex overflow-x-auto md:flex-col">
+      <ul className="flex overflow-x-auto md:h-full md:flex-col">
         <NavItem
           name="Portfolio"
           icon={<BriefcaseIcon className={iconClassStyle} />}
@@ -25,6 +26,14 @@ export default function SideBar() {
           icon={<PresentationChartBarIcon className={iconClassStyle} />}
           href="/net"
         />
+        <div className="flex justify-end flex-grow mr-2 md:flex-col md:mx-0 md:mb-2">
+          <hr className="hidden mx-4 mb-2 border-t-2 md:block" />
+          <NavItem
+            name="Logout"
+            icon={<ArrowRightOnRectangleIcon className={iconClassStyle} />}
+            href="/api/logout"
+          />
+        </div>
       </ul>
     </nav>
   );

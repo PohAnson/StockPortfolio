@@ -6,6 +6,7 @@ import {
 import Card from "../../components/Card";
 import TransactionForm from "../../components/transaction/form/TransactionForm";
 import Link from "next/link";
+import ErrorBanner from "../../components/ErrorBanner";
 
 export default function NewTransactionPage() {
   async function showMessage(status_code, json_data) {
@@ -25,15 +26,7 @@ export default function NewTransactionPage() {
       );
     } else {
       // Error
-      setMessage(
-        <div className="w-full px-4 py-2 m-auto text-white bg-red-500 rounded-lg shadow-lg shadow-red-500/40">
-          <p>
-            <ExclamationCircleIcon className="inline-block w-6 mr-1" />
-            <b>Error: </b>
-            {json_data["error"]}
-          </p>
-        </div>
-      );
+      setMessage(<ErrorBanner errorText={json_data["error"]} />);
     }
   }
 

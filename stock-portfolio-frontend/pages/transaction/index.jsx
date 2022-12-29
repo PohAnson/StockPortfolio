@@ -10,7 +10,6 @@ export default function TransactionPage() {
       .then((r) => r.json())
       .then(setTransactionData);
   }, []);
-  useEffect(() => console.log(transactionData), [transactionData]);
   let table = (
     <div className="overflow-auto">
       <table className="text-xs md:text-base">
