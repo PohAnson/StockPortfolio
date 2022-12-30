@@ -24,7 +24,9 @@ def api_root():
 @app.route("/api/transaction", methods=["GET"])
 def get_transaction():
     userid = request.args.get("userid", None)
-    transactions = db.find_all_transaction(filter={"userid": userid} if userid else {})
+    transactions = db.find_all_transaction(
+        filter={"userid": userid} if userid else {}
+    )
 
     return jsonify([transaction.jsonify() for transaction in transactions])
 

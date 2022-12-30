@@ -26,7 +26,8 @@ class Transaction:
 
     def __repr__(self):
         return (
-            f"Transaction {self._id if self._id is not None else ''}({self.date}, {self.code}, "
+            f"Transaction {self._id if self._id is not None else ''}"
+            f"({self.date}, {self.code}, "
             f"{self.type_}, {self.price}, {self.volume})"
         )
 
@@ -129,7 +130,9 @@ class Transaction:
         fields = ["date", "code", "type_", "price", "volume", "userid"]
         missing_field = list(
             filter(
-                lambda field: field not in _dict or _dict[field] is None, fields)
+                lambda field: field not in _dict or _dict[field] is None,
+                fields,
+            )
         )
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")

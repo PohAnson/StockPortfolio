@@ -25,9 +25,14 @@ class TransactionDb:
         return data
 
     def find_all_transaction(self, *, filter={}) -> list:
-        data = [Transaction.from_dict(record) for record in self.coll.find(filter)]
+        data = [
+            Transaction.from_dict(record) for record in self.coll.find(filter)
+        ]
         return data
 
     @staticmethod
     def generate_transaction_id():
-        return "".join(secrets.choice(string.ascii_lowercase) for _ in range(7))
+
+        return "".join(
+            secrets.choice(string.ascii_lowercase) for _ in range(7)
+        )

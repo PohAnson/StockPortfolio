@@ -72,7 +72,8 @@ class _StockRecord:
     def add_transaction(self, transaction: Transaction) -> None:
         if transaction.code != self.code:
             raise TypeError(
-                f"Stock {transaction.code} is added to {self.code} ledger")
+                f"Stock {transaction.code} is added to {self.code} ledger"
+            )
         self.transaction_set.add(transaction)
 
     def to_dict(self) -> dict[str, Any]:
@@ -93,7 +94,8 @@ class _StockRecord:
         trading_access = round(0.0075 / 100 * value, 2)
         settlement_instruction = 0.35
         sub_sum = sum(
-            [commision, clearing, trading_access, settlement_instruction])
+            [commision, clearing, trading_access, settlement_instruction]
+        )
         tax = round(7 / 100 * sub_sum, 2)
         return sum([sub_sum, tax])
 

@@ -12,10 +12,7 @@ class SortedSet(Sequence, MutableSet):
 
     def __contains__(self, value) -> bool:
         return any(
-            filter(
-                lambda x: x[self.key] == value[self.key],
-                self.__data
-            )
+            filter(lambda x: x[self.key] == value[self.key], self.__data)
         )
 
     def __delitem__(self, index: Union[slice, Any]):

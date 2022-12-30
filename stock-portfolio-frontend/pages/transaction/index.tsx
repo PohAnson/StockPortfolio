@@ -26,7 +26,7 @@ export default function TransactionPage() {
         <tbody>
           {transactionData == null ||
             transactionData.map((data, index) => (
-              <Transaction key={data._id} data={data} index={index} />
+              <Transaction key={data._id} data={data} />
             ))}
         </tbody>
       </table>

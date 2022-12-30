@@ -25,7 +25,7 @@ export default function StockCodeSearch(props) {
         <div className="flex flex-col">
           <Combobox.Input
             autoComplete="off"
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)} // @SuppressWarnings("typescript:S6480")
             displayValue={(stock) =>
               stock.hasOwnProperty("TradingCode") &&
               stock.hasOwnProperty("TradingName")

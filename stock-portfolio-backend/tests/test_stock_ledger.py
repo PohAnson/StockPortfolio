@@ -76,27 +76,31 @@ class StockLedgerTestCase(unittest.TestCase):
 
     def test_to_json_and_add_transaction(self):
         ledger = Ledger()
-        ledger.add_transaction(Transaction.from_dict({
-            "date": datetime.datetime(2020, 12, 11, 0, 0),
-            "code": "AZG",
-            "type_": "buy",
-            "price": 1.1,
-            "volume": 1000,
-            "_id": "pydqluk",
-        }))
+        ledger.add_transaction(
+            Transaction.from_dict(
+                {
+                    "date": datetime.datetime(2020, 12, 11, 0, 0),
+                    "code": "AZG",
+                    "type_": "buy",
+                    "price": 1.1,
+                    "volume": 1000,
+                    "_id": "pydqluk",
+                }
+            )
+        )
         result = ledger.to_json()[0]
         expected = {
             "code": "AZG",
             "name": "8Telecom",
             "cost": 1127.6,
             "avg_price": 1.1276,
-            "volume": 1000
+            "volume": 1000,
         }
         self.assertTrue(
-            len(result.keys()) == len(
-                expected.keys()),
+            len(result.keys()) == len(expected.keys()),
             f"missing elements:\n"
-            f"result:{result.keys()}\nexpect:{expected.keys()}")
+            f"result:{result.keys()}\nexpect:{expected.keys()}",
+        )
         for k, v in result.items():
             if k in expected:
                 self.assertAlmostEqual(expected[k], v, 2)
@@ -106,30 +110,39 @@ class StockLedgerTestCase(unittest.TestCase):
     def test_add_transactions(self):
         ledger = Ledger()
         ledger.add_transaction(
-            Transaction.from_dict({
-                "date": datetime.datetime(2020, 12, 11, 0, 0),
-                "code": "AZG",
-                "type_": "buy",
-                "price": 1.1,
-                "volume": 1000,
-                "_id": "pydqluk", }),
-            Transaction.from_dict({
-                "date": datetime.datetime(2020, 12, 11, 0, 0),
-                "code": "40B",
-                "type_": "buy",
-                "price": 1.1,
-                "volume": 1000,
-                "_id": "hydqluk", }),
-            Transaction.from_dict({
-                "date": datetime.datetime(2021, 12, 11, 0, 0),
-                "code": "AZG",
-                "type_": "sell",
-                "price": 1.2,
-                "volume": 1000,
-                "_id": "gydqluk",
-            }))
+            Transaction.from_dict(
+                {
+                    "date": datetime.datetime(2020, 12, 11, 0, 0),
+                    "code": "AZG",
+                    "type_": "buy",
+                    "price": 1.1,
+                    "volume": 1000,
+                    "_id": "pydqluk",
+                }
+            ),
+            Transaction.from_dict(
+                {
+                    "date": datetime.datetime(2020, 12, 11, 0, 0),
+                    "code": "40B",
+                    "type_": "buy",
+                    "price": 1.1,
+                    "volume": 1000,
+                    "_id": "hydqluk",
+                }
+            ),
+            Transaction.from_dict(
+                {
+                    "date": datetime.datetime(2021, 12, 11, 0, 0),
+                    "code": "AZG",
+                    "type_": "sell",
+                    "price": 1.2,
+                    "volume": 1000,
+                    "_id": "gydqluk",
+                }
+            ),
+        )
         self.assertAlmostEqual(1, 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

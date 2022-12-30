@@ -7,7 +7,7 @@ class UserDb:
 
     def __init__(self, client: MongoClient):
         self.coll = client["test_data"]["user_info"]
-        self.coll.create_index('username', unique=True)
+        self.coll.create_index("username", unique=True)
 
     @staticmethod
     def check_missing_fields(user_data: dict, required_fields: list):
@@ -55,8 +55,7 @@ class UserDb:
 
     def find_one_user(self, username: str, show_password=False) -> dict:
         return self.coll.find_one(
-            {"username": username},
-            {"password": show_password}
+            {"username": username}, {"password": show_password}
         )
 
     def authenticate_one_user(self, user_data) -> bool:
@@ -64,11 +63,13 @@ class UserDb:
         self.check_missing_fields(user_data, ["username", "password"])
         if not self.is_username_present(user_data["username"]):
             raise ValueError(
-                f"Username '{user_data['username']}' does not exists")
+                f"Username '{user_data['username']}' does not exists"
+            )
 
         # authenticate user
         hashedpw = self.find_one_user(
-            user_data["username"], show_password=True)["password"]
+            user_data["username"], show_password=True
+        )["password"]
         verify_result = self.ph.verify(hashedpw, user_data["password"])
 
         if self.ph.check_needs_rehash(hashedpw):

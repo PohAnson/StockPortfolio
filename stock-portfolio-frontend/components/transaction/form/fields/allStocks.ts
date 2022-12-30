@@ -1,4 +1,4 @@
-export var allStocks = [
+export const allStocks = [
   {
     _id: "502",
     TradingName: "3Cnergy",
