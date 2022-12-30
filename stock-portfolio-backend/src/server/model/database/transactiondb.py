@@ -24,8 +24,8 @@ class TransactionDb:
         self.coll.insert_one(data)
         return data
 
-    def find_all_transaction(self) -> list:
-        data = [Transaction.from_dict(record) for record in self.coll.find({})]
+    def find_all_transaction(self, *, filter={}) -> list:
+        data = [Transaction.from_dict(record) for record in self.coll.find(filter)]
         return data
 
     @staticmethod

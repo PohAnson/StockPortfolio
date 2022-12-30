@@ -14,6 +14,7 @@ class Transaction:
         price: float,
         volume: int,
         _id=None,
+        userid=None,
     ):
         self.date: datetime = date
         self.code: str = code
@@ -21,6 +22,7 @@ class Transaction:
         self.price: float = price
         self.volume: int = volume
         self._id = _id
+        self.userid = userid
 
     def __repr__(self):
         return (
@@ -124,15 +126,17 @@ class Transaction:
     @classmethod
     def from_dict(cls, _dict) -> "Transaction":
         # check if all the required fields is present
-        fields = ["date", "code", "type_", "price", "volume"]
+        fields = ["date", "code", "type_", "price", "volume", "userid"]
         missing_field = list(
-            filter(lambda field: field not in _dict or _dict[field] is None, fields)
+            filter(
+                lambda field: field not in _dict or _dict[field] is None, fields)
         )
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
         return cls(**_dict)
 
     def to_dict(self) -> dict:
+        print(self._id)
         return {
             "date": self.date,
             "code": self.code,
@@ -140,6 +144,7 @@ class Transaction:
             "price": self.price,
             "volume": self.volume,
             "_id": self._id,
+            "userid": self.userid,
         }
 
     def jsonify(self):

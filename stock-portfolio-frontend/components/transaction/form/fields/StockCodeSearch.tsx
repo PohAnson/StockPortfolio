@@ -1,4 +1,4 @@
-import { allStocks } from "./allStocks.js";
+import { allStocks } from "./allStocks";
 import { Combobox } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";

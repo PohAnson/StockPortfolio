@@ -8,9 +8,9 @@ from server.model.transaction import Transaction
 app = Flask(__name__)
 
 
-def get_ledger():
+def get_ledger(userid=None):
     ledger = Ledger()
-    ledger.add_transactions(db.find_all_transaction())
+    ledger.add_transactions(db.find_all_transaction(filter={"userid": userid}))
     return ledger
 
 
@@ -23,7 +23,8 @@ def api_root():
 
 @app.route("/api/transaction", methods=["GET"])
 def get_transaction():
-    transactions = db.find_all_transaction()
+    userid = request.args.get("userid", None)
+    transactions = db.find_all_transaction(filter={"userid": userid} if userid else {})
 
     return jsonify([transaction.jsonify() for transaction in transactions])
 
@@ -41,7 +42,8 @@ def post_transaction():
 
 @app.route("/api/portfolio")
 def get_portfolio():
-    ledger = get_ledger()
+    userid = request.args.get("userid", None)
+    ledger = get_ledger(userid)
 
     return jsonify([rec for rec in ledger.to_json() if rec["volume"] != 0])
 
@@ -49,7 +51,9 @@ def get_portfolio():
 @app.route("/api/pnl")
 def get_pnl():
     # get the net profit and loss data
-    ledger = get_ledger()
+    userid = request.args.get("userid", None)
+    ledger = get_ledger(userid)
+
     return jsonify([rec for rec in ledger.to_json() if rec["volume"] == 0])
 
 
@@ -74,12 +78,12 @@ def post_login():
 def post_signup():
     user_data = request.json
     try:
-        db.insert_one_user(user_data)
+        userid = db.insert_one_user(user_data)
     except ValueError as e:
         print(e)
         return jsonify({"error": str(e)}), 406
 
-    return jsonify({'ok': True}), 200
+    return {"userid": userid}, 200
 
 
 app.run(debug=True)
