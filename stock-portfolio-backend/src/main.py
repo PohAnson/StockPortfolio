@@ -68,6 +68,12 @@ def get_transaction_by_id(transaction_id):
     return jsonify(result)
 
 
+@app.route("/api/transaction/<transaction_id>", methods=["DELETE"])
+def delete_transaction(transaction_id):
+    result = db.delete_transaction_by_id(transaction_id)
+    return jsonify({"ok": result.acknowledged})
+
+
 @app.route("/api/transaction/<transaction_id>", methods=["PUT"])
 def put_transaction(transaction_id):
     transaction_dict = Transaction.from_dict(

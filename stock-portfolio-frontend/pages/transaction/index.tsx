@@ -1,16 +1,17 @@
-import { PencilSquareIcon } from "@heroicons/react/20/solid";
+import { PencilSquareIcon, DocumentMinusIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import LoadingPage from "../../components/Loading";
 
 export default function TransactionPage() {
   const [transactionData, setTransactionData] = useState(null);
-
+  const [isStale, setIsStale] = useState(false);
   useEffect(() => {
     fetch("/api/transaction")
       .then((r) => r.json())
-      .then(setTransactionData);
-  }, []);
+      .then(setTransactionData)
+      .then(() => setIsStale(false));
+  }, [isStale]);
   let table = (
     <div className="overflow-auto">
       <table className="text-xs md:text-base">
@@ -27,7 +28,7 @@ export default function TransactionPage() {
         <tbody>
           {transactionData == null ||
             transactionData.map((data, index) => (
-              <Transaction key={data._id} data={data} />
+              <Transaction key={data._id} data={data} setIsStale={setIsStale} />
             ))}
         </tbody>
       </table>
@@ -47,7 +48,7 @@ export default function TransactionPage() {
   );
 }
 
-function Transaction({ data }) {
+function Transaction({ data, setIsStale }) {
   let { type_: type, code, name, date, price, volume, _id } = data;
   return (
     <tr key={_id} className="odd:bg-gray-50 even:bg-white">
@@ -70,10 +71,25 @@ function Transaction({ data }) {
       <td>{price.toFixed(3)}</td>
       <td>{volume}</td>
       <td>{(parseFloat(price) * parseInt(volume)).toFixed(2)}</td>
-      <td className="w-4">
+      <td className="w-6">
         <Link href={`/transaction/edit/${_id}`}>
-          <PencilSquareIcon className="w-4 hover:cursor-pointer" />
+          <PencilSquareIcon className="w-4 my-4 sm:w-8 hover:cursor-pointer" />
         </Link>
+        <DocumentMinusIcon
+          className="w-4 my-4 sm:w-8 hover:cursor-pointer"
+          onClick={() => {
+            if (
+              confirm(
+                `Confirm delete: 
+            Date: ${date}
+            Code/Name: ${code} / ${name}`
+              )
+            ) {
+              fetch(`/api/transaction/${_id}`, { method: "delete" });
+              setIsStale(true);
+            }
+          }}
+        />
       </td>
     </tr>
   );

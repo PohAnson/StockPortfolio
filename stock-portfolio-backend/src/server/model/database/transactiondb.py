@@ -30,6 +30,9 @@ class TransactionDb:
     ) -> UpdateResult:
         return self.coll.update_one({"_id": transaction_id}, {"$set": data})
 
+    def delete_transaction_by_id(self, transaction_id):
+        return self.coll.delete_one({"_id": transaction_id})
+
     def find_all_transaction(self, *, filter={}) -> list:
         data = [
             Transaction.from_dict(record) for record in self.coll.find(filter)
