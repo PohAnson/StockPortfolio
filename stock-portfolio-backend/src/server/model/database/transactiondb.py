@@ -2,6 +2,7 @@ import secrets
 import string
 
 from pymongo import MongoClient
+from pymongo.results import UpdateResult
 
 from ..transaction import Transaction
 
@@ -24,11 +25,19 @@ class TransactionDb:
         self.coll.insert_one(data)
         return data
 
+    def update_one_transaction_by_id(
+        self, transaction_id, data
+    ) -> UpdateResult:
+        return self.coll.update_one({"_id": transaction_id}, {"$set": data})
+
     def find_all_transaction(self, *, filter={}) -> list:
         data = [
             Transaction.from_dict(record) for record in self.coll.find(filter)
         ]
         return data
+
+    def find_one_transaction_by_id(self, transaction_id, *, mask=None):
+        return self.coll.find_one({"_id": transaction_id}, mask)
 
     @staticmethod
     def generate_transaction_id():

@@ -4,14 +4,44 @@ import { useState } from "react";
 import TradeDateField from "./fields/TradeDateField";
 import TradePriceField from "./fields/TradePriceField";
 import TradeVolumeField from "./fields/TradeVolumeField";
+import { useRouter } from "next/router";
 
-export default function TransactionForm({ showMessage }) {
+export default function TransactionForm({
+  showMessage,
+  isEdit,
+  data,
+  transactionId,
+}) {
+  let router = useRouter();
+
+  let {
+    code = null,
+    date = null,
+    name = null,
+    price = null,
+    type_ = null,
+    volume = null,
+  } = data != null ? data : {};
   // init useState for all fields
-  const [tradeDate, setTradeDate] = useState(null);
-  const [tradeType, setTradeType] = useState(null);
-  const [selectedStock, setSelectedStock] = useState({});
-  const [tradePrice, setTradePrice] = useState(null);
-  const [tradeVolume, setTradeVolume] = useState(null);
+  const [tradeDate, setTradeDate] = useState(date || null);
+  const [tradeType, setTradeType] = useState(type_ || null);
+  const [selectedStock, setSelectedStock] = useState(
+    code != null && name != null
+      ? {
+          TradingCode: code,
+          TradingName: name,
+        }
+      : {}
+  );
+  const [tradePrice, setTradePrice] = useState(price || null);
+  const [tradeVolume, setTradeVolume] = useState(volume || null);
+  function resetFields() {
+    setTradeDate(null);
+    setSelectedStock(null);
+    setTradeType(null);
+    setTradePrice(null);
+    setTradeVolume(null);
+  }
 
   function submitForm(e) {
     e.preventDefault();
@@ -29,11 +59,15 @@ export default function TransactionForm({ showMessage }) {
       formData.date = `${date}/${month}/${year}`;
     }
 
-    fetch("/api/transaction", {
-      method: "post",
+    fetch(isEdit ? `/api/transaction/${transactionId}` : "/api/transaction", {
+      method: isEdit ? "put" : "post",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
     }).then((r) => showMessage(r.status, r.json()));
+    if (isEdit) {
+      router.back();
+    }
+    resetFields();
   }
   return (
     <>

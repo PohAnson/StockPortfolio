@@ -42,6 +42,44 @@ def post_transaction():
     return jsonify(data)
 
 
+@app.route("/api/transaction/<transaction_id>", methods=["GET"])
+def get_transaction_by_id(transaction_id):
+    result = db.find_one_transaction_by_id(
+        transaction_id,
+        mask={
+            "code": 1,
+            "date": 1,
+            "name": 1,
+            "price": 1,
+            "type_": 1,
+            "volume": 1,
+        },
+    )
+    if result is None:
+        return (
+            jsonify(
+                {"Error": f"No such transaction '{transaction_id}' was found."}
+            ),
+            404,
+        )
+    stock_name = db.find_one_stock(result["code"])["TradingName"]
+    result["name"] = stock_name
+    result["date"] = result["date"].strftime("%Y-%m-%d")
+    return jsonify(result)
+
+
+@app.route("/api/transaction/<transaction_id>", methods=["PUT"])
+def put_transaction(transaction_id):
+    transaction_dict = Transaction.from_dict(
+        request.json, {"userid": 0}).to_dict()
+    transaction_dict.pop("_id")
+    transaction_dict.pop("userid")
+    result = db.update_one_transaction_by_id(
+        transaction_id, transaction_dict)
+
+    return jsonify({"ok": result.acknowledged})
+
+
 @app.route("/api/portfolio")
 def get_portfolio():
     userid = request.args.get("userid", None)

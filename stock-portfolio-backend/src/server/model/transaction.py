@@ -125,21 +125,29 @@ class Transaction:
         return cls.from_dict(json.loads(json_str))
 
     @classmethod
-    def from_dict(cls, _dict) -> "Transaction":
+    def from_dict(cls, _dict, mask={}) -> "Transaction":
         # check if all the required fields is present
-        fields = ["date", "code", "type_", "price", "volume", "userid"]
-        missing_field = list(
-            filter(
-                lambda field: field not in _dict or _dict[field] is None,
-                fields,
-            )
-        )
+        # 1 means must be present
+        # 0 means optional
+        fields = {
+            "date": 1,
+            "code": 1,
+            "type_": 1,
+            "price": 1,
+            "volume": 1,
+            "userid": 1,
+            "_id": 0,
+        }
+        fields.update(mask)
+        missing_field = []
+        for k, v in fields.items():
+            if v and (k not in _dict or _dict[k] is None):
+                missing_field.append(k)
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
         return cls(**_dict)
 
     def to_dict(self) -> dict:
-        print(self._id)
         return {
             "date": self.date,
             "code": self.code,

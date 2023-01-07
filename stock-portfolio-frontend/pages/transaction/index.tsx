@@ -1,3 +1,4 @@
+import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import LoadingPage from "../../components/Loading";
@@ -69,6 +70,11 @@ function Transaction({ data }) {
       <td>{price.toFixed(3)}</td>
       <td>{volume}</td>
       <td>{(parseFloat(price) * parseInt(volume)).toFixed(2)}</td>
+      <td className="w-4">
+        <Link href={`/transaction/edit/${_id}`}>
+          <PencilSquareIcon className="w-4 hover:cursor-pointer" />
+        </Link>
+      </td>
     </tr>
   );
 }

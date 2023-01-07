@@ -50,7 +50,6 @@ class UserDb:
         hashed_pw = self.ph.hash(user_data["password"])
         user_data["password"] = hashed_pw
         result = self.coll.insert_one(user_data)
-        print(type(result.inserted_id))
         return result.inserted_id
 
     def find_one_user(self, username: str, show_password=False) -> dict:
