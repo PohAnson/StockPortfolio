@@ -100,7 +100,7 @@ def get_pnl():
     userid = request.args.get("userid", None)
     ledger = get_ledger(userid)
 
-    return jsonify([rec for rec in ledger.to_json() if rec["volume"] == 0])
+    return jsonify(ledger.to_json())
 
 
 @app.route("/api/login", methods=["POST"])
@@ -129,7 +129,7 @@ def post_signup():
         print(e)
         return jsonify({"error": str(e)}), 406
 
-    return {"userid": userid}, 200
+    return {"userid": str(userid)}, 200
 
 
 app.run(debug=True)

@@ -71,18 +71,18 @@ function Transaction({ data, setIsStale }) {
       <td>{price.toFixed(3)}</td>
       <td>{volume}</td>
       <td>{(parseFloat(price) * parseInt(volume)).toFixed(2)}</td>
-      <td className="w-6">
+      <td className="w-6 md:w-full md:flex">
         <Link href={`/transaction/edit/${_id}`}>
-          <PencilSquareIcon className="w-4 my-4 sm:w-8 hover:cursor-pointer" />
+          <PencilSquareIcon className="w-4 my-2 sm:w-8 md:mx-2 hover:cursor-pointer" />
         </Link>
         <DocumentMinusIcon
-          className="w-4 my-4 sm:w-8 hover:cursor-pointer"
+          className="w-4 my-2 sm:w-8 md:mx-2 hover:cursor-pointer"
           onClick={() => {
             if (
               confirm(
                 `Confirm delete: 
-            Date: ${date}
-            Code/Name: ${code} / ${name}`
+        Date: ${date}
+        Code/Name: ${code} / ${name}`
               )
             ) {
               fetch(`/api/transaction/${_id}`, { method: "delete" });
