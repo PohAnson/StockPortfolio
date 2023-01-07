@@ -15,32 +15,37 @@ export default function TransactionForm({
   let router = useRouter();
 
   let {
-    code = null,
-    date = null,
-    name = null,
-    price = null,
-    type_ = null,
-    volume = null,
+    code = "",
+    date = "",
+    name = "",
+    price = "",
+    type_ = "",
+    volume = "",
   } = data != null ? data : {};
+
   // init useState for all fields
-  const [tradeDate, setTradeDate] = useState(date || null);
-  const [tradeType, setTradeType] = useState(type_ || null);
+  const [tradeDate, setTradeDate] = useState(date);
+  const [tradeType, setTradeType] = useState(type_);
   const [selectedStock, setSelectedStock] = useState(
-    code != null && name != null
+    code != "" && name != ""
       ? {
           TradingCode: code,
           TradingName: name,
         }
       : {}
   );
-  const [tradePrice, setTradePrice] = useState(price || null);
-  const [tradeVolume, setTradeVolume] = useState(volume || null);
+  const [tradePrice, setTradePrice] = useState(price);
+  const [tradeVolume, setTradeVolume] = useState(volume);
+
   function resetFields() {
-    setTradeDate(null);
-    setSelectedStock(null);
-    setTradeType(null);
-    setTradePrice(null);
-    setTradeVolume(null);
+    setTradeDate("");
+    setSelectedStock({
+      TradingCode: "",
+      TradingName: "",
+    });
+    setTradeType("");
+    setTradePrice("");
+    setTradeVolume("");
   }
 
   function submitForm(e) {
@@ -63,11 +68,15 @@ export default function TransactionForm({
       method: isEdit ? "put" : "post",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
-    }).then((r) => showMessage(r.status, r.json()));
+    }).then((r) => {
+      showMessage(r.status, r.json());
+      if (r.status == 200) {
+        resetFields();
+      }
+    });
     if (isEdit) {
       router.back();
     }
-    resetFields();
   }
   return (
     <>

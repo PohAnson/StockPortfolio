@@ -70,8 +70,10 @@ class Transaction:
         """
 
         if type(date) is str:
-            date = datetime.strptime(date, "%d/%m/%Y")
-
+            try:
+                date = datetime.strptime(date, "%d/%m/%Y")
+            except ValueError:
+                raise ValueError("Invalid Date")
         # validate that the date is in range
         if date <= datetime(2000, 1, 1) or date >= datetime(3000, 1, 1):
             raise ValueError(f"Invalid Date of {date.strftime('%d/%m/%Y')}")
