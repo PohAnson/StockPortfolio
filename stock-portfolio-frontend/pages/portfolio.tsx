@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Card from "../components/Card";
 import LoadingPage from "../components/Loading";
 
 export default function PortfolioPage() {
@@ -26,10 +27,20 @@ export default function PortfolioPage() {
       </table>
     </div>
   );
+  let loadedPage =
+    portfolioData == null || portfolioData.length === 0 ? (
+      <Card>
+        <p className="text-lg font-semibold text-center">
+          No Transaction Found
+        </p>
+      </Card>
+    ) : (
+      table
+    );
   return (
     <>
       <h1>Portfolio</h1>
-      {portfolioData == null ? <LoadingPage /> : table}
+      {portfolioData == null ? <LoadingPage /> : loadedPage}
     </>
   );
 }

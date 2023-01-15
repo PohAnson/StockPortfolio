@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Card from "../components/Card";
 import LoadingPage from "../components/Loading";
 
 export default function NetPage() {
@@ -25,10 +26,20 @@ export default function NetPage() {
       </table>
     </div>
   );
+  let loadedPage =
+    pnlData == null || pnlData.length === 0 ? (
+      <Card>
+        <p className="text-lg font-semibold text-center">
+          No Transaction Found
+        </p>
+      </Card>
+    ) : (
+      table
+    );
   return (
     <>
       <h1>Net Profit/Loss</h1>
-      {pnlData == null ? <LoadingPage /> : table}
+      {pnlData == null ? <LoadingPage /> : loadedPage}
     </>
   );
 }

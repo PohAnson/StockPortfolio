@@ -1,6 +1,7 @@
 import { PencilSquareIcon, DocumentMinusIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Card from "../../components/Card";
 import LoadingPage from "../../components/Loading";
 
 export default function TransactionPage() {
@@ -34,6 +35,16 @@ export default function TransactionPage() {
       </table>
     </div>
   );
+  let loadedPage =
+    transactionData == null || transactionData.length === 0 ? (
+      <Card>
+        <p className="text-lg font-semibold text-center">
+          No Transaction Found
+        </p>
+      </Card>
+    ) : (
+      table
+    );
   return (
     <>
       <h1>Transaction History</h1>
@@ -43,7 +54,7 @@ export default function TransactionPage() {
         </p>
       </Link>
 
-      {transactionData == null ? <LoadingPage /> : table}
+      {transactionData == null ? <LoadingPage /> : loadedPage}
     </>
   );
 }
