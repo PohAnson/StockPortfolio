@@ -1,5 +1,6 @@
 import { PencilSquareIcon, DocumentMinusIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Card from "../../components/Card";
 import LoadingPage from "../../components/Loading";
@@ -7,12 +8,19 @@ import LoadingPage from "../../components/Loading";
 export default function TransactionPage() {
   const [transactionData, setTransactionData] = useState(null);
   const [isStale, setIsStale] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     fetch("/api/transaction")
       .then((r) => r.json())
-      .then(setTransactionData)
+      .then((json) => {
+        if ("error" in json) {
+          router.push("/login");
+        } else {
+          setTransactionData(json);
+        }
+      })
       .then(() => setIsStale(false));
-  }, [isStale]);
+  }, [isStale, router]);
   let table = (
     <div className="overflow-auto">
       <table className="text-xs md:text-base">
