@@ -101,6 +101,7 @@ export default function TransactionForm({
         />
         <input
           type="submit"
+          value={isEdit ? "Update" : "Submit"}
           className="col-span-2 px-10 hover:shadow-md place-self-center hover:bg-blue-100"
         />
       </form>

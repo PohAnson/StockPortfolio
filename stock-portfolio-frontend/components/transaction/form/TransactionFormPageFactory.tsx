@@ -10,8 +10,7 @@ export default function TransactionFormPageFactory(
   data = null,
   transactionId = null
 ) {
-  async function showMessage(status_code, json_data) {
-    json_data = await json_data;
+  function showMessage(status_code, json_data) {
     // Success
     if (status_code == 200) {
       setMessage(
