@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import json
 from datetime import datetime
 from typing import Union
-from .stock_code_name_dict import stock_code_name_dict
+
+from data.stock_code_name_dict import stock_code_name_dict
 
 
 class Transaction:

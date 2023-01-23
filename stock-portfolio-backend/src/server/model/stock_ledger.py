@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import Any
-from .transaction import Transaction
-from .stock_code_name_dict import stock_code_name_dict
-from ..data_structure import SortedSet
+
+from data.stock_code_name_dict import stock_code_name_dict
+from server.data_structure import SortedSet
+from server.model.transaction import Transaction
 
 
 class _StockRecord:
@@ -10,7 +12,7 @@ class _StockRecord:
     def __init__(self, code: str) -> None:
         self.code = code
 
-        self.transaction_set: set[Transaction] = SortedSet("date")
+        self.transaction_set: SortedSet[Transaction] = SortedSet("date")
 
     @property
     def avg_price(self):
@@ -45,7 +47,7 @@ class _StockRecord:
         pnl = 0  # the net profit/loss when vol is zero, +ve is profit
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
-            total_cost += self.calculate_broker_fees(value)
+            total_cost += self.calculate_fees(value, transaction.date)
             if transaction.type_ == "buy":
                 total_cost += value
                 total_volume += transaction.volume
@@ -62,7 +64,7 @@ class _StockRecord:
         total_cost = 0
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
-            total_cost += self.calculate_broker_fees(value)
+            total_cost += self.calculate_fees(value, transaction.date)
             if transaction.type_ == "buy":
                 total_cost += value
             elif transaction.type_ == "sell":
@@ -88,7 +90,7 @@ class _StockRecord:
         }
 
     @staticmethod
-    def calculate_broker_fees(value):
+    def calculate_fees(value: float, date: datetime):
         commision = max(25, 0.28 / 100 * value)
         clearing = round(0.0325 / 100 * value, 2)
         trading_access = round(0.0075 / 100 * value, 2)
@@ -96,7 +98,8 @@ class _StockRecord:
         sub_sum = sum(
             [commision, clearing, trading_access, settlement_instruction]
         )
-        tax = round(7 / 100 * sub_sum, 2)
+        tax_rate_percentage = 7 if date < datetime(2023, 1, 1) else 8
+        tax = round(tax_rate_percentage / 100 * sub_sum, 2)
         return sum([sub_sum, tax])
 
 
@@ -108,7 +111,7 @@ class Ledger:
         return self.__str__()
 
     def __str__(self) -> str:
-        return str(self.to_json())
+        return str(self.to_dict())
 
     def add_transaction(self, transaction: Transaction) -> None:
         if transaction.code not in self.stock_recs:
@@ -119,7 +122,7 @@ class Ledger:
         for transaction in transactions:
             self.add_transaction(transaction)
 
-    def to_json(self) -> list[dict[str, Any]]:
+    def to_dict(self) -> list[dict[str, Any]]:
         ledger_json = []
         for rec in self.stock_recs.values():
             ledger_json.append(rec.to_dict())

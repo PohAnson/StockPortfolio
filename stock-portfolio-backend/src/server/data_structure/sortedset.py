@@ -1,14 +1,16 @@
-from typing import Any, Union
-from collections.abc import Sequence, MutableSet, Mapping
+from collections.abc import MutableSet, Sequence
+from typing import Any, Generator, Generic, Mapping, TypeVar, Union
+
+T = TypeVar("T", bound=Mapping)
 
 
-class SortedSet(Sequence, MutableSet):
+class SortedSet(Sequence, MutableSet, Generic[T]):
     """Sort by an key in ascending order,
     and ensure that all the elements are unique."""
 
     def __init__(self, key: Union[str, int]) -> None:
         self.key = key
-        self.__data: list[Mapping] = []
+        self.__data: list[T] = []
 
     def __contains__(self, value) -> bool:
         return any(
@@ -21,13 +23,13 @@ class SortedSet(Sequence, MutableSet):
         else:
             del self.__data
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> T:
         return self.__data[index]
 
     def __len__(self):
         return len(self.__data)
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[T, None, None]:
         for data in self.__data:
             yield data
 
@@ -48,7 +50,7 @@ class SortedSet(Sequence, MutableSet):
             stop (int, optional): the ending index. Defaults to None.
 
         Returns:
-            int: the index where it is found at.
+            int: the index where it is found at. None if it is not found.
         """
         for i, elm in enumerate(self.__data[start:stop], start):
             if value == elm:

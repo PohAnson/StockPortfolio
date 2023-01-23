@@ -2,7 +2,7 @@ from argon2 import PasswordHasher
 from pymongo import MongoClient
 
 
-class UserDb:
+class _UserDb:
     ph = PasswordHasher()
 
     def __init__(self, client: MongoClient):
@@ -75,3 +75,6 @@ class UserDb:
             self.coll.delete_one({"username": user_data["username"]})
             self.insert_one_user(user_data)
         return verify_result
+
+
+userdb = _UserDb(MongoClient())

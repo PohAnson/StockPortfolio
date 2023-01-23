@@ -3,7 +3,7 @@ from typing import Union
 from pymongo import MongoClient
 
 
-class StockDb:
+class _StockDb:
     def __init__(self, client: MongoClient):
         self.coll = client["data"]["stock_data"]
 
@@ -17,3 +17,6 @@ class StockDb:
             Union[dict, None]: return None if invalid code is given.
         """
         return self.coll.find_one({"_id": stock_code})
+
+
+stockdb = _StockDb(MongoClient())

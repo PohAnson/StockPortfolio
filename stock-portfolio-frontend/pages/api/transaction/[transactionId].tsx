@@ -4,11 +4,11 @@ export default async function handler(req, res) {
   let statusCode, json;
   if (req.method == "GET") {
     [statusCode, json] = await fetch(
-      process.env.BACKEND_SERVER_URL + `/api/transaction/${transactionId}`
+      process.env.API_URL + `/transaction/${transactionId}`
     ).then(async (r) => [r.status, await r.json()]);
   } else if (req.method == "PUT") {
     [statusCode, json] = await fetch(
-      process.env.BACKEND_SERVER_URL + `/api/transaction/${transactionId}`,
+      process.env.API_URL + `/transaction/${transactionId}`,
       {
         method: "put",
         body: JSON.stringify({ ...req.body }),
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     ).then(async (r) => [r.status, await r.json()]);
   } else if (req.method == "DELETE") {
     [statusCode, json] = await fetch(
-      process.env.BACKEND_SERVER_URL + `/api/transaction/${transactionId}`,
+      process.env.API_URL + `/transaction/${transactionId}`,
       {
         method: "delete",
       }

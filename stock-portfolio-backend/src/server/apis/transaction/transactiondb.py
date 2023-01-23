@@ -4,10 +4,10 @@ import string
 from pymongo import MongoClient
 from pymongo.results import UpdateResult
 
-from ..transaction import Transaction
+from server.model.transaction import Transaction
 
 
-class TransactionDb:
+class _TransactionDb:
     def __init__(self, client: MongoClient):
         self.coll = client["test_data"]["transactions"]
 
@@ -48,3 +48,6 @@ class TransactionDb:
         return "".join(
             secrets.choice(string.ascii_lowercase) for _ in range(7)
         )
+
+
+transactiondb = _TransactionDb(MongoClient())
