@@ -1,17 +1,11 @@
-import { withSessionRoute } from "../../lib/session";
+import { putJsonHandler } from "../../lib/baseApiHandler";
 
-export default withSessionRoute(async function handler(req, res) {
+export default async function handler(req, res) {
   console.log(req.method, "/api/signup");
-  let [statusCode, json] = await fetch(process.env.API_URL + "/user", {
-    method: "PUT",
-    body: JSON.stringify(req.body),
-    headers: { "Content-Type": "application/json" },
-  }).then(async (r) => [r.status, await r.json()]);
-  if (statusCode == 200) {
-    req.session.user = { ...json };
-    await req.session.save();
-    res.status(200).json(json);
-  } else {
-    res.status(statusCode).json(json);
-  }
-});
+  let [statusCode, json] = await putJsonHandler(
+    process.env.API_URL + "/user",
+    req.body
+  );
+  res.setHeader("Set-Cookie", `sassyid=${json.sassyid}`);
+  res.status(statusCode).json(json);
+}

@@ -33,9 +33,10 @@ class _TransactionDb:
     def delete_transaction_by_id(self, transaction_id):
         return self.coll.delete_one({"_id": transaction_id})
 
-    def find_all_transaction(self, *, filter={}) -> list:
+    def find_all_transaction(self, *, filter_dict={}) -> list:
         data = [
-            Transaction.from_dict(record) for record in self.coll.find(filter)
+            Transaction.from_dict(record)
+            for record in self.coll.find(filter_dict)
         ]
         return data
 

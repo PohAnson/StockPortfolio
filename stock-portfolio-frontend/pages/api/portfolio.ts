@@ -1,11 +1,12 @@
-import { withUserSessionRoute } from "../../lib/session";
+import { NextApiRequest } from "next";
+import { getJsonHandler } from "../../lib/baseApiHandler";
 
-export default withUserSessionRoute(async function handler(req, res, user) {
+export default async function handler(req: NextApiRequest, res) {
   console.log(req.method, "/api/portfolio");
   let statusCode, json;
-  [statusCode, json] = await fetch(
-    process.env.API_URL + `/portfolio?userid=${user.userid}`
-  ).then(async (r) => [r.status, await r.json()]);
-
+  [statusCode, json] = await getJsonHandler(
+    process.env.API_URL + `/portfolio`,
+    req.cookies.sassyid
+  );
   res.status(statusCode).json(json);
-});
+}

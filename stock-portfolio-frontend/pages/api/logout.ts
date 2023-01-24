@@ -1,7 +1,6 @@
-import { withIronSessionApiRoute } from "iron-session/next";
-import { sessionOptions } from "../../lib/session";
+import { getJsonHandler } from "../../lib/baseApiHandler";
 
-export default withIronSessionApiRoute(function logoutRoute(req, res) {
-  req.session.destroy();
+export default function logoutRoute(req, res) {
+  getJsonHandler(process.env.API_URL + "/user/logout", req.cookies.sassyid);
   res.redirect("/");
-}, sessionOptions);
+}

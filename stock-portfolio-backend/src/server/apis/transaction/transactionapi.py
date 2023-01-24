@@ -11,12 +11,12 @@ transaction_api_bp = Blueprint(
 
 @transaction_api_bp.get("")
 def get_transaction():
-    userid = request.args.get("userid", None)
-    print(transactiondb)
+    userid = request.environ.get("userid", None)
+    if userid is None:
+        return jsonify({"error": "No valid user"})
     transactions = transactiondb.find_all_transaction(
-        filter={"userid": userid} if userid else {}
+        filter_dict={"userid": userid}
     )
-
     return jsonify([transaction.jsonify() for transaction in transactions])
 
 
@@ -24,14 +24,12 @@ def get_transaction():
 def post_transaction():
     try:
         transaction = Transaction.from_dict(
-            {**request.json}
-        )  # "userid": userid})
-        print(transaction)
+            {**request.json, "userid": request.environ.get("userid")}
+        )
     except ValueError as e:
         print(e)
         return jsonify({"error": str(e)}), 406
     data = transactiondb.insert_one_transaction(transaction)
-    print(data)
     return jsonify(data)
 
 

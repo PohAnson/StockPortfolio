@@ -8,13 +8,13 @@ portfolio_api_bp = Blueprint("portfolio", __name__, url_prefix="portfolio")
 
 @portfolio_api_bp.get("")
 def get_portfolio():
-    userid = request.args.get("userid", None)
+    userid = request.environ.get("userid", None)
     if userid is None:
-        return jsonify({"error": "No valid userid given"}), 400
+        return jsonify({"error": "No valid user"}), 400
 
     ledger = Ledger()
     ledger.add_transactions(
-        transactiondb.find_all_transaction(filter={"userid": userid})
+        transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
 
     return jsonify([rec for rec in ledger.to_dict() if rec["volume"] != 0])

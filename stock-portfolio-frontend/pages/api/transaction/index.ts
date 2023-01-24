@@ -1,25 +1,21 @@
-import { withUserSessionRoute } from "../../../lib/session";
+import { getJsonHandler, postJsonHandler } from "../../../lib/baseApiHandler";
 
-export default withUserSessionRoute(async function handler(req, res, user) {
+export default async function handler(req, res) {
   console.log(req.method, `/api/transaction`);
   let statusCode, json;
   if (req.method == "GET") {
-    [statusCode, json] = await fetch(
-      process.env.API_URL + `/transaction?userid=${user.userid}`
-    ).then(async (r) => [r.status, await r.json()]);
+    [statusCode, json] = await getJsonHandler(
+      process.env.API_URL + `/transaction`,
+      req.cookies.sassyid
+    );
   } else if (req.method == "POST") {
-    [statusCode, json] = await fetch(
-      process.env.API_URL + `/transaction?userid=${user.userid}`,
-      {
-        method: "POST",
-        body: JSON.stringify({ ...req.body, userid: user.userid }),
-        headers: { "Content-Type": "application/json" },
-      }
-    ).then(async (r) => {
-      return [r.status, await r.json()];
-    });
+    [statusCode, json] = await postJsonHandler(
+      process.env.API_URL + `/transaction`,
+      req.body,
+      req.cookies.sassyid
+    );
   } else {
     res.status(405).json({ error: `Invalid method ${req.method}` });
   }
   res.status(statusCode).json(json);
-});
+}

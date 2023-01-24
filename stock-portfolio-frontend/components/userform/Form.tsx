@@ -64,7 +64,7 @@ export default function FormFactory(formType: "Login" | "Sign Up") {
       )}
       <form
         onSubmit={formType == "Login" ? submitFormLogin : submitFormSignup}
-        method="post"
+        method="POST"
         className="grid grid-cols-[1fr_1.5fr] gap-y-6 p-4 sm:p-8"
       >
         {formType == "Sign Up" && <NameField name={name} setName={setName} />}

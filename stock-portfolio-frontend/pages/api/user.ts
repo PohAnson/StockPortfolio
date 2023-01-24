@@ -1,14 +1,10 @@
-import { withSessionRoute } from "../../lib/session";
-export interface User {
-  isLogin: boolean;
-  userid: string;
-  name: string;
-}
+import { getJsonHandler } from "../../lib/baseApiHandler";
 
-export default withSessionRoute(function userRoute(req, res) {
-  if (req.session.user) {
-    res.json({ ...req.session.user, isLogin: true });
-  } else {
-    res.json({ isLogin: false });
-  }
-});
+export default async function handler(req, res) {
+  console.log(req.method, "/api/user");
+  let [statusCode, json] = await getJsonHandler(
+    process.env.API_URL + "/user",
+    req.cookies.sessionId
+  );
+  res.status(statusCode).json(json);
+}

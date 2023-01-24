@@ -4,7 +4,7 @@ import { useState } from "react";
 import TradeDateField from "./fields/TradeDateField";
 import TradePriceField from "./fields/TradePriceField";
 import TradeVolumeField from "./fields/TradeVolumeField";
-import { useRouter } from "next/router";
+import Router from "next/router";
 
 export default function TransactionForm({
   showMessage,
@@ -12,8 +12,6 @@ export default function TransactionForm({
   data,
   transactionId,
 }) {
-  let router = useRouter();
-
   let {
     code = "",
     date = "",
@@ -65,22 +63,22 @@ export default function TransactionForm({
     }
 
     fetch(isEdit ? `/api/transaction/${transactionId}` : "/api/transaction", {
-      method: isEdit ? "put" : "post",
+      method: isEdit ? "PUT" : "POST",
       body: JSON.stringify(formData),
       headers: { "Content-Type": "application/json" },
-    }).then((r) => {
-      showMessage(r.status, r.json());
+    }).then(async (r) => {
+      showMessage(r.status, await r.json());
       if (r.status == 200) {
         resetFields();
       }
     });
     if (isEdit) {
-      router.back();
+      Router.back();
     }
   }
   return (
     <>
-      <h1>Create Transaction</h1>
+      <h1>{isEdit ? "Update" : "Create"} Transaction</h1>
       <form
         onSubmit={submitForm}
         className="grid items-center w-11/12 grid-cols-[1fr_1.5fr] md:p-8 m-auto gap-y-6 rounded-2xl"

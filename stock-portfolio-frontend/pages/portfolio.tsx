@@ -1,3 +1,4 @@
+import Router from "next/router";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 import LoadingPage from "../components/Loading";
@@ -7,7 +8,13 @@ export default function PortfolioPage() {
   useEffect(() => {
     fetch("/api/portfolio")
       .then((r) => r.json())
-      .then(setPortfolioData);
+      .then((r) => {
+        if ("error" in r) {
+          Router.replace("/login");
+        } else {
+          setPortfolioData(r);
+        }
+      });
   }, []);
   let table = (
     <div className="overflow-auto">

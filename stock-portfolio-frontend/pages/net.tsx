@@ -1,23 +1,22 @@
-import { useRouter } from "next/router";
+import Router from "next/router";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 import LoadingPage from "../components/Loading";
 
 export default function NetPage() {
   let [pnlData, setPnlData] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/pnl")
       .then((r) => r.json())
       .then((json) => {
         if ("error" in json) {
-          router.push("/login")
+          Router.replace("/login");
         } else {
           setPnlData(json);
         }
       });
-  }, [router]);
+  }, []);
 
   let table = (
     <div className="overflow-auto">

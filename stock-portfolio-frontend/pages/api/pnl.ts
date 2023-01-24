@@ -1,10 +1,11 @@
-import { withUserSessionRoute } from "../../lib/session";
+import { getJsonHandler } from "../../lib/baseApiHandler";
 
-export default withUserSessionRoute(async function handler(req, res, user) {
+export default async function handler(req, res) {
   console.log(req.method, "/api/pnl");
-  let [statusCode, json] = await fetch(
-    process.env.API_URL + `/pnl?userid=${user.userid}`
-  ).then(async (r) => [r.status, await r.json()]);
+  let [statusCode, json] = await getJsonHandler(
+    process.env.API_URL + `/pnl`,
+    req.cookies.sassyid
+  );
 
   res.status(statusCode).json(json);
-});
+}
