@@ -1,6 +1,7 @@
 import secrets
 import string
 
+import pymongo
 from pymongo import MongoClient
 from pymongo.results import UpdateResult
 
@@ -36,7 +37,9 @@ class _TransactionDb:
     def find_all_transaction(self, *, filter_dict={}) -> list:
         data = [
             Transaction.from_dict(record)
-            for record in self.coll.find(filter_dict)
+            for record in self.coll.find(filter_dict).sort(
+                "date", pymongo.ASCENDING
+            )
         ]
         return data
 

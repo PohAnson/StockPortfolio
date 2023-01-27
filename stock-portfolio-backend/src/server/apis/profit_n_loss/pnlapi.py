@@ -19,4 +19,4 @@ def get_pnl():
         transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
 
-    return jsonify(ledger.to_dict())
+    return jsonify([x for x in ledger.to_dict() if x["pnl"] != 0])
