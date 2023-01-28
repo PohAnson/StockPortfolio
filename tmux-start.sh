@@ -16,7 +16,8 @@ then
     tmux split-window -v  -c "stock-portfolio-backend"
     tmux send-keys -t 1 "source venv/bin/activate" C-m
     tmux send-keys -t 1 "python src/main.py" C-m
-    tmux split-window  -v -c "stock-portfolio-backend" "./start_mongo_server.sh"
+    tmux split-window  -v -c "stock-portfolio-backend" 
+    tmux send-keys -t 2 "./start_mongo_server.sh" C-m
     tmux select-layout even-vertical
     
     window=1
