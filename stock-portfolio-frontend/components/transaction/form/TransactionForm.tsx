@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+import BrokerField from "./fields/BrokerField";
 import StockCodeSearch from "./fields/StockCodeSearch";
 import TradeDateField from "./fields/TradeDateField";
 import TradePriceField from "./fields/TradePriceField";
@@ -20,10 +21,12 @@ export default function TransactionForm({
     price = "",
     type_ = "",
     volume = "",
+    broker = "",
   } = data != null ? data : {};
 
   // init useState for all fields
   const [tradeDate, setTradeDate] = useState(date);
+  const [tradeBroker, setTradeBroker] = useState(broker);
   const [tradeType, setTradeType] = useState(type_);
   const [selectedStock, setSelectedStock] = useState(
     code != "" && name != ""
@@ -42,6 +45,7 @@ export default function TransactionForm({
       TradingCode: "",
       TradingName: "",
     });
+    setTradeBroker("");
     setTradeType("");
     setTradePrice("");
     setTradeVolume("");
@@ -52,6 +56,7 @@ export default function TransactionForm({
     let formData = {
       date: tradeDate,
       code: selectedStock["TradingCode"],
+      broker: tradeBroker,
       type_: tradeType,
       price: parseFloat(tradePrice),
       volume: parseInt(tradeVolume),
@@ -88,6 +93,10 @@ export default function TransactionForm({
         <StockCodeSearch
           selectedStock={selectedStock}
           setSelectedStock={setSelectedStock}
+        />
+        <BrokerField
+          tradeBroker={tradeBroker}
+          setTradeBroker={setTradeBroker}
         />
         <TradeTypeField tradeType={tradeType} setTradeType={setTradeType} />
         <TradePriceField

@@ -56,7 +56,7 @@ class _StockRecord:
         transactions = []
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
-            fees = self.calculate_fees(value, transaction.date)
+            fees = transaction.calculate_fees()
 
             if transaction.type_ == "buy":
                 transactions.append(
@@ -120,7 +120,7 @@ class _StockRecord:
         total_cost = 0
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
-            total_cost += self.calculate_fees(value, transaction.date)
+            total_cost += transaction.calculate_fees()
             if transaction.type_ == "buy":
                 total_cost += value
             elif transaction.type_ == "sell":
@@ -154,19 +154,6 @@ class _StockRecord:
             "dividends_breakdown": dividends_breakdown,
             "dividends_sum": dividends_sum,
         }
-
-    @staticmethod
-    def calculate_fees(value: float, date: datetime):
-        commission = max(25, 0.28 / 100 * value)
-        clearing = round(0.0325 / 100 * value, 2)
-        trading_access = round(0.0075 / 100 * value, 2)
-        settlement_instruction = 0.35
-        sub_sum = sum(
-            [commission, clearing, trading_access, settlement_instruction]
-        )
-        tax_rate_percentage = 7 if date < datetime(2023, 1, 1) else 8
-        tax = round(tax_rate_percentage / 100 * sub_sum, 2)
-        return sum([sub_sum, tax])
 
 
 class Ledger:

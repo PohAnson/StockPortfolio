@@ -19,7 +19,7 @@ export default function NetPage() {
           setPnlData(json);
         }
       });
-  }, []);
+  }, [router]);
   let totalEarnings, totalDividend, totalTransaction;
   if (pnlData != null) {
     totalTransaction = pnlData

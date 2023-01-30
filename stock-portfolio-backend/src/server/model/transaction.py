@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+from platform import platform
 from typing import Literal, Union
 
 from data.stock_code_name_dict import stock_code_name_dict
@@ -15,11 +16,13 @@ class Transaction:
         type_: Literal["buy", "sell"],
         price: float,
         volume: int,
+        broker: Literal["poems", "moomoo"],
         _id=None,
         userid=None,
     ):
         self.date: datetime = date
         self.code: str = code
+        self.broker = broker
         self.type_: Literal["buy", "sell"] = type_
         self.price: float = price
         self.volume: int = volume
@@ -88,8 +91,19 @@ class Transaction:
     @code.setter
     def code(self, code):
         if code not in stock_code_name_dict.keys():
-            raise ValueError(f"Invalid Code of {code}")
+            raise ValueError(f"Invalid Stock Code of {code}")
         self._code = code
+
+    @property
+    def broker(self):
+        return self._broker
+
+    @broker.setter
+    def broker(self, broker):
+        broker_list = ["poems", "moomoo"]
+        if broker not in broker_list:
+            raise ValueError(f"Invalid Broker of {broker}")
+        self._broker = broker
 
     @property
     def type_(self):
@@ -124,6 +138,27 @@ class Transaction:
         except ValueError:
             raise ValueError(f"Invalid Volume of {vol}")
 
+    def calculate_fees(self) -> float:
+        value = self.price * self.volume
+        clearing = round(0.0325 / 100 * value, 2)
+        trading_access = round(0.0075 / 100 * value, 2)
+
+        if self.broker == "poems":
+            commission = max(25, 0.28 / 100 * value)
+            settlement_instruction = 0.35
+            sub_sum = sum(
+                [commission, clearing, trading_access, settlement_instruction]
+            )
+
+        elif self.broker == "moomoo":
+            commission = max(0.99, 0.03 / 100 * value)
+            platform_fee = commission  # calculated in the same way
+            sub_sum = sum([commission, platform_fee, clearing, trading_access])
+
+        tax_rate_percentage = 7 if self.date < datetime(2023, 1, 1) else 8
+        tax = round(tax_rate_percentage / 100 * sub_sum, 2)
+        return sum([sub_sum, tax])
+
     @classmethod
     def from_jsonstr(cls, json_str) -> "Transaction":
         return cls.from_dict(json.loads(json_str))
@@ -136,6 +171,7 @@ class Transaction:
         fields = {
             "date": 1,
             "code": 1,
+            "broker": 1,
             "type_": 1,
             "price": 1,
             "volume": 1,
@@ -155,6 +191,7 @@ class Transaction:
         return {
             "date": self.date,
             "code": self.code,
+            "broker": self.broker,
             "type_": self.type_,
             "price": self.price,
             "volume": self.volume,

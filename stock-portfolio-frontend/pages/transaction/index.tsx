@@ -70,7 +70,7 @@ export default function TransactionPage() {
 }
 
 function Transaction({ data, setIsStale }) {
-  let { type_: type, code, name, date, price, volume, _id } = data;
+  let { type_: type, code, name, date, price, volume, _id, broker } = data;
   return (
     <tr key={_id} className="odd:bg-gray-50 even:bg-white">
       <td>{date}</td>
@@ -78,8 +78,8 @@ function Transaction({ data, setIsStale }) {
         <div
           className={`w-min m-auto py-0.5 px-1 md:py-2 md:px-4 md:font-semibold my-1 rounded-full ${
             type == "buy"
-              ? "bg-green-100 text-green-600"
-              : "bg-red-100 text-red-600"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
           }`}
         >
           {type}
@@ -87,7 +87,18 @@ function Transaction({ data, setIsStale }) {
       </td>
       <td>
         <p className="font-bold ">{name}</p>
-        <p className="text-sm text-gray-700">{code}</p>
+        <div className="flex items-center">
+          {broker == "poems" ? (
+            <p className="inline-block px-2 py-0.5 text-xs font-bold mr-2 my-0.5 text-white border rounded-md bg-poems">
+              P
+            </p>
+          ) : (
+            <p className="inline-block px-2 py-0.5 text-xs font-bold mr-2 my-0.5 text-white border rounded-md bg-moomoo">
+              M
+            </p>
+          )}
+          <p className="inline-block text-sm text-gray-700">{code}</p>
+        </div>
       </td>
       <td>{price.toFixed(3)}</td>
       <td>{volume}</td>

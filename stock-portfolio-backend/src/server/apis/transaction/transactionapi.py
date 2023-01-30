@@ -38,8 +38,9 @@ def get_transaction_by_id(transaction_id):
     result = transactiondb.find_one_transaction_by_id(
         transaction_id,
         mask={
-            "code": 1,
             "date": 1,
+            "code": 1,
+            "broker": 1,
             "name": 1,
             "price": 1,
             "type_": 1,

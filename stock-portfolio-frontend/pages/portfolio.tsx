@@ -18,7 +18,7 @@ export default function PortfolioPage() {
           setPortfolioData(r);
         }
       });
-  }, []);
+  }, [router]);
   let table = (
     <div className="overflow-auto">
       <table>
