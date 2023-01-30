@@ -1,10 +1,10 @@
-import TradeTypeField from "./fields/TradeTypeField";
-import StockCodeSearch from "./fields/StockCodeSearch";
+import { useRouter } from "next/router";
 import { useState } from "react";
+import StockCodeSearch from "./fields/StockCodeSearch";
 import TradeDateField from "./fields/TradeDateField";
 import TradePriceField from "./fields/TradePriceField";
+import TradeTypeField from "./fields/TradeTypeField";
 import TradeVolumeField from "./fields/TradeVolumeField";
-import Router from "next/router";
 
 export default function TransactionForm({
   showMessage,
@@ -12,6 +12,7 @@ export default function TransactionForm({
   data,
   transactionId,
 }) {
+  const router = useRouter();
   let {
     code = "",
     date = "",
@@ -73,7 +74,7 @@ export default function TransactionForm({
       }
     });
     if (isEdit) {
-      Router.back();
+      router.back();
     }
   }
   return (

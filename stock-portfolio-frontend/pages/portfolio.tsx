@@ -1,16 +1,19 @@
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 import LoadingPage from "../components/Loading";
 
 export default function PortfolioPage() {
+  const router = useRouter();
+
   let [portfolioData, setPortfolioData] = useState(null);
+
   useEffect(() => {
     fetch("/api/portfolio")
       .then((r) => r.json())
       .then((r) => {
         if ("error" in r) {
-          Router.replace("/login");
+          router.replace("/login");
         } else {
           setPortfolioData(r);
         }

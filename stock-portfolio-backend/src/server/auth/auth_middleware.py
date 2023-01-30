@@ -17,9 +17,7 @@ class middleware:
     ):
 
         request = Request(environ)
-        sessionid = request.cookies.get(
-            "sassyid", "a_qyzST9AyCv5Ie_-j8gEkuVHHw_nbfhhNpznnRjh8lM"
-        )
+        sessionid = request.cookies.get("sassyid")
 
         # ignore url that deals with user signup, login, and logout
         whitelist = ["/api/v0/user"]

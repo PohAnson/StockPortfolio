@@ -1,11 +1,13 @@
 import { PencilSquareIcon, DocumentMinusIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Card from "../../components/Card";
 import LoadingPage from "../../components/Loading";
 
 export default function TransactionPage() {
+  const router = useRouter();
+
   const [transactionData, setTransactionData] = useState(null);
   const [isStale, setIsStale] = useState(false);
 
@@ -14,13 +16,13 @@ export default function TransactionPage() {
       .then((r) => r.json())
       .then((json) => {
         if ("error" in json) {
-          Router.replace("/login");
+          router.replace("/login");
         } else {
           setTransactionData(json);
         }
       })
       .then(() => setIsStale(false));
-  }, [isStale]);
+  }, [isStale, router]);
   let table = (
     <div className="overflow-auto">
       <table className="text-xs md:text-base">
@@ -91,7 +93,7 @@ function Transaction({ data, setIsStale }) {
       <td>{volume}</td>
       <td>{(parseFloat(price) * parseInt(volume)).toFixed(2)}</td>
       <td className="w-6">
-        <div className="md:flex">
+        <div className="sm:flex">
           <Link href={`/transaction/edit/${_id}`}>
             <PencilSquareIcon className="w-4 my-2 sm:w-8 md:mx-2 hover:cursor-pointer" />
           </Link>

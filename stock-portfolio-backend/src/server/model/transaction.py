@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import Union
+from typing import Literal, Union
 
 from data.stock_code_name_dict import stock_code_name_dict
 
@@ -12,7 +12,7 @@ class Transaction:
         self,
         date: Union[str, datetime],
         code: str,
-        type_: str,
+        type_: Literal["buy", "sell"],
         price: float,
         volume: int,
         _id=None,
@@ -20,7 +20,7 @@ class Transaction:
     ):
         self.date: datetime = date
         self.code: str = code
-        self.type_: str = type_
+        self.type_: Literal["buy", "sell"] = type_
         self.price: float = price
         self.volume: int = volume
         self._id = _id

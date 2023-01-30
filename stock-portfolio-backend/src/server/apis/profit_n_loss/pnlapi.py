@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request
 
 from server.apis.transaction.transactiondb import transactiondb
 from server.model.stock_ledger import Ledger
+from server.scraper.dividends.calculate_dividends import (
+    calc_total_dividend_earnings, get_dividends_earnings_breakdown)
 
 pnl_api_bp = Blueprint("pnl", __name__, url_prefix="pnl")
 
@@ -11,12 +13,34 @@ def get_pnl():
     # get the net profit and loss data
     userid = request.environ.get("userid")
 
-    if userid is None:
-        return jsonify({"error": "No valid userid given"}), 400
-
     ledger = Ledger()
     ledger.add_transactions(
         transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
 
-    return jsonify([x for x in ledger.to_dict() if x["pnl"] != 0])
+    return jsonify([x for x in ledger.to_json() if x["pnl"] != 0])
+
+
+@pnl_api_bp.get("/<code>")
+def get_pnl_breakdown_by_code(code):
+    userid = request.environ.get("userid")
+
+    all_transactions = transactiondb.find_all_transaction(
+        filter_dict={"userid": userid, "code": code}
+    )
+    # calculate buy and sell result
+    ledger = Ledger()
+    ledger.add_transactions(all_transactions)
+
+    results = ledger.to_dict().get(code)
+
+    # format the dates
+    transactions_breakdown = results.get("transactions_breakdown", [])
+    for result in transactions_breakdown:
+        result[0] = result[0].strftime("%d/%m/%Y")
+
+    dividends_breakdown = results.get("dividends_breakdown", [])
+    for result in dividends_breakdown:
+        result[0] = result[0].strftime("%d/%m/%Y")
+
+    return jsonify(results)

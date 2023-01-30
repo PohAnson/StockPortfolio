@@ -1,5 +1,5 @@
 from argon2.exceptions import VerifyMismatchError
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, request
 
 from server.apis.users.userdb import userdb
 from server.auth.session_manager import SessionManager
@@ -39,6 +39,7 @@ def user_login():
 @user_api_bp.get("/logout")
 def user_logout():
     session_manager.remove_ses(request.cookies.get("sassyid"))
+    return jsonify({"ok": True})
 
 
 @user_api_bp.put("")

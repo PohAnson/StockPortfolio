@@ -17,4 +17,4 @@ def get_portfolio():
         transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
 
-    return jsonify([rec for rec in ledger.to_dict() if rec["volume"] != 0])
+    return jsonify([rec for rec in ledger.to_json() if rec["volume"] != 0])

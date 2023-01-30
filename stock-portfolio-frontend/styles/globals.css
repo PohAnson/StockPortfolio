@@ -13,6 +13,9 @@ body {
 h1 {
   @apply m-8 text-4xl text-center;
 }
+h2 {
+  @apply m-6 text-2xl font-semibold;
+}
 input,
 .button {
   @apply inline-block p-2 border rounded-full border-blue-700 drop-shadow;
@@ -23,7 +26,7 @@ input,
 }
 
 table {
-  @apply w-4/5 m-auto  bg-white rounded;
+  @apply w-4/5 m-auto bg-white rounded;
 }
 
 th {

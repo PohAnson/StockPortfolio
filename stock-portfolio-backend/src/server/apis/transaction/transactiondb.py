@@ -1,7 +1,9 @@
+import os
 import secrets
 import string
 
 import pymongo
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.results import UpdateResult
 
@@ -10,7 +12,11 @@ from server.model.transaction import Transaction
 
 class _TransactionDb:
     def __init__(self, client: MongoClient):
-        self.coll = client["test_data"]["transactions"]
+        load_dotenv()
+        if os.getenv("DEVELOPMENT_MODE") == "False":
+            self.coll = client["data"]["transactions"]
+        else:
+            self.coll = client["test_data"]["transactions"]
 
     def insert_one_transaction(self, data) -> dict:
         """Insert a transaction into database

@@ -19,5 +19,4 @@ app.wsgi_app = middleware(app.wsgi_app)
 CORS(app, supports_credentials=True, origin="127.0.0.1")
 
 app.register_blueprint(api_bp)
-# print(app.url_map)
-app.run(debug=True)
+app.run(debug=os.getenv("DEVELOPMENT_MODE", False))

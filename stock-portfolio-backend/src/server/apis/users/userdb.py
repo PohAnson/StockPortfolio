@@ -1,4 +1,7 @@
+import os
+
 from argon2 import PasswordHasher
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
 
@@ -6,7 +9,12 @@ class _UserDb:
     ph = PasswordHasher()
 
     def __init__(self, client: MongoClient):
-        self.coll = client["test_data"]["user_info"]
+        load_dotenv()
+        if os.getenv("DEVELOPMENT_MODE") == "False":
+            self.coll = client["data"]["user_info"]
+        else:
+            self.coll = client["test_data"]["user_info"]
+
         self.coll.create_index("username", unique=True)
 
     @staticmethod

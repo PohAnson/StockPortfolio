@@ -1,9 +1,14 @@
 from datetime import datetime
 from typing import Any
 
+from pathos.multiprocessing import ProcessingPool as Pool
+
 from data.stock_code_name_dict import stock_code_name_dict
 from server.data_structure import SortedSet
 from server.model.transaction import Transaction
+from server.scraper.dividends.calculate_dividends import (
+    calc_total_dividend_earnings,
+)
 
 
 class _StockRecord:
@@ -36,28 +41,79 @@ class _StockRecord:
 
         return total_vol
 
-    def tabulate(self) -> dict[str, Any]:
+    def tabulate_transactions(self) -> dict[str, Any]:
         """Single pass to tabulate the transactions.
 
         Returns:
-            dict[str, Any]: contains key: "volume", "cost", "pnl"
+            dict[str, Any]: has keys: "volume", "cost", "pnl", "transactions"
         """
-        total_cost = 0
-        total_volume = 0
+        # sum of all the transactions till sold fully.
+        cur_total_cost = 0
+        cur_total_volume = 0
         pnl = 0  # the net profit/loss when vol is zero, +ve is profit
+
+        # (date, buy/sell, price, volume, value, net)
+        transactions = []
         for transaction in self.transaction_set:
             value = transaction.price * transaction.volume
-            total_cost += self.calculate_fees(value, transaction.date)
+            fees = self.calculate_fees(value, transaction.date)
+
             if transaction.type_ == "buy":
-                total_cost += value
-                total_volume += transaction.volume
+                transactions.append(
+                    [
+                        transaction.date,
+                        "buy",
+                        transaction.price,
+                        transaction.volume,
+                        value + fees,
+                        0,
+                    ]
+                )
+                cur_total_cost += value + fees
+                cur_total_volume += transaction.volume
+
             elif transaction.type_ == "sell":
-                total_cost -= value
-                total_volume -= transaction.volume
-            if total_volume == 0:
-                pnl -= total_cost
-                total_cost = 0
-        return {"volume": total_volume, "cost": total_cost, "pnl": pnl}
+                # net p/l for the cur transaction so far.
+                # +ve means there is profit
+                trans_net_pl = 0
+                # check if fully sold
+                if cur_total_volume == transaction.volume:
+                    # fully sold
+                    trans_net_pl = value - fees - cur_total_cost
+
+                    # when fully sold, save to pnl and reset the cost and vol
+                    pnl += trans_net_pl
+                    cur_total_volume = 0
+                    cur_total_cost = 0
+
+                else:
+                    # percentage of cost based on volume left
+                    percentage_cost = (
+                        cur_total_cost / cur_total_volume * transaction.volume
+                    )
+                    trans_net_pl = value - percentage_cost - fees
+
+                    pnl += trans_net_pl
+                    cur_total_volume -= transaction.volume
+                    cur_total_cost -= percentage_cost
+
+                transactions.append(
+                    [
+                        transaction.date,
+                        "sell",
+                        transaction.price,
+                        transaction.volume,
+                        value - fees,
+                        trans_net_pl,
+                    ]
+                )
+
+        return {
+            "volume": cur_total_volume,
+            "cost": cur_total_cost,
+            "pnl": pnl,
+            "transactions": transactions,
+        }
 
     @property
     def cost(self) -> float:
@@ -79,24 +135,34 @@ class _StockRecord:
         self.transaction_set.add(transaction)
 
     def to_dict(self) -> dict[str, Any]:
-        tabulated_data = self.tabulate()
+        calculated_data = self.tabulate_transactions()
+        dividends_sum, dividends_breakdown = calc_total_dividend_earnings(
+            self.code, self.transaction_set
+        )
         return {
             "code": self.code,
             "name": stock_code_name_dict[self.code],
-            "volume": tabulated_data["volume"],
-            "cost": tabulated_data["cost"],
+            "volume": calculated_data["volume"],
+            "cost": calculated_data["cost"],
             "avg_price": self.avg_price,
-            "pnl": tabulated_data["pnl"],
+            "pnl": calculated_data["pnl"] + dividends_sum,
+            # transactions_breakdown: list[list]]
+            # [date, buy/sell, price, volume, value, net]
+            "transactions_breakdown": calculated_data["transactions"],
+            "transactions_sum": calculated_data["pnl"],
+            # dividend breakdown: list[list]][ex-date, rate, volume, value]
+            "dividends_breakdown": dividends_breakdown,
+            "dividends_sum": dividends_sum,
         }
 
     @staticmethod
     def calculate_fees(value: float, date: datetime):
-        commision = max(25, 0.28 / 100 * value)
+        commission = max(25, 0.28 / 100 * value)
         clearing = round(0.0325 / 100 * value, 2)
         trading_access = round(0.0075 / 100 * value, 2)
         settlement_instruction = 0.35
         sub_sum = sum(
-            [commision, clearing, trading_access, settlement_instruction]
+            [commission, clearing, trading_access, settlement_instruction]
         )
         tax_rate_percentage = 7 if date < datetime(2023, 1, 1) else 8
         tax = round(tax_rate_percentage / 100 * sub_sum, 2)
@@ -122,8 +188,16 @@ class Ledger:
         for transaction in transactions:
             self.add_transaction(transaction)
 
-    def to_dict(self) -> list[dict[str, Any]]:
-        ledger_json = []
-        for rec in self.stock_recs.values():
-            ledger_json.append(rec.to_dict())
-        return ledger_json
+    def to_dict(self) -> dict[str, dict[str, Any]]:
+        with Pool(4) as p:
+            results = p.map(
+                lambda item: {item[0]: item[1].to_dict()},
+                self.stock_recs.items(),
+            )
+        dict_result = {}
+        while results:
+            dict_result.update(results.pop())
+        return dict_result
+
+    def to_json(self) -> list[dict]:
+        return self.to_dict().values()

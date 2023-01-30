@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 
 import ErrorBanner from "../ErrorBanner";
@@ -10,6 +10,8 @@ import SubmitButton from "./SubmitButton";
 import UsernameField from "./UsernameField";
 
 export default function FormFactory(formType: "Login" | "Sign Up") {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +30,7 @@ export default function FormFactory(formType: "Login" | "Sign Up") {
     }).then(async (r) => {
       let [statusCode, json] = [r.status, await r.json()];
       if (statusCode == 200) {
-        Router.push("/portfolio");
+        router.push("/portfolio");
       } else {
         setErrorMessage(json["error"]);
       }
@@ -48,7 +50,7 @@ export default function FormFactory(formType: "Login" | "Sign Up") {
     }).then(async (r) => {
       let [statusCode, json] = [r.status, await r.json()];
       if (statusCode == 200) {
-        Router.push("/portfolio");
+        router.push("/portfolio");
       } else {
         setErrorMessage(json["error"]);
       }

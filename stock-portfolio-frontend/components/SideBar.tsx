@@ -24,7 +24,7 @@ export default function SideBar() {
         <NavItem
           name="Net P/L"
           icon={<PresentationChartBarIcon className={iconClassStyle} />}
-          href="/net"
+          href="/pnl"
         />
         <div className="flex justify-end flex-grow mr-2 md:flex-col md:mx-0 md:mb-2">
           <hr className="hidden mx-4 mb-2 border-t-2 md:block" />
