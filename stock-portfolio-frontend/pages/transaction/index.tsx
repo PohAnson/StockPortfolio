@@ -38,7 +38,7 @@ export default function TransactionPage() {
         </thead>
         <tbody>
           {transactionData == null ||
-            transactionData.map((data, index) => (
+            transactionData.map((data) => (
               <Transaction key={data._id} data={data} setIsStale={setIsStale} />
             ))}
         </tbody>
@@ -59,7 +59,7 @@ export default function TransactionPage() {
     <>
       <h1>Transaction History</h1>
       <Link href="/transaction/new">
-        <p className="button mx-[10%] mb-4 w-min whitespace-nowrap">
+        <p className="button mx-[10%] mb-4 w-min whitespace-nowrap font-bold">
           New Transaction
         </p>
       </Link>

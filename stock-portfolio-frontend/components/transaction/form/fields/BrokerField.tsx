@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { PillButton } from "./PillButton";
 
 export default function BrokerField({ tradeBroker, setTradeBroker }) {
@@ -6,8 +5,6 @@ export default function BrokerField({ tradeBroker, setTradeBroker }) {
     <>
       <label>Broker: </label>
       <div>
-        {/* <BrokerRadioOption broker="philip" />
-        <BrokerRadioOption broker="moomoo" /> */}
         <PillButton
           name="broker"
           id="broker_poems"

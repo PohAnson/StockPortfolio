@@ -27,12 +27,9 @@ def user_login():
             )
             result.pop("_id")
 
-    except ValueError as e:
+    except (ValueError, VerifyMismatchError) as e:
         print(e)
-        return jsonify({"error": str(e)}), 406
-    except VerifyMismatchError as e:
-        print(e)
-        return jsonify({"error": "Incorrect Password"}), 401
+        return jsonify({"error": "Incorrect Login Credentials"}), 401
     return jsonify(result), 200
 
 

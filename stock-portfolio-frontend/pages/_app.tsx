@@ -6,7 +6,7 @@ import SideBar from "../components/SideBar";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   return (
-    <html lang="en">
+    <>
       <Head>
         <title>Stock Portfolio</title>
         <meta name="description" content="Stock Portfolio" />
@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }) {
           </div>
         </div>
       )}
-    </html>
+    </>
   );
 }
 
