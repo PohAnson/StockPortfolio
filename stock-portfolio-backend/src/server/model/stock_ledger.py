@@ -1,7 +1,4 @@
-from datetime import datetime
 from typing import Any
-
-from pathos.multiprocessing import ProcessingPool as Pool
 
 from data.stock_code_name_dict import stock_code_name_dict
 from server.data_structure import SortedSet
@@ -176,15 +173,7 @@ class Ledger:
             self.add_transaction(transaction)
 
     def to_dict(self) -> dict[str, dict[str, Any]]:
-        with Pool(4) as p:
-            results = p.map(
-                lambda item: {item[0]: item[1].to_dict()},
-                self.stock_recs.items(),
-            )
-        dict_result = {}
-        while results:
-            dict_result.update(results.pop())
-        return dict_result
+        return {k: v.to_dict() for k, v in self.stock_recs.items()}
 
     def to_json(self) -> list[dict]:
         return self.to_dict().values()

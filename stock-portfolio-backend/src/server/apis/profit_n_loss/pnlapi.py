@@ -2,8 +2,6 @@ from flask import Blueprint, jsonify, request
 
 from server.apis.transaction.transactiondb import transactiondb
 from server.model.stock_ledger import Ledger
-from server.scraper.dividends.calculate_dividends import (
-    calc_total_dividend_earnings, get_dividends_earnings_breakdown)
 
 pnl_api_bp = Blueprint("pnl", __name__, url_prefix="pnl")
 
