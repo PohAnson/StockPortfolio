@@ -1,8 +1,6 @@
 import unittest
 
-import _add_dir_to_path
-
-from server.data_structure import SortedSet
+from src.server.data_structure import SortedSet
 
 
 class SortedSetTestCase(unittest.TestCase):

@@ -172,6 +172,11 @@ class Ledger:
         for transaction in transactions:
             self.add_transaction(transaction)
 
+    def tabulate_transactions(self):
+        return {
+            k: v.tabulate_transactions() for k, v in self.stock_recs.items()
+        }
+
     def to_dict(self) -> dict[str, dict[str, Any]]:
         return {k: v.to_dict() for k, v in self.stock_recs.items()}
 

@@ -17,7 +17,7 @@ def get_transaction():
     transactions = transactiondb.find_all_transaction(
         filter_dict={"userid": userid}
     )
-    return jsonify([transaction.jsonify() for transaction in transactions])
+    return jsonify([transaction.to_json() for transaction in transactions])
 
 
 @transaction_api_bp.post("")

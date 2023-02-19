@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from platform import platform
 from typing import Literal, Union
 
 from data.stock_code_name_dict import stock_code_name_dict
@@ -123,9 +122,12 @@ class Transaction:
     @price.setter
     def price(self, price):
         try:
-            self._price = float(price)
+            if float(price) < 0:
+                raise ValueError()
         except ValueError:
             raise ValueError(f"Invalid Price of {price}")
+        else:
+            self._price = float(price)
 
     @property
     def volume(self):
@@ -134,9 +136,17 @@ class Transaction:
     @volume.setter
     def volume(self, vol):
         try:
-            self._volume = int(vol)
+            # integer and non-negative
+            if int(vol) < 0 or "." in str(vol):
+                raise ValueError()
         except ValueError:
             raise ValueError(f"Invalid Volume of {vol}")
+        else:
+            self._volume = int(vol)
+
+    @property
+    def fees(self) -> float:
+        return self.calculate_fees()
 
     def calculate_fees(self) -> float:
         value = self.price * self.volume
@@ -160,7 +170,7 @@ class Transaction:
         return sum([sub_sum, tax])
 
     @classmethod
-    def from_jsonstr(cls, json_str) -> "Transaction":
+    def from_jsonstr(cls, json_str: str) -> "Transaction":
         return cls.from_dict(json.loads(json_str))
 
     @classmethod
@@ -199,7 +209,7 @@ class Transaction:
             "userid": self.userid,
         }
 
-    def jsonify(self):
+    def to_json(self):
         data = self.to_dict()
         data["date"] = data["date"].strftime("%d/%m/%Y")
         data["name"] = stock_code_name_dict[self.code]

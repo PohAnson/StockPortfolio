@@ -6,7 +6,7 @@ from typing import NamedTuple
 import requests
 from bs4 import BeautifulSoup, ResultSet, SoupStrainer
 
-sys.path.append("/shared/Projects/StockPortfolio/stock-portfolio-backend/src")
+sys.path.append("src")
 from server.model.transaction import Transaction
 
 

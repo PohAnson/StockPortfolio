@@ -1,83 +1,83 @@
 import datetime
 import unittest
 
-import _add_dir_to_path
-
 from server.model.stock_ledger import Ledger
 from server.model.transaction import Transaction
+
+_transactions = [
+    Transaction.from_dict(
+        {
+            "date": datetime.datetime(2020, 12, 11, 0, 0),
+            "code": "AZG",
+            "type_": "buy",
+            "price": 1.1,
+            "volume": 1000,
+            "_id": "pydqluk",
+            "userid": "412",
+            "broker": "poems",
+        }
+    ),
+    Transaction.from_dict(
+        {
+            "date": datetime.datetime(2020, 12, 12, 0, 0),
+            "code": "AZG",
+            "type_": "sell",
+            "price": 1.5,
+            "volume": 1000,
+            "_id": "sdqjkuk",
+            "userid": "412",
+            "broker": "poems",
+        }
+    ),
+    Transaction.from_dict(
+        {
+            "date": datetime.datetime(2020, 12, 14, 0, 0),
+            "code": "AZG",
+            "type_": "buy",
+            "price": 1.5,
+            "volume": 1000,
+            "_id": "pydheli",
+            "userid": "412",
+            "broker": "poems",
+        }
+    ),
+    Transaction.from_dict(
+        {
+            "date": datetime.datetime(2020, 2, 11, 0, 0),
+            "code": "BLU",
+            "type_": "buy",
+            "price": 1.1,
+            "volume": 1000,
+            "_id": "nkdqluk",
+            "userid": "412",
+            "broker": "poems",
+        }
+    ),
+    Transaction.from_dict(
+        {
+            "date": datetime.datetime(2020, 12, 11, 0, 0),
+            "code": "BLU",
+            "type_": "buy",
+            "price": 1.1,
+            "volume": 2000,
+            "_id": "pjnqluk",
+            "userid": "412",
+            "broker": "poems",
+        }
+    ),
+]
 
 
 class StockLedgerTestCase(unittest.TestCase):
     def setUp(self) -> None:
 
-        transactions = [
-            Transaction.from_dict(record)
-            for record in [
-                {
-                    "date": datetime.datetime(2020, 12, 11, 0, 0),
-                    "code": "AZG",
-                    "type_": "buy",
-                    "price": 1.1,
-                    "volume": 1000,
-                    "_id": "pydqluk",
-                },
-                {
-                    "date": datetime.datetime(2021, 11, 11, 0, 0),
-                    "code": "AZG",
-                    "type_": "sell",
-                    "price": 1.2,
-                    "volume": 1000,
-                    "_id": "wmabpfl",
-                },
-                {
-                    "date": datetime.datetime(2020, 11, 11, 0, 0),
-                    "code": "40B",
-                    "type_": "buy",
-                    "price": 2.34,
-                    "volume": 1000,
-                    "_id": "blwpsjd",
-                },
-                {
-                    "date": datetime.datetime(2222, 11, 11, 0, 0),
-                    "code": "O9E",
-                    "type_": "buy",
-                    "price": 2.0,
-                    "volume": 2,
-                    "_id": "lnxqsvs",
-                },
-                {
-                    "date": datetime.datetime(2222, 11, 11, 0, 0),
-                    "code": "O9E",
-                    "type_": "buy",
-                    "price": 2.0,
-                    "volume": 2,
-                    "_id": "gnksvbb",
-                },
-                {
-                    "date": datetime.datetime(2222, 2, 22, 0, 0),
-                    "code": "40B",
-                    "type_": "sell",
-                    "price": 2.0,
-                    "volume": 2,
-                    "_id": "yyrvghw",
-                },
-                {
-                    "date": datetime.datetime(2222, 2, 12, 0, 0),
-                    "code": "40B",
-                    "type_": "sell",
-                    "price": 1.0,
-                    "volume": 998,
-                    "_id": "orwugtw",
-                },
-            ]
-        ]
         ledger = Ledger()
-        ledger.add_transactions(transactions)
+        ledger.add_transactions(_transactions)
         self.ledger = ledger
-        print(ledger)
 
-    def test_to_json_and_add_transaction(self):
+    def test_add_transaction(self):
         ledger = Ledger()
+        self.assertEqual(ledger.to_dict(), {})
         ledger.add_transaction(
             Transaction.from_dict(
                 {
@@ -87,64 +87,106 @@ class StockLedgerTestCase(unittest.TestCase):
                     "price": 1.1,
                     "volume": 1000,
                     "_id": "pydqluk",
+                    "userid": "412",
+                    "broker": "poems",
                 }
             )
         )
-        result = ledger.to_json()[0]
-        expected = {
-            "code": "AZG",
-            "name": "8Telecom",
-            "cost": 1127.6,
-            "avg_price": 1.1276,
-            "volume": 1000,
-        }
+        result = ledger.to_dict()
+        self.assertTrue(len(result) == 1, "Transaction not added")
         self.assertTrue(
-            len(result.keys()) == len(expected.keys()),
-            f"missing elements:\n"
-            f"result:{result.keys()}\nexpect:{expected.keys()}",
+            "AZG" in result.keys(),
+            "Transaction not added to ledger properly",
         )
-        for k, v in result.items():
-            if k in expected:
-                self.assertAlmostEqual(expected[k], v, 2)
-            else:
-                self.fail(f"Key {k} is not in the expected result")
+
+        headers = [
+            "code",
+            "name",
+            "volume",
+            "cost",
+            "avg_price",
+            "pnl",
+            "transactions_breakdown",
+            "transactions_sum",
+            "dividends_breakdown",
+            "dividends_sum",
+        ]
+        val = result["AZG"]
+
+        self.assertTrue(len(headers) == len(val))
+        for h in headers:
+            if h not in val.keys():
+                self.fail(f"Key {h} is not in the expected result")
 
     def test_add_transactions(self):
         ledger = Ledger()
-        ledger.add_transaction(
-            Transaction.from_dict(
-                {
-                    "date": datetime.datetime(2020, 12, 11, 0, 0),
-                    "code": "AZG",
-                    "type_": "buy",
-                    "price": 1.1,
-                    "volume": 1000,
-                    "_id": "pydqluk",
-                }
-            ),
-            Transaction.from_dict(
-                {
-                    "date": datetime.datetime(2020, 12, 11, 0, 0),
-                    "code": "40B",
-                    "type_": "buy",
-                    "price": 1.1,
-                    "volume": 1000,
-                    "_id": "hydqluk",
-                }
-            ),
-            Transaction.from_dict(
-                {
-                    "date": datetime.datetime(2021, 12, 11, 0, 0),
-                    "code": "AZG",
-                    "type_": "sell",
-                    "price": 1.2,
-                    "volume": 1000,
-                    "_id": "gydqluk",
-                }
-            ),
+        ledger.add_transactions(_transactions)
+        result = ledger.to_dict()
+        self.assertTrue(len(result) == 2, "Transaction not added properly")
+
+    def test_tabulated_data(self):
+        result = self.ledger.tabulate_transactions()
+
+        # BLU
+        self.assertAlmostEqual(result["BLU"]["volume"], 3000)
+        self.assertAlmostEqual(result["BLU"]["cost"], 3355.66)
+        self.assertAlmostEqual(result["BLU"]["pnl"], 0)
+
+        # AZG
+        self.assertAlmostEqual(result["AZG"]["volume"], 1000)
+        self.assertAlmostEqual(result["AZG"]["cost"], 1527.77)
+        self.assertAlmostEqual(result["AZG"]["pnl"], 344.63)
+
+    def test_to_dict(self):
+        ledger = Ledger()
+        ledger.add_transactions(
+            [
+                Transaction.from_dict(
+                    {
+                        "date": datetime.datetime(2016, 1, 1, 0, 0),
+                        "code": "BSL",
+                        "type_": "buy",
+                        "price": 1.1,
+                        "volume": 1000,
+                        "_id": "pydqluk",
+                        "userid": "412",
+                        "broker": "poems",
+                    }
+                ),
+                Transaction.from_dict(
+                    {
+                        "date": datetime.datetime(2018, 1, 1, 0, 0),
+                        "code": "BSL",
+                        "type_": "buy",
+                        "price": 1.5,
+                        "volume": 1000,
+                        "_id": "sdqjkuk",
+                        "userid": "412",
+                        "broker": "poems",
+                    }
+                ),
+                Transaction.from_dict(
+                    {
+                        "date": datetime.datetime(2020, 1, 1, 0, 0),
+                        "code": "BSL",
+                        "type_": "sell",
+                        "price": 1.5,
+                        "volume": 2000,
+                        "_id": "pydheli",
+                        "userid": "412",
+                        "broker": "poems",
+                    }
+                ),
+            ]
         )
-        self.assertAlmostEqual(1, 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        result = ledger.to_dict()["BSL"]
+        expected = {
+            "volume": 0,
+            "cost": 0,
+            "avg_price": 0,
+            "pnl": 436.23,
+            "transactions_sum": 316.23,
+            "dividends_sum": 120,
+        }
+        for k, v in expected.items():
+            self.assertAlmostEqual(result[k], v, msg=k)
