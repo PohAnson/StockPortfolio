@@ -40,17 +40,17 @@ class _TransactionDb:
     def delete_transaction_by_id(self, transaction_id):
         return self.coll.delete_one({"_id": transaction_id})
 
-    def find_all_transaction(self, *, filter_dict={}) -> list:
+    def find_all_transaction(self, *, filter_dict={}, projection={}) -> list:
         data = [
-            Transaction.from_dict(record)
-            for record in self.coll.find(filter_dict).sort(
+            Transaction.from_dict(record, projection)
+            for record in self.coll.find(filter_dict, projection).sort(
                 "date", pymongo.ASCENDING
             )
         ]
         return data
 
-    def find_one_transaction_by_id(self, transaction_id, *, mask=None):
-        return self.coll.find_one({"_id": transaction_id}, mask)
+    def find_one_transaction_by_id(self, transaction_id, *, projection=None):
+        return self.coll.find_one({"_id": transaction_id}, projection)
 
     @staticmethod
     def generate_transaction_id():

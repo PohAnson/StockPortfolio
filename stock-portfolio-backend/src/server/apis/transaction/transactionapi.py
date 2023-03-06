@@ -15,7 +15,7 @@ def get_transaction():
     if userid is None:
         return jsonify({"error": "No valid user"})
     transactions = transactiondb.find_all_transaction(
-        filter_dict={"userid": userid}
+        filter_dict={"userid": userid}, projection={"userid": 0}
     )
     return jsonify([transaction.to_json() for transaction in transactions])
 
@@ -37,7 +37,7 @@ def post_transaction():
 def get_transaction_by_id(transaction_id):
     result = transactiondb.find_one_transaction_by_id(
         transaction_id,
-        mask={
+        projection={
             "date": 1,
             "code": 1,
             "broker": 1,

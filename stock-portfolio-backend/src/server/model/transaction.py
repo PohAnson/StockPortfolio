@@ -174,7 +174,7 @@ class Transaction:
         return cls.from_dict(json.loads(json_str))
 
     @classmethod
-    def from_dict(cls, _dict, mask={}) -> "Transaction":
+    def from_dict(cls, _dict, projection={}) -> "Transaction":
         # check if all the required fields is present
         # 1 means must be present
         # 0 means optional
@@ -188,7 +188,7 @@ class Transaction:
             "userid": 1,
             "_id": 0,
         }
-        fields.update(mask)
+        fields.update(projection)
         missing_field = []
         for k, v in fields.items():
             if v and (k not in _dict or _dict[k] is None):
@@ -213,4 +213,5 @@ class Transaction:
         data = self.to_dict()
         data["date"] = data["date"].strftime("%d/%m/%Y")
         data["name"] = stock_code_name_dict[self.code]
+        data.pop("userid")
         return data
