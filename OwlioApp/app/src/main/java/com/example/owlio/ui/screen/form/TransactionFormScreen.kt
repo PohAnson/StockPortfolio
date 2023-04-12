@@ -24,11 +24,11 @@ import com.example.owlio.ui.screen.form.transactionFormField.TradeDateField
 import com.example.owlio.ui.theme.OwlioAppTheme
 
 @Composable
-fun TransactionFormScreen() {
+fun TransactionFormScreen(modifier: Modifier=Modifier) {
     val vm: TransactionFormViewModel = viewModel()
     val uiState = vm.uiState.collectAsState().value
 
-    Column {
+    Column(modifier = modifier.padding(8.dp,0.dp)) {
 
         TradeDateField(uiState.tradeDate) { vm.updateTradeDate(it) }
         StockSelectorField(

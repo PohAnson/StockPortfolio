@@ -3,16 +3,21 @@ package com.example.owlio.ui.screen
 import com.example.owlio.R
 
 
-enum class Screens(val label: String, val icon: Int, val route: String) {
+enum class Screens(val label: String, val route: String, val icon: Int? = null) {
     PORTFOLIO(
         "Portfolio",
-        R.drawable.business_center,
         "portfolio",
+        R.drawable.business_center,
     ),
-    TRANSACTION("Transaction", R.drawable.description, "transaction"), PNL(
+    TRANSACTION(
+        "Transaction",
+        "transaction",
+        R.drawable.description,
+    ),
+    PNL(
         "P/L Report",
-        R.drawable.assessment,
         "pnl",
-    )
-
+        R.drawable.assessment,
+    ),
+    TRANSACTIONFORM("New Transaction", "transactionForm")
 }

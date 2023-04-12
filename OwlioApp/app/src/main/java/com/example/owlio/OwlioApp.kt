@@ -1,5 +1,6 @@
 package com.example.owlio
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import com.example.owlio.ui.screen.PnlScreen
 import com.example.owlio.ui.screen.PortfolioScreen
 import com.example.owlio.ui.screen.Screens
 import com.example.owlio.ui.screen.TransactionScreen
+import com.example.owlio.ui.screen.form.TransactionFormScreen
 
 
 @Composable
@@ -30,10 +32,13 @@ fun OwlioApp() {
                 PortfolioScreen()
             }
             composable(Screens.TRANSACTION.route) {
-                TransactionScreen()
+                TransactionScreen(goToTransactionForm = { navController.navigate(route = Screens.TRANSACTIONFORM.route) }, modifier=Modifier.padding(innerpadding))
             }
             composable(Screens.PNL.route) {
                 PnlScreen()
+            }
+            composable(Screens.TRANSACTIONFORM.route) {
+                TransactionFormScreen(modifier = Modifier.padding(innerpadding))
             }
         }
     }
@@ -54,11 +59,11 @@ fun OwlioBottonNavBar(navController: NavController) {
 
                 },
                 icon = {
-                    Icon(
-                        painter = painterResource(id = screen.icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(28.dp)
-                    )
+                    screen.icon?.let { painterResource(id = it) }?.let {
+                        Icon(
+                            painter = it, contentDescription = null, modifier = Modifier.size(28.dp)
+                        )
+                    }
                 },
                 label = {
                     Text(
