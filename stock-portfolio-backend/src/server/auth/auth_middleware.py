@@ -1,5 +1,4 @@
 import json
-from wsgiref.types import StartResponse, WSGIEnvironment
 
 from werkzeug.wrappers import Request, Response
 
@@ -12,9 +11,7 @@ class middleware:
     def __init__(self, app) -> None:
         self.app = app
 
-    def __call__(
-        self, environ: WSGIEnvironment, start_response: StartResponse
-    ):
+    def __call__(self, environ, start_response):
 
         request = Request(environ)
         sessionid = request.cookies.get("sassyid")
