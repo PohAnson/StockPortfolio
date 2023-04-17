@@ -2,18 +2,25 @@ package com.example.owlio.ui.screen.form
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.owlio.data.StockInfoRepo
 import com.example.owlio.model.Broker
 import com.example.owlio.model.StockInfo
 import com.example.owlio.model.TradeType
 import com.example.owlio.model.Transaction
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-private val TAG = "TransactionFormViewModel"
+private const val TAG = "TransactionFormViewModel"
 
-class TransactionFormViewModel : ViewModel() {
+@HiltViewModel
+class TransactionFormViewModel @Inject constructor(private val stockInfoRepo: StockInfoRepo) :
+    ViewModel() {
+
     private val _uiState = MutableStateFlow(TransactionUiFormDataState())
     val uiState: StateFlow<TransactionUiFormDataState> = _uiState.asStateFlow()
 
@@ -26,7 +33,7 @@ class TransactionFormViewModel : ViewModel() {
         }
     }
 
-    fun updateSelectedStock(stock: StockInfo) {
+    fun updateSelectedStock(stock: StockInfo?) {
         _uiState.update { it.copy(selectedStock = stock) }
     }
 
@@ -46,7 +53,7 @@ class TransactionFormViewModel : ViewModel() {
         _uiState.update { it.copy(volume = volume) }
     }
 
-    fun updateErrorMessage(msg: String?) {
+    private fun updateErrorMessage(msg: String?) {
         _uiState.update { it.copy(errorMessage = msg) }
     }
 
@@ -68,9 +75,10 @@ class TransactionFormViewModel : ViewModel() {
 
     }
 
-    fun getAllStockInfo(): List<StockInfo> {
-        return listOf() // TODO: get data from db
+    fun getAllStockInfo(): Flow<List<StockInfo>> {
+        return stockInfoRepo.getAllStock()
     }
+
 }
 
 data class TransactionUiFormDataState(
