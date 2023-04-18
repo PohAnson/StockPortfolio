@@ -32,7 +32,7 @@ fun TradeDateField(tradeDate: String, setTradeDate: (String) -> Unit) {
     val datePicker = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-            setTradeDate("$dayOfMonth/${month + 1}/$year")
+            setTradeDate("$dayOfMonth/${"%02d".format(month + 1)}/$year")
         },
         calendar[Calendar.YEAR], calendar[Calendar.MONTH], calendar[Calendar.DAY_OF_MONTH],
     )

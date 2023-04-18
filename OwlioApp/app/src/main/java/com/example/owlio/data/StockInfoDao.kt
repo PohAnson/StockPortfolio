@@ -10,4 +10,7 @@ interface StockInfoDao {
     @Query("SELECT * FROM stock_info")
     fun getAllStockInfo(): Flow<List<StockInfo>>
 
+    @Query("SELECT * FROM stock_info WHERE trading_code=:tradingCode")
+    suspend fun getStockInfoByCode(tradingCode: String): List<StockInfo>
+
 }

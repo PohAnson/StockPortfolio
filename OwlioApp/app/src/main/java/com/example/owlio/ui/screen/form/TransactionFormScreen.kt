@@ -18,6 +18,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -34,6 +35,7 @@ import com.example.owlio.ui.screen.form.transactionFormField.BrokerField
 import com.example.owlio.ui.screen.form.transactionFormField.StockSelectorField
 import com.example.owlio.ui.screen.form.transactionFormField.TradeDateField
 import com.example.owlio.ui.theme.OwlioAppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionFormScreen(modifier: Modifier = Modifier) {
@@ -41,6 +43,7 @@ fun TransactionFormScreen(modifier: Modifier = Modifier) {
     val uiState = vm.uiState.collectAsState().value
     val stockList = vm.getAllStockInfo().collectAsState(initial = listOf()).value
 
+    val coroutineScope = rememberCoroutineScope()
     Column(modifier = modifier.padding(8.dp, 0.dp)) {
 
         TradeDateField(uiState.tradeDate) { vm.updateTradeDate(it) }
@@ -62,7 +65,7 @@ fun TransactionFormScreen(modifier: Modifier = Modifier) {
             }
         }
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth(1f)) {
-            Button(onClick = { vm.validateAllFields() }) {
+            Button(onClick = { coroutineScope.launch { vm.validateAllFields() } }) {
                 Text("Submit")
             }
 

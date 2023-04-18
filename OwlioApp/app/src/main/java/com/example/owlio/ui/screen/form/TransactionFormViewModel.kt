@@ -57,22 +57,38 @@ class TransactionFormViewModel @Inject constructor(private val stockInfoRepo: St
         _uiState.update { it.copy(errorMessage = msg) }
     }
 
-    fun validateAllFields(): Boolean {
-        val validatedResults = _uiState.value.validateAllFormData()
-        if (!validatedResults.values.any()) {
-            // if form data is valid
+    suspend fun validateAllFields() {
+        val validatedResults: Map<String, Boolean> = validateAllFormData()
+        if (validatedResults.all { it.value }) {
+            // if all form data is valid
             updateErrorMessage(null)
-            return true
+        } else {
+            // form data is invalid
+            updateErrorMessage(
+                "${
+                    (validatedResults.filter { !it.value }.keys.joinToString())
+                } is invalid"
+            )
         }
-        // form data is invalid
-        updateErrorMessage(
-            "${
-                (validatedResults.filter { !it.value }.keys.joinToString())
-            } is invalid"
-        )
         Log.d(TAG.plus(" validateAllFields"), validatedResults.toString())
-        return false
 
+
+    }
+
+
+    suspend fun validateAllFormData(): Map<String, Boolean> {
+        val (tradeDate, selectedStock, broker, tradeType, price, volume) = _uiState.value
+        val stockCode = selectedStock?.tradingCode ?: ""
+
+
+        return mapOf(
+            "Date" to Transaction.validateTradeDateString(tradeDate),
+            "Stock" to Transaction.validateStockCodeString(stockCode, stockInfoRepo),
+            "Broker" to (broker != null),
+            "Trade Type" to (tradeType != null),
+            "Price" to Transaction.validatePriceString(price),
+            "Volume" to Transaction.validateVolumeString(volume),
+        )
     }
 
     fun getAllStockInfo(): Flow<List<StockInfo>> {
@@ -89,18 +105,4 @@ data class TransactionUiFormDataState(
     val price: String = "",
     val volume: String = "",
     val errorMessage: String? = "",
-) {
-
-    fun validateAllFormData(): Map<String, Boolean> {
-        val stockCode = selectedStock?.tradingCode ?: ""
-        return mapOf(
-            "Date" to Transaction.validateTradeDateString(tradeDate),
-            "Stock" to Transaction.validateStockCodeString(stockCode),
-            "Broker" to (broker != null),
-            "Trade Type" to (tradeType != null),
-            "Price" to Transaction.validatePriceString(price),
-            "Volume" to Transaction.validateVolumeString(volume),
-
-            )
-    }
-}
+)

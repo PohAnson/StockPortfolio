@@ -1,6 +1,7 @@
 package com.example.owlio.model
 
 import android.util.Log
+import com.example.owlio.data.StockInfoRepo
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -15,7 +16,7 @@ data class Transaction(
     val broker: Broker,
     val tradeType: TradeType,
     val price: Float = 0f,
-    val volume: Int = 0
+    val volume: Int = 0,
 ) {
 
     companion object {
@@ -34,8 +35,10 @@ data class Transaction(
 
         }
 
-        fun validateStockCodeString(value: String): Boolean {
-            return false //TODO("Not yet implemented")
+        suspend fun validateStockCodeString(
+            stockCode: String, stockInfoRepo: StockInfoRepo
+        ): Boolean {
+            return stockInfoRepo.getStockInfoByCode(stockCode).isNotEmpty()
         }
 
         fun validatePriceString(value: String): Boolean {
@@ -63,3 +66,4 @@ data class Transaction(
         }
     }
 }
+
