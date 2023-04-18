@@ -2,24 +2,29 @@ package com.example.owlio.ui.screen.form
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.owlio.data.StockInfoRepo
+import com.example.owlio.data.TransactionRepo
 import com.example.owlio.model.Broker
 import com.example.owlio.model.StockInfo
 import com.example.owlio.model.TradeType
 import com.example.owlio.model.Transaction
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "TransactionFormViewModel"
 
 @HiltViewModel
-class TransactionFormViewModel @Inject constructor(private val stockInfoRepo: StockInfoRepo) :
-    ViewModel() {
+class TransactionFormViewModel @Inject constructor(
+    private val stockInfoRepo: StockInfoRepo, private val transactionRepo: TransactionRepo
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiFormDataState())
     val uiState: StateFlow<TransactionUiFormDataState> = _uiState.asStateFlow()
@@ -53,33 +58,44 @@ class TransactionFormViewModel @Inject constructor(private val stockInfoRepo: St
         _uiState.update { it.copy(volume = volume) }
     }
 
-    private fun updateErrorMessage(msg: String?) {
-        _uiState.update { it.copy(errorMessage = msg) }
+
+    suspend fun submitForm() {
+        /**
+         * Submit the form, return true if it is submitted         *
+         * */
+        _uiState.update { it.copy(submissionStatus = SubmissionStatus.Loading) }
+        val submissionStatus = validateAllFields()
+        _uiState.update { it.copy(submissionStatus = submissionStatus) }
+        if (submissionStatus is SubmissionStatus.Validated) {
+            viewModelScope.launch(Dispatchers.IO) {
+                transactionRepo.insertTransaction(uiState.value.toTransaction())
+            }.invokeOnCompletion {
+                _uiState.update { it.copy(submissionStatus = SubmissionStatus.Success) }
+            }
+        }
     }
 
-    suspend fun validateAllFields() {
+    private suspend fun validateAllFields(): SubmissionStatus {
         val validatedResults: Map<String, Boolean> = validateAllFormData()
-        if (validatedResults.all { it.value }) {
+        Log.d(TAG.plus(" validateAllFields"), validatedResults.toString())
+        return if (validatedResults.all { it.value }) {
             // if all form data is valid
-            updateErrorMessage(null)
+            SubmissionStatus.Validated
         } else {
             // form data is invalid
-            updateErrorMessage(
+            SubmissionStatus.Error(
                 "${
                     (validatedResults.filter { !it.value }.keys.joinToString())
                 } is invalid"
             )
+
         }
-        Log.d(TAG.plus(" validateAllFields"), validatedResults.toString())
-
-
     }
 
 
-    suspend fun validateAllFormData(): Map<String, Boolean> {
+    private suspend fun validateAllFormData(): Map<String, Boolean> {
         val (tradeDate, selectedStock, broker, tradeType, price, volume) = _uiState.value
         val stockCode = selectedStock?.tradingCode ?: ""
-
 
         return mapOf(
             "Date" to Transaction.validateTradeDateString(tradeDate),
@@ -104,5 +120,27 @@ data class TransactionUiFormDataState(
     val tradeType: TradeType? = null,
     val price: String = "",
     val volume: String = "",
-    val errorMessage: String? = "",
+    val submissionStatus: SubmissionStatus = SubmissionStatus.NotSubmitted
 )
+
+
+fun TransactionUiFormDataState.toTransaction(): Transaction {
+    return Transaction(
+        tradeDate = Transaction.fromTradeDateString(this.tradeDate),
+        stockCode = this.selectedStock?.tradingCode ?: "",
+        broker = this.broker ?: Broker.INVALID,
+        tradeType = this.tradeType ?: TradeType.INVALID,
+        price = Transaction.priceStringToFloat(this.price),
+        volume = Transaction.volumeStringToInt(this.volume)
+    )
+}
+
+sealed interface SubmissionStatus {
+    object NotSubmitted : SubmissionStatus
+    object Loading : SubmissionStatus
+    object Validated : SubmissionStatus
+    data class Error(val errorMessage: String) : SubmissionStatus
+    object Success : SubmissionStatus
+}
+
+

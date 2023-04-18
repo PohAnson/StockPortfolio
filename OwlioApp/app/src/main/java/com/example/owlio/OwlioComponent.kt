@@ -1,8 +1,9 @@
 package com.example.owlio
 
 import android.content.Context
+import com.example.owlio.data.OwlioDatabase
 import com.example.owlio.data.StockInfoDao
-import com.example.owlio.data.StockInfoDatabase
+import com.example.owlio.data.TransactionDao
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -12,14 +13,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Component(modules = [OwlioActivityModule::class])
-interface OwlioComponent {
-//    @Provides
-//    @Singleton
-//    fun getStockInfoRepo(): StockInfoRepo
-
-//    fun inject(activity: MainActivity)
-
-}
+interface OwlioComponent
 
 
 @Module
@@ -27,13 +21,18 @@ interface OwlioComponent {
 class OwlioActivityModule {
     @Provides
     @Singleton
-    fun stockInfoDatabase(@ApplicationContext context: Context): StockInfoDatabase {
-        return StockInfoDatabase.getDatabase(context)
+    fun owlioDatabase(@ApplicationContext context: Context): OwlioDatabase {
+        return OwlioDatabase.getDatabase(context)
     }
 
     @Provides
     fun stockInfoDao(@ApplicationContext context: Context): StockInfoDao {
-        return stockInfoDatabase(context).stockInfoDao()
+        return owlioDatabase(context).stockInfoDao()
+    }
+
+    @Provides
+    fun transactionDao(@ApplicationContext context: Context): TransactionDao {
+        return owlioDatabase(context).transactionDao()
     }
 
 

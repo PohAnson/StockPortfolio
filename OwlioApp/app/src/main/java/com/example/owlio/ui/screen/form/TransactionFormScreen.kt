@@ -15,6 +15,9 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,15 +40,24 @@ import com.example.owlio.ui.screen.form.transactionFormField.TradeDateField
 import com.example.owlio.ui.theme.OwlioAppTheme
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun TransactionFormScreen(modifier: Modifier = Modifier) {
+fun TransactionFormScreen(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    navigateBack: () -> Unit,
+
+    ) {
     val vm: TransactionFormViewModel = hiltViewModel()
     val uiState = vm.uiState.collectAsState().value
     val stockList = vm.getAllStockInfo().collectAsState(initial = listOf()).value
 
     val coroutineScope = rememberCoroutineScope()
-    Column(modifier = modifier.padding(8.dp, 0.dp)) {
+    val focusManager = LocalFocusManager.current
 
+
+
+    Column(modifier = modifier.padding(8.dp, 0.dp)) {
         TradeDateField(uiState.tradeDate) { vm.updateTradeDate(it) }
         StockSelectorField(
             stockList, uiState.selectedStock
@@ -54,30 +66,55 @@ fun TransactionFormScreen(modifier: Modifier = Modifier) {
         TradeTypeField(uiState.tradeType) { vm.updateTradeType(it) }
         PriceField(uiState.price) { vm.updatePrice(it) }
         VolumeField(uiState.volume) { vm.updateVolume(it) }
-        if (!uiState.errorMessage.isNullOrBlank()) {
+        if (uiState.submissionStatus is SubmissionStatus.Error) {
             Box(
                 contentAlignment = Alignment.BottomCenter,
                 modifier = Modifier
                     .fillMaxWidth(1f)
                     .padding(8.dp)
             ) {
-                Text(uiState.errorMessage, color = Color.Red)
+                Text(uiState.submissionStatus.errorMessage, color = Color.Red)
             }
         }
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth(1f)) {
-            Button(onClick = { coroutineScope.launch { vm.validateAllFields() } }) {
+            Button(onClick = {
+                focusManager.clearFocus()
+
+                coroutineScope.launch {
+                    vm.submitForm()
+                    when (uiState.submissionStatus) {
+                        is SubmissionStatus.Success ->
+                            snackbarHostState.showSnackbar(
+                                message = "Transaction Added",
+                                actionLabel = "View",
+                                duration = SnackbarDuration.Short
+                            ).let { snackbarResult ->
+                                if (snackbarResult == SnackbarResult.ActionPerformed) {
+                                    navigateBack()
+                                }
+                            }
+
+                        is SubmissionStatus.Error -> {
+                            snackbarHostState.showSnackbar(
+                                message = "Error: ${uiState.submissionStatus.errorMessage}",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+
+                        else -> {}
+                    }
+                }
+            }) {
                 Text("Submit")
             }
-
         }
     }
 }
 
+
 @Composable
 fun GenericFieldRow(
-    label: String,
-    spaceBelow: Boolean = true,
-    inputField: @Composable (() -> Unit)
+    label: String, spaceBelow: Boolean = true, inputField: @Composable (() -> Unit)
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -160,6 +197,6 @@ fun VolumeField(volume: String, updateVolume: (String) -> Unit) {
 @Composable
 fun TransactionFormScreenPreview() {
     OwlioAppTheme {
-        TransactionFormScreen()
+        TransactionFormScreen(snackbarHostState = SnackbarHostState(), navigateBack = {})
     }
 }

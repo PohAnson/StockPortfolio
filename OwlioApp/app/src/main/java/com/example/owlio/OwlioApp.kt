@@ -6,7 +6,10 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -29,8 +32,18 @@ import com.example.owlio.ui.screen.form.TransactionFormScreen
 @Composable
 fun OwlioApp() {
     val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
 
-    Scaffold(bottomBar = { OwlioBottonNavBar(navController = navController) }) { innerpadding ->
+
+    Scaffold(scaffoldState = scaffoldState,
+        bottomBar = { OwlioBottonNavBar(navController = navController) },
+        snackbarHost = {
+            SnackbarHost(it) { snackbarData ->
+                Snackbar(
+                    snackbarData
+                )
+            }
+        }) { innerpadding ->
         NavHost(navController = navController, startDestination = Screens.PORTFOLIO.route) {
             composable(Screens.PORTFOLIO.route) {
                 PortfolioScreen()
@@ -45,7 +58,11 @@ fun OwlioApp() {
                 PnlScreen()
             }
             composable(Screens.TRANSACTIONFORM.route) {
-                TransactionFormScreen(modifier = Modifier.padding(innerpadding))
+                TransactionFormScreen(
+                    modifier = Modifier.padding(innerpadding),
+                    snackbarHostState = scaffoldState.snackbarHostState,
+                    navigateBack = { navController.popBackStack() },
+                )
             }
         }
     }
