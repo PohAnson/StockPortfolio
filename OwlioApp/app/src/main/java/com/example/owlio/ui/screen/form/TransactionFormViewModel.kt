@@ -59,19 +59,22 @@ class TransactionFormViewModel @Inject constructor(
     }
 
 
-    suspend fun submitForm() {
+    suspend fun submitForm(): SubmissionStatus {
         /**
          * Submit the form, return true if it is submitted         *
          * */
         _uiState.update { it.copy(submissionStatus = SubmissionStatus.Loading) }
         val submissionStatus = validateAllFields()
         _uiState.update { it.copy(submissionStatus = submissionStatus) }
-        if (submissionStatus is SubmissionStatus.Validated) {
+        return if (submissionStatus is SubmissionStatus.Validated) {
             viewModelScope.launch(Dispatchers.IO) {
                 transactionRepo.insertTransaction(uiState.value.toTransaction())
             }.invokeOnCompletion {
                 _uiState.update { it.copy(submissionStatus = SubmissionStatus.Success) }
             }
+            SubmissionStatus.Success
+        } else {
+            submissionStatus
         }
     }
 

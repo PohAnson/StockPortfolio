@@ -16,8 +16,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,17 +32,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owlio.model.TradeType
+import com.example.owlio.ui.SnackbarDelegate
+import com.example.owlio.ui.SnackbarState
 import com.example.owlio.ui.screen.form.transactionFormField.BrokerField
 import com.example.owlio.ui.screen.form.transactionFormField.StockSelectorField
 import com.example.owlio.ui.screen.form.transactionFormField.TradeDateField
 import com.example.owlio.ui.theme.OwlioAppTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
 fun TransactionFormScreen(
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState,
+    snackbarDelegate: SnackbarDelegate,
     navigateBack: () -> Unit,
 
     ) {
@@ -81,22 +83,21 @@ fun TransactionFormScreen(
                 focusManager.clearFocus()
 
                 coroutineScope.launch {
-                    vm.submitForm()
-                    when (uiState.submissionStatus) {
-                        is SubmissionStatus.Success ->
-                            snackbarHostState.showSnackbar(
-                                message = "Transaction Added",
-                                actionLabel = "View",
-                                duration = SnackbarDuration.Short
-                            ).let { snackbarResult ->
-                                if (snackbarResult == SnackbarResult.ActionPerformed) {
-                                    navigateBack()
-                                }
-                            }
+                    val submissionStatus =
+                        withContext(Dispatchers.Default) {
+                            vm.submitForm()
+                        }
+                    when (submissionStatus) {
+                        is SubmissionStatus.Success -> snackbarDelegate.showSnackbar(snackbarState = SnackbarState.SUCCESS,
+                            message = "Transaction Added",
+                            actionLabel = "View",
+                            duration = SnackbarDuration.Short,
+                            onAction = { navigateBack() })
 
                         is SubmissionStatus.Error -> {
-                            snackbarHostState.showSnackbar(
-                                message = "Error: ${uiState.submissionStatus.errorMessage}",
+                            snackbarDelegate.showSnackbar(
+                                snackbarState = SnackbarState.ERROR,
+                                message = "Error: ${submissionStatus.errorMessage}",
                                 duration = SnackbarDuration.Short
                             )
                         }
@@ -104,6 +105,7 @@ fun TransactionFormScreen(
                         else -> {}
                     }
                 }
+
             }) {
                 Text("Submit")
             }
@@ -197,6 +199,6 @@ fun VolumeField(volume: String, updateVolume: (String) -> Unit) {
 @Composable
 fun TransactionFormScreenPreview() {
     OwlioAppTheme {
-        TransactionFormScreen(snackbarHostState = SnackbarHostState(), navigateBack = {})
+        TransactionFormScreen(snackbarDelegate = SnackbarDelegate(), navigateBack = {})
     }
 }

@@ -12,6 +12,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,25 +24,30 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.owlio.ui.SnackbarDelegate
+import com.example.owlio.ui.getValue
 import com.example.owlio.ui.screen.PnlScreen
 import com.example.owlio.ui.screen.PortfolioScreen
 import com.example.owlio.ui.screen.Screens
 import com.example.owlio.ui.screen.TransactionScreen
 import com.example.owlio.ui.screen.form.TransactionFormScreen
 
-
 @Composable
 fun OwlioApp() {
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
-
+    val snackbarDelegate by remember { SnackbarDelegate() }
+    snackbarDelegate.apply {
+        snackbarHostState = scaffoldState.snackbarHostState
+        coroutineScope = rememberCoroutineScope()
+    }
 
     Scaffold(scaffoldState = scaffoldState,
         bottomBar = { OwlioBottonNavBar(navController = navController) },
         snackbarHost = {
             SnackbarHost(it) { snackbarData ->
                 Snackbar(
-                    snackbarData
+                    snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
                 )
             }
         }) { innerpadding ->
@@ -60,13 +67,14 @@ fun OwlioApp() {
             composable(Screens.TRANSACTIONFORM.route) {
                 TransactionFormScreen(
                     modifier = Modifier.padding(innerpadding),
-                    snackbarHostState = scaffoldState.snackbarHostState,
+                    snackbarDelegate = snackbarDelegate,
                     navigateBack = { navController.popBackStack() },
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun OwlioBottonNavBar(navController: NavController) {
