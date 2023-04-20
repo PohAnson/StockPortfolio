@@ -20,7 +20,7 @@ abstract class OwlioDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 Room.databaseBuilder(
                     context.applicationContext, OwlioDatabase::class.java, "stock_info"
-                ).fallbackToDestructiveMigration().createFromAsset("databases/stock_info.db")
+                ).fallbackToDestructiveMigration().createFromAsset("databases/prepopulated_data.db")
                     .build().also {
                         INSTANCE = it
                     }
