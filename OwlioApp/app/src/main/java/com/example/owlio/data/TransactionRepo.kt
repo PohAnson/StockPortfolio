@@ -5,4 +5,5 @@ import javax.inject.Inject
 
 class TransactionRepo @Inject constructor(private val transactionDao: TransactionDao) {
     fun insertTransaction(transaction: Transaction) = transactionDao.insert(transaction)
+    fun getAllTransaction() = transactionDao.getAllTransaction()
 }

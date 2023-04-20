@@ -9,3 +9,7 @@ fun LocalDate.toDate(): Date {
         this.atStartOfDay(ZoneId.systemDefault()).toInstant()
     )
 }
+
+fun Date.toLocalDate(): LocalDate {
+    return this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+}

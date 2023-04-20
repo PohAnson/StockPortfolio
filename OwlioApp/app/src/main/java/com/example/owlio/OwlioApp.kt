@@ -29,8 +29,8 @@ import com.example.owlio.ui.getValue
 import com.example.owlio.ui.screen.PnlScreen
 import com.example.owlio.ui.screen.PortfolioScreen
 import com.example.owlio.ui.screen.Screens
-import com.example.owlio.ui.screen.TransactionScreen
 import com.example.owlio.ui.screen.form.TransactionFormScreen
+import com.example.owlio.ui.screen.transaction.TransactionScreen
 
 @Composable
 fun OwlioApp() {
