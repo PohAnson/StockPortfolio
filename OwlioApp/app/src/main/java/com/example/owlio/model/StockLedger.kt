@@ -66,9 +66,9 @@ class StockLedger {
         transactions.forEach { addTransaction(it) }
     }
 
-    fun tabulateAllTransactions(): Map<String, Map<String, Any>> {
+    fun tabulateAllTransactionsForPortfolio(): Map<String, Map<String, Any>> {
         // stockCode: {volume, cost, pnl}
-        return stockRecords.mapValues { it.value.tabulateTransaction() }
+        return stockRecords.mapValues { it.value.tabulateTransaction() }.filterValues { it["volume"] != 0 }
     }
 }
 
