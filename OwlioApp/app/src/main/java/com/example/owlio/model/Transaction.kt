@@ -9,6 +9,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.owlio.data.StockInfoRepo
 import com.example.owlio.utils.toDate
+import com.example.owlio.utils.toLocalDate
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -34,6 +35,9 @@ data class Transaction(
     val volume: Int = 0,
 ) {
 
+    fun calculateFees(): Float {
+        return broker.calculateFees(value = price*volume, date = tradeDate.toLocalDate())
+    }
 
     companion object {
         fun fromTradeDateString(value: String): Date {

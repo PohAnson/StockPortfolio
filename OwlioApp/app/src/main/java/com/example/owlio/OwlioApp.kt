@@ -53,7 +53,7 @@ fun OwlioApp() {
         }) { innerpadding ->
         NavHost(navController = navController, startDestination = Screens.PORTFOLIO.route) {
             composable(Screens.PORTFOLIO.route) {
-                PortfolioScreen()
+                PortfolioScreen(modifier = Modifier.padding(innerpadding))
             }
             composable(Screens.TRANSACTION.route) {
                 TransactionScreen(
