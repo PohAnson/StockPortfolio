@@ -37,7 +37,7 @@ fun TransactionTable(transactionList: List<Transaction>, stockInfoMapping: Map<S
         return when (index) {
             0 -> 70.dp
             1 -> 70.dp
-            2 -> 150.dp
+            2 -> 140.dp
             3 -> 50.dp
             else -> 0.dp
         }
@@ -45,7 +45,7 @@ fun TransactionTable(transactionList: List<Transaction>, stockInfoMapping: Map<S
     LazyColumn(
         Modifier
             .fillMaxSize()
-            .padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             Row {
@@ -57,7 +57,7 @@ fun TransactionTable(transactionList: List<Transaction>, stockInfoMapping: Map<S
                     )
                 }
             }
-            Divider(Modifier.padding(vertical = 6.dp))
+            Divider(Modifier.padding(top = 8.dp))
         }
         items(transactionList, key = { it.transactionId }) {
             TransactionRow(
@@ -71,8 +71,8 @@ fun TransactionTable(transactionList: List<Transaction>, stockInfoMapping: Map<S
 
 @Composable
 fun TransactionRow(transaction: Transaction, stockInfo: StockInfo?, cellWidth: (Int) -> Dp) {
-    val cellTextStyle = TextStyle(fontSize = 14.sp)
-    Row(Modifier.padding(vertical = 4.dp)) {
+    val cellTextStyle = TextStyle(fontSize = 15.sp)
+    Row(Modifier.padding(vertical = 10.dp)) {
         //Date
         Text(
             transaction.tradeDate.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yy")),
@@ -100,10 +100,10 @@ fun TransactionRow(transaction: Transaction, stockInfo: StockInfo?, cellWidth: (
         Column(
             modifier = Modifier.width(cellWidth(2))
         ) {
-            val fontSz = if ((stockInfo?.tradingName ?: "").length < 15) 14.sp else 12.sp
+            val fontSz = if ((stockInfo?.tradingName ?: "").length < 14) 15.sp else 12.sp
 
             Text(
-                text = stockInfo?.tradingName ?: "UNKNOWN STOCK",
+                text = stockInfo?.tradingName ?: "NIL",
                 style = cellTextStyle,
                 fontSize = fontSz,
                 maxLines = 1,

@@ -1,5 +1,6 @@
 package com.example.owlio.ui.screen
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -11,5 +12,9 @@ import com.example.owlio.ui.screen.portfolio.PortfolioViewModel
 fun PortfolioScreen(modifier: Modifier = Modifier) {
     val vm: PortfolioViewModel = hiltViewModel()
     val portfolioRowDataList = vm.portfolioRowDataState.collectAsState().value
-    PortfolioTable(portfolioRowDataList = portfolioRowDataList, modifier=modifier)
+    if (vm.isLoading) {
+        Text(text = "Loading ......")
+    } else {
+        PortfolioTable(portfolioRowDataList = portfolioRowDataList, modifier = modifier)
+    }
 }

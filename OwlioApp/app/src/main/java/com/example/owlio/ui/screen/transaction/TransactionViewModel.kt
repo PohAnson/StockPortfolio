@@ -29,7 +29,8 @@ class TransactionViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val stockInfoMapping: Flow<Map<String, StockInfo>> =
-        stockInfoRepo.getAllStock().mapLatest { it.map { it.tradingCode to it }.toMap() }
+        stockInfoRepo.getAllStock()
+            .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
 
 }
 

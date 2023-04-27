@@ -9,11 +9,14 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,30 +44,36 @@ fun OwlioApp() {
         snackbarHostState = scaffoldState.snackbarHostState
         coroutineScope = rememberCoroutineScope()
     }
+    var topAppBarTitle by remember { mutableStateOf("Owlio") }
 
-    Scaffold(scaffoldState = scaffoldState,
-        bottomBar = { OwlioBottonNavBar(navController = navController) },
-        snackbarHost = {
-            SnackbarHost(it) { snackbarData ->
-                Snackbar(
-                    snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
-                )
-            }
-        }) { innerpadding ->
+    Scaffold(scaffoldState = scaffoldState, topBar = {
+        OwlioTopAppBar(title = topAppBarTitle)
+    }, bottomBar = { OwlioBottonNavBar(navController = navController) }, snackbarHost = {
+        SnackbarHost(it) { snackbarData ->
+            Snackbar(
+                snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
+            )
+        }
+    },
+    ) { innerpadding ->
         NavHost(navController = navController, startDestination = Screens.PORTFOLIO.route) {
             composable(Screens.PORTFOLIO.route) {
+                topAppBarTitle = Screens.PORTFOLIO.label
                 PortfolioScreen(modifier = Modifier.padding(innerpadding))
             }
             composable(Screens.TRANSACTION.route) {
+                topAppBarTitle = Screens.TRANSACTION.label
                 TransactionScreen(
                     goToTransactionForm = { navController.navigate(route = Screens.TRANSACTIONFORM.route) },
                     modifier = Modifier.padding(innerpadding)
                 )
             }
             composable(Screens.PNL.route) {
+                topAppBarTitle = Screens.PNL.label
                 PnlScreen()
             }
             composable(Screens.TRANSACTIONFORM.route) {
+                topAppBarTitle = Screens.TRANSACTIONFORM.label
                 TransactionFormScreen(
                     modifier = Modifier.padding(innerpadding),
                     snackbarDelegate = snackbarDelegate,
@@ -73,6 +82,15 @@ fun OwlioApp() {
             }
         }
     }
+}
+
+@Composable
+fun OwlioTopAppBar(
+    title: String, modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(title) }, modifier = modifier
+    )
 }
 
 

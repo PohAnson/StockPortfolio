@@ -36,7 +36,7 @@ data class Transaction(
 ) {
 
     fun calculateFees(): Float {
-        return broker.calculateFees(value = price*volume, date = tradeDate.toLocalDate())
+        return broker.calculateFees(value = price * volume, date = tradeDate.toLocalDate())
     }
 
     companion object {

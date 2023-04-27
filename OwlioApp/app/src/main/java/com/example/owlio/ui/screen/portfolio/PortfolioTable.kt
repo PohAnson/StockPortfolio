@@ -2,6 +2,9 @@ package com.example.owlio.ui.screen.portfolio
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,13 +24,13 @@ import androidx.compose.ui.unit.sp
 import com.example.owlio.model.PortfolioRowData
 
 @Composable
-fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modifier=Modifier) {
+fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modifier = Modifier) {
     fun cellWidth(index: Int): Dp {
         return when (index) {
-            0 -> 150.dp
+            0 -> 140.dp
             1 -> 70.dp
             2 -> 70.dp
-            3 -> 70.dp
+            3 -> 80.dp
             else -> 0.dp
         }
     }
@@ -34,7 +38,9 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
     val headerTitle: List<String> = listOf("Symbol", "Avg Price", "Volume", "Cost")
 
     LazyColumn(
-        modifier.padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally
+        modifier
+            .fillMaxSize()
+            .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             Row {
@@ -46,7 +52,7 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
                     )
                 }
             }
-            Divider(Modifier.padding(vertical = 6.dp))
+            Divider(Modifier.padding(top = 8.dp))
         }
         items(portfolioRowDataList, key = { it.stockCode }) {
             PortfolioRow(it, cellWidth = ::cellWidth)
@@ -57,26 +63,44 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
 
 @Composable
 fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
-    val cellTextStyle = TextStyle(fontSize = 14.sp)
-    Row(Modifier.padding(vertical = 4.dp)) {
+    val cellTextStyle = TextStyle(fontSize = 15.sp)
+    Row(Modifier.padding(vertical = 10.dp)) {
         // Stock Name/Code
         Column(modifier = Modifier.width(cellWidth(0))) {
+            val fontSz = if ((portfolioRowData.stockName).length < 14) 15.sp else 12.sp
+
             Text(
                 text = portfolioRowData.stockName,
                 style = cellTextStyle,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                fontSize = fontSz,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(text = portfolioRowData.stockCode, style = cellTextStyle)
         }
 
         // Avg Price
-        Text("%.3f".format(portfolioRowData.avgPrice), modifier = Modifier.width(cellWidth(1)))
+        Text(
+            "%.3f".format(portfolioRowData.avgPrice),
+            modifier = Modifier.width(cellWidth(1)),
+            style = cellTextStyle
+        )
 
         // Volume
-        Text(portfolioRowData.volume.toString(), modifier = Modifier.width(cellWidth(2)))
+        Text(
+            portfolioRowData.volume.toString(),
+            modifier = Modifier.width(cellWidth(2)),
+            style = cellTextStyle
+        )
 
         // Total Cost
-        Text("%.2f".format(portfolioRowData.cost), modifier = Modifier.width(cellWidth(3)))
+        Text(
+            "%.2f".format(portfolioRowData.cost),
+            modifier = Modifier.width(cellWidth(3)),
+            style = cellTextStyle
+        )
 
 
     }
