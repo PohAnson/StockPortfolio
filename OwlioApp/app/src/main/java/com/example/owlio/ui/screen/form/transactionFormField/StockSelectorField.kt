@@ -26,7 +26,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.example.owlio.model.StockInfo
-import com.example.owlio.ui.screen.form.GenericFieldRow
 
 fun StockInfo.containsStringQuery(query: String): Boolean {
     val currentQuery = query.trim()

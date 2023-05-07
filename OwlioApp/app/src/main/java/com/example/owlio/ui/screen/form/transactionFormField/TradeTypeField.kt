@@ -11,12 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.owlio.model.Broker
+import com.example.owlio.model.TradeType
 
 
 @Composable
-fun BrokerField(selectedBroker: Broker?, updateBroker: (Broker) -> Unit) {
-    GenericFieldRow(label = "Broker") {
+fun TradeTypeField(tradeType: TradeType?, updateTradeType: (TradeType) -> Unit) {
+    GenericFieldRow(label = "Trade Type") {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -25,22 +25,20 @@ fun BrokerField(selectedBroker: Broker?, updateBroker: (Broker) -> Unit) {
                 backgroundColor = MaterialTheme.colors.primary,
                 contentColor = MaterialTheme.colors.onPrimary
             )
+//            tradeType == TradeType.Buy
             OutlinedButton(
-                onClick = { updateBroker(Broker.Poems) },
+                onClick = { updateTradeType(TradeType.Buy) },
                 modifier = Modifier.padding(8.dp),
-                colors = if (selectedBroker?.name == Broker.Poems.name) selectedButtonColors else ButtonDefaults.outlinedButtonColors(),
+                colors = if (tradeType == TradeType.Buy) selectedButtonColors else ButtonDefaults.outlinedButtonColors(),
             ) {
-                Text("Poems")
+                Text("Buy")
             }
             OutlinedButton(
-                onClick = { updateBroker(Broker.Moomoo) },
-                colors = if (selectedBroker?.name == Broker.Moomoo.name) selectedButtonColors else ButtonDefaults.outlinedButtonColors(),
+                onClick = { updateTradeType(TradeType.Sell) },
+                colors = if (tradeType == TradeType.Sell) selectedButtonColors else ButtonDefaults.outlinedButtonColors(),
             ) {
-                Text("Moomoo")
-
-
+                Text("Sell")
             }
-
         }
     }
 }
