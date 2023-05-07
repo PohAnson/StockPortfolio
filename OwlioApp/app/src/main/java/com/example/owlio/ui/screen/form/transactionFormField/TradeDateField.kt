@@ -18,8 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.owlio.ui.screen.form.GenericFieldRow
-import java.util.*
+import java.util.Calendar
 
 
 @Composable
@@ -32,7 +31,7 @@ fun TradeDateField(tradeDate: String, setTradeDate: (String) -> Unit) {
     val datePicker = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-            setTradeDate("$dayOfMonth/${month + 1}/$year")
+            setTradeDate("${"%02d".format(dayOfMonth)}/${"%02d".format(month + 1)}/$year")
         },
         calendar[Calendar.YEAR], calendar[Calendar.MONTH], calendar[Calendar.DAY_OF_MONTH],
     )

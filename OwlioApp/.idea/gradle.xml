@@ -6,6 +6,17 @@
       <GradleProjectSettings>
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="/shared/Projects/StockPortfolio/OwlioApp" />
+            <option value="/shared/Projects/StockPortfolio/OwlioApp/app" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="/shared/Projects/StockPortfolio/OwlioApp" />
         <option name="modules">
           <set>
