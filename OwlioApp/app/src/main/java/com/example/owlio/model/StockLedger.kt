@@ -1,5 +1,8 @@
 package com.example.owlio.model
 
+import com.example.owlio.data.DividendInfoRepo
+import com.example.owlio.data.TransactionDividendDataSource
+
 
 class _SingleStockRecord(val code: String) {
 
@@ -49,6 +52,12 @@ class _SingleStockRecord(val code: String) {
         return mapOf("volume" to curTotalVolume, "cost" to curTotalCost, "pnl" to pnl)
     }
 
+    suspend fun tabulateDividends(dividendInfoRepo: DividendInfoRepo): Float {
+        return TransactionDividendDataSource.calculateTotalDividendEarnings(
+            dividendInfoRepo.getDividendDateRowList(code).toMutableList(), transactionSet.toList()
+        )
+    }
+
 }
 
 
@@ -68,7 +77,16 @@ class StockLedger {
 
     fun tabulateAllTransactionsForPortfolio(): Map<String, Map<String, Any>> {
         // stockCode: {volume, cost, pnl}
-        return stockRecords.mapValues { it.value.tabulateTransaction() }.filterValues { it["volume"] != 0 }
+        return stockRecords.mapValues { it.value.tabulateTransaction() }
+            .filterValues { it["volume"] != 0 }
+    }
+
+    suspend fun tabulateAllTransactionForPnl(dividendInfoRepo: DividendInfoRepo): Map<String, Map<String, Any>> {
+        // stockCode: {volume, cost, pnl, dividend}
+        return stockRecords.mapValues {
+            it.value.tabulateTransaction()
+                .plus("dividend" to it.value.tabulateDividends(dividendInfoRepo))
+        }
     }
 }
 

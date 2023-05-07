@@ -1,13 +1,14 @@
-package com.example.owlio.ui.screen.portfolio
+package com.example.owlio.ui.screen.pnl
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.owlio.data.DividendInfoRepo
 import com.example.owlio.data.StockInfoRepo
 import com.example.owlio.data.TransactionRepo
-import com.example.owlio.model.PortfolioRowData
+import com.example.owlio.model.PnlRowData
 import com.example.owlio.model.StockInfo
 import com.example.owlio.model.StockLedger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,43 +23,35 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class PortfolioViewModel @Inject constructor(
-    stockInfoRepo: StockInfoRepo, val transactionRepo: TransactionRepo
+class PnlViewModel @Inject constructor(
+    private val dividendInfoRepo: DividendInfoRepo,
+    private val transactionRepo: TransactionRepo,
+    stockInfoRepo: StockInfoRepo
 ) : ViewModel() {
     var isLoading by mutableStateOf(true)
     val stockInfoMapping: Flow<Map<String, StockInfo>> = stockInfoRepo.getAllStock()
         .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
-    val portfolioRowDataState = getPortfolioRows(tabulateTransactions(), stockInfoMapping)
-
-    fun tabulateTransactions(): Flow<Map<String, Map<String, Any>>> {
-        val ledger = StockLedger()
-        return transactionRepo.getAllTransaction().mapLatest {
-            ledger.addTransactions(it)
-            ledger.tabulateAllTransactionsForPortfolio()
-        }
-    }
+    val pnlRow = getAllPnlRow()
 
 
-    fun getPortfolioRows(
-        tabulatedTransactions: Flow<Map<String, Map<String, Any>>>,
-        stockInfoMapping: Flow<Map<String, StockInfo>>
-    ): StateFlow<List<PortfolioRowData>> {
-        return tabulatedTransactions.mapLatest { singleTabulatedTransaction ->
+    private fun getAllPnlRow(): StateFlow<List<PnlRowData>> {
+        return transactionRepo.getAllTransaction().mapLatest { allTransaction ->
             isLoading = true
-            singleTabulatedTransaction.map {
-                PortfolioRowData(
+            val ledger = StockLedger()
+            ledger.addTransactions(allTransaction)
+            val tabulatedTransaction = ledger.tabulateAllTransactionForPnl(dividendInfoRepo)
+            tabulatedTransaction.map {
+                PnlRowData(
                     stockInfoMapping.first().let { stockInfoMap: Map<String, StockInfo> ->
                         stockInfoMap[it.key]?.tradingName ?: ""
                     },
                     it.key,
-                    it.value["volume"] as Int,
-                    it.value["cost"] as Float,
+                    it.value["pnl"] as Float,
+                    it.value["dividend"] as Float,
                 )
-            }.also { isLoading = false }
-
-        }.stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5000), listOf()
-        )
+            }.also {
+                isLoading = false
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
     }
-
 }

@@ -29,10 +29,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.owlio.ui.SnackbarDelegate
 import com.example.owlio.ui.getValue
-import com.example.owlio.ui.screen.PnlScreen
 import com.example.owlio.ui.screen.PortfolioScreen
 import com.example.owlio.ui.screen.Screens
 import com.example.owlio.ui.screen.form.TransactionFormScreen
+import com.example.owlio.ui.screen.pnl.PnlScreen
 import com.example.owlio.ui.screen.transaction.TransactionScreen
 
 @Composable
@@ -46,15 +46,19 @@ fun OwlioApp() {
     }
     var topAppBarTitle by remember { mutableStateOf("Owlio") }
 
-    Scaffold(scaffoldState = scaffoldState, topBar = {
-        OwlioTopAppBar(title = topAppBarTitle)
-    }, bottomBar = { OwlioBottonNavBar(navController = navController) }, snackbarHost = {
-        SnackbarHost(it) { snackbarData ->
-            Snackbar(
-                snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
-            )
-        }
-    },
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            OwlioTopAppBar(title = topAppBarTitle)
+        },
+        bottomBar = { OwlioBottonNavBar(navController = navController) },
+        snackbarHost = {
+            SnackbarHost(it) { snackbarData ->
+                Snackbar(
+                    snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
+                )
+            }
+        },
     ) { innerpadding ->
         NavHost(navController = navController, startDestination = Screens.PORTFOLIO.route) {
             composable(Screens.PORTFOLIO.route) {
