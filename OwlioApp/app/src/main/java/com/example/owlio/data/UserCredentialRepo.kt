@@ -20,6 +20,10 @@ class UserCredentialRepo @Inject constructor(private val dataStorePreferences: D
         }
     }
 
+    suspend fun clearUserCredentials() {
+        dataStorePreferences.edit { it.clear() }
+    }
+
     val username = dataStorePreferences.data.catch {
         handleIoException(it)
         emit(emptyPreferences())

@@ -30,9 +30,8 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
         }
     }
 
-    fun credential(): String {
-        return runBlocking(Dispatchers.Default) {
-            "${userCredentialRepo.username.firstOrNull()} ${userCredentialRepo.password.firstOrNull()}"
-        }
+    fun clearCredential() {
+        runBlocking { userCredentialRepo.clearUserCredentials() }
     }
+
 }

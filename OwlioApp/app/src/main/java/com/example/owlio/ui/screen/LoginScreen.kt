@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owlio.R
 import com.example.owlio.ui.SnackbarDelegate
 import com.example.owlio.ui.SnackbarState
@@ -35,39 +34,30 @@ import com.example.owlio.ui.SnackbarState
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier, snackbarDelegate: SnackbarDelegate, onSuccess: () -> Unit
+    isCredentialPresent: Boolean,
+    checkCredential: (String, String) -> Boolean,
+    saveCredential: (String, String) -> Boolean,
+    modifier: Modifier = Modifier,
+    snackbarDelegate: SnackbarDelegate,
+    onSuccess: () -> Unit
 ) {
-    val vm: LoginViewModel = hiltViewModel()
-    when (vm.isCredentialPresent()) {
-        false ->
-            // Signup Form
-            UserAuthForm(login = false, modifier = modifier, onSubmit = { username, password ->
-                if (username.isEmpty() && password.isEmpty()) {
-                    snackbarDelegate.showSnackbar(
-                        SnackbarState.ERROR, "Username/Password is empty!"
-                    )
-                } else {
-                    vm.saveCredential(
-                        username, password
-                    )
-                    onSuccess()
-                }
-            })
-
-        true ->
-            // Login Form
-            UserAuthForm(login = true, modifier = modifier, onSubmit = { username, password ->
-                if (vm.checkCredential(username, password)) {
-                    onSuccess()
-                } else {
-                    snackbarDelegate.showSnackbar(
-                        SnackbarState.ERROR,
-                        "Invalid Username/Password",
-                        duration = SnackbarDuration.Long
-                    )
-
-                }
-            })
+    if (isCredentialPresent) {
+        // Auto login
+        onSuccess()
+    } else {
+        // Signup Form
+        UserAuthForm(login = false, modifier = modifier, onSubmit = { username, password ->
+            if (username.isEmpty() && password.isEmpty()) {
+                snackbarDelegate.showSnackbar(
+                    SnackbarState.ERROR, "Username/Password is empty!"
+                )
+            } else {
+                saveCredential(
+                    username, password
+                )
+                onSuccess()
+            }
+        })
     }
 }
 
@@ -80,7 +70,7 @@ private fun UserAuthForm(
     val formNameType = if (login) "Login" else "Sign Up"
     val focusManager = LocalFocusManager.current
     Column(
-        modifier = Modifier.fillMaxSize(1f), horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.fillMaxSize(1f), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // wave picture
         Image(

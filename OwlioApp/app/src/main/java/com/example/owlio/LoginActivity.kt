@@ -17,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owlio.ui.SnackbarDelegate
 import com.example.owlio.ui.getValue
 import com.example.owlio.ui.screen.LoginScreen
+import com.example.owlio.ui.screen.LoginViewModel
 import com.example.owlio.ui.theme.OwlioAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,7 +31,6 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContent {
             val snackbarDelegate by remember { SnackbarDelegate() }
             val scaffoldState = rememberScaffoldState()
@@ -37,6 +38,11 @@ class LoginActivity : ComponentActivity() {
                 snackbarHostState = scaffoldState.snackbarHostState
                 coroutineScope = rememberCoroutineScope()
             }
+            val vm: LoginViewModel = hiltViewModel()
+            val isClearCredential = intent.getBooleanExtra("isClearCredential", false)
+            if (isClearCredential) vm.clearCredential()
+
+
             OwlioAppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -52,7 +58,20 @@ class LoginActivity : ComponentActivity() {
                             )
                         }
                     }) { innerpadding ->
-                        LoginScreen(modifier = Modifier.padding(innerpadding),
+                        LoginScreen(
+                            isCredentialPresent = vm.isCredentialPresent(),
+                            checkCredential = { username, password ->
+                                vm.checkCredential(
+                                    username,
+                                    password
+                                )
+                            },
+                            saveCredential = { username, password ->
+                                vm.checkCredential(
+                                    username,
+                                    password
+                                )
+                            }, modifier = Modifier.padding(innerpadding),
                             snackbarDelegate,
                             onSuccess = {
                                 val intent = Intent(this, MainActivity::class.java)

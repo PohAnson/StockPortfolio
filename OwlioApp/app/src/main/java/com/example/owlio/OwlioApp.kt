@@ -10,6 +10,8 @@ import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +38,7 @@ import com.example.owlio.ui.screen.pnl.PnlScreen
 import com.example.owlio.ui.screen.transaction.TransactionScreen
 
 @Composable
-fun OwlioApp() {
+fun OwlioApp(onLogout: () -> Unit) {
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val snackbarDelegate by remember { SnackbarDelegate() }
@@ -51,7 +53,7 @@ fun OwlioApp() {
         topBar = {
             OwlioTopAppBar(title = topAppBarTitle)
         },
-        bottomBar = { OwlioBottonNavBar(navController = navController) },
+        bottomBar = { OwlioBottonNavBar(navController = navController, onLogout) },
         snackbarHost = {
             SnackbarHost(it) { snackbarData ->
                 Snackbar(
@@ -99,7 +101,7 @@ fun OwlioTopAppBar(
 
 
 @Composable
-fun OwlioBottonNavBar(navController: NavController) {
+fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
     BottomNavigation {
         val screens = listOf(Screens.PORTFOLIO, Screens.TRANSACTION, Screens.PNL)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -127,6 +129,13 @@ fun OwlioBottonNavBar(navController: NavController) {
                 alwaysShowLabel = true,
             )
         }
+        BottomNavigationItem(selected = false, onClick = { onLogout() }, icon = {
+            Icon(
+                imageVector = Icons.Outlined.AccountBox, contentDescription = null
+            )
+        }, label = { Text(text = "Logout") })
+
+
     }
 }
 
