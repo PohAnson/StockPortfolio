@@ -12,8 +12,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,34 +36,44 @@ import com.example.owlio.ui.SnackbarState
 fun LoginScreen(
     isCredentialPresent: Boolean,
     checkCredential: (String, String) -> Boolean,
-    saveCredential: (String, String) -> Boolean,
+    saveCredential: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     snackbarDelegate: SnackbarDelegate,
-    onSuccess: () -> Unit
+    onSuccess: () -> Unit,
+    login: (String, String) -> Unit,
 ) {
+    var isLoginForm by remember {
+        mutableStateOf(true)
+    }
     if (isCredentialPresent) {
         // Auto login
         onSuccess()
     } else {
+        // Login Form
+        if (isLoginForm) UserAuthForm(login = true,
+            onSubmit = { username, password -> login(username, password) },
+            toggleSignUpSignInForm = { isLoginForm = false })
+        else
         // Signup Form
-        UserAuthForm(login = false, modifier = modifier, onSubmit = { username, password ->
-            if (username.isEmpty() && password.isEmpty()) {
-                snackbarDelegate.showSnackbar(
-                    SnackbarState.ERROR, "Username/Password is empty!"
-                )
-            } else {
-                saveCredential(
-                    username, password
-                )
-                onSuccess()
-            }
-        })
+            UserAuthForm(login = false, modifier = modifier, onSubmit = { username, password ->
+                if (username.isEmpty() && password.isEmpty()) {
+                    snackbarDelegate.showSnackbar(
+                        SnackbarState.ERROR, "Username/Password is empty!"
+                    )
+                } else {
+                    saveCredential(username, password)
+                    onSuccess()
+                }
+            }, toggleSignUpSignInForm = { isLoginForm = true })
     }
 }
 
 @Composable
 private fun UserAuthForm(
-    login: Boolean, modifier: Modifier = Modifier, onSubmit: (String, String) -> Unit
+    login: Boolean,
+    modifier: Modifier = Modifier,
+    onSubmit: (String, String) -> Unit,
+    toggleSignUpSignInForm: () -> Unit = {}
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -123,6 +133,13 @@ private fun UserAuthForm(
             onSubmit(username, password)
         }) {
             Text(formNameType)
+        }
+        Spacer(modifier = Modifier.height(48.dp))
+
+
+        TextButton(onClick = { toggleSignUpSignInForm() }) {
+            if (login) Text("Sign up here")
+            else Text("Sign in here")
         }
 
     }

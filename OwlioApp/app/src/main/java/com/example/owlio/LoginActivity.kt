@@ -77,7 +77,8 @@ class LoginActivity : ComponentActivity() {
                                 val intent = Intent(this, MainActivity::class.java)
                                 startActivity(intent)
                                 finish()
-                            })
+                            },
+                            login = { username, password -> vm.saveCredential(username, password) })
                     }
                 }
             }
