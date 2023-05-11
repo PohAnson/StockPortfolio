@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["dotenv", "jsonify", "jsonstr", "userid"]
+  "cSpell.words": [
+    "dotenv",
+    "jsonify",
+    "jsonstr",
+    "sessionfinish",
+    "sessionstart",
+    "userid"
+  ]
 }
