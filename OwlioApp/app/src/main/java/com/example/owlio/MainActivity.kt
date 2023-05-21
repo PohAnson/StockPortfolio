@@ -1,5 +1,6 @@
 package com.example.owlio
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,7 +24,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background,
                 ) {
-                    OwlioApp()
+                    OwlioApp(onLogout = {
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.putExtra("isLogout", true)
+                        startActivity(intent)
+                        finish()
+                    })
                 }
             }
         }
