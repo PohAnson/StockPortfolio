@@ -11,6 +11,11 @@ session_manager = SessionManager()
 
 @user_api_bp.get("")
 def user_session_available():
+    """Check if user session is available
+
+    Json Response:
+        + 200 {"isLogin": boolean}
+    """
     return jsonify(
         {"isLogin": request.environ.get("sassyid") in session_manager}
     )
@@ -18,6 +23,16 @@ def user_session_available():
 
 @user_api_bp.post("")
 def user_login():
+    """Logins the user
+
+    Requires:
+        json: {"username", "password"}
+
+    Json Response:
+        + 200 {"sassyid": str}
+        + 401 {"error", Incorrect Login Credentials}
+    """
+
     user_data = request.json
     try:
         if userdb.authenticate_one_user(user_data):
@@ -35,12 +50,30 @@ def user_login():
 
 @user_api_bp.get("/logout")
 def user_logout():
+    """Logout the user
+
+    Requires:
+        valid request cookies containing key "sassyid"
+
+    Json Response:
+        + 200 {"ok": True}
+    """
     session_manager.remove_ses(request.cookies.get("sassyid"))
     return jsonify({"ok": True})
 
 
 @user_api_bp.put("")
 def user_signup():
+    """Create new user account
+
+    Requires:
+        json: {"username", "password", "name"}
+
+    Json Response:
+        + 200 {"sassyid": str session_id}
+        + 406 {"error": str error_msg}
+    """
+
     user_data = request.json
     try:
         userid = userdb.insert_one_user(user_data)

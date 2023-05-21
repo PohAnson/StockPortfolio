@@ -31,6 +31,7 @@ class middleware:
             return res(environ, start_response)
 
         environ.update(userid=self.session_manager.get_ses_user(sessionid))
+        environ.update(sassyid=sessionid)
 
         print(
             f"sessionid:\t{sessionid}", f"\nuserid:  \t{environ.get('userid')}"

@@ -1,3 +1,4 @@
+from multiprocessing import Value
 import sys
 from dataclasses import dataclass
 from datetime import datetime as dt
@@ -38,9 +39,15 @@ def _parse_table_rows(rows) -> list[DividendDateRow]:
 
         ex_date = dt.strptime(ex_date.get_text(), "%Y-%m-%d")
         if ex_date >= dt(2015, 1, 1) and rate.get_text().strip() != "-":
-            dividend_payouts.append(
-                DividendDateRow(float(rate.get_text().strip("SGD ")), ex_date)
-            )
+            try:
+                dividend_payouts.append(
+                    DividendDateRow(
+                        float(rate.get_text().strip("SGD ")), ex_date
+                    )
+                )
+            except ValueError:
+                # when the rate is not in SGD
+                continue
 
     return dividend_payouts
 

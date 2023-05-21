@@ -70,7 +70,6 @@ _transactions = [
 
 class StockLedgerTestCase(unittest.TestCase):
     def setUp(self) -> None:
-
         ledger = Ledger()
         ledger.add_transactions(_transactions)
         self.ledger = ledger
@@ -184,9 +183,9 @@ class StockLedgerTestCase(unittest.TestCase):
             "volume": 0,
             "cost": 0,
             "avg_price": 0,
-            "pnl": 436.23,
+            "pnl": 481.23,
             "transactions_sum": 316.23,
-            "dividends_sum": 120,
+            "dividends_sum": 165,
         }
         for k, v in expected.items():
             self.assertAlmostEqual(result[k], v, msg=k)

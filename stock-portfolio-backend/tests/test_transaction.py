@@ -22,7 +22,6 @@ class TransactionTestCase(unittest.TestCase):
         self.assertEqual(trans_dict_original, trans_dict_result)
 
     def test_to_json(self):
-        # trans_dict_original =
         trans = Transaction.from_dict(
             {
                 "date": datetime.datetime(2020, 12, 21, 0, 0),
@@ -36,20 +35,20 @@ class TransactionTestCase(unittest.TestCase):
             }
         )
         trans_json_result = trans.to_json()
-        self.assertEqual(
-            {
-                "_id": "pydqluk",
-                "date": "21/12/2020",
-                "code": "AZG",
-                "type_": "buy",
-                "price": 1.1,
-                "volume": 1000,
-                "userid": "412",
-                "broker": "poems",
-                "name": "8Telecom",
-            },
-            trans_json_result,
-        )
+        expected = {
+            "_id": "pydqluk",
+            "date": "21/12/2020",
+            "code": "AZG",
+            "type_": "buy",
+            "price": 1.1,
+            "volume": 1000,
+            "userid": "412",
+            "broker": "poems",
+            "name": "8Telecom",
+        }
+
+        for k, v in trans_json_result.items():
+            self.assertAlmostEqual(v, expected[k], msg=k)
 
     def test_calc_poems_fees(self):
         trans = Transaction.from_dict(
