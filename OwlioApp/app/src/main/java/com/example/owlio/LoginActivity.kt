@@ -39,8 +39,10 @@ class LoginActivity : ComponentActivity() {
                 coroutineScope = rememberCoroutineScope()
             }
             val vm: LoginViewModel = hiltViewModel()
-            val isClearCredential = intent.getBooleanExtra("isClearCredential", false)
-            if (isClearCredential) vm.clearCredential()
+            val isLogout = intent.getBooleanExtra("isLogout", false)
+            if (isLogout) vm.logout()
+
+
 
 
             OwlioAppTheme {
@@ -58,34 +60,20 @@ class LoginActivity : ComponentActivity() {
                             )
                         }
                     }) { innerpadding ->
-                        LoginScreen(
-                            isCredentialPresent = vm.isCredentialPresent(),
-                            checkCredential = { username, password ->
-                                vm.checkCredential(
-                                    username,
-                                    password
-                                )
-                            },
-                            saveCredential = { username, password ->
-                                vm.checkCredential(
-                                    username,
-                                    password
-                                )
-                            }, modifier = Modifier.padding(innerpadding),
-                            snackbarDelegate,
+                        LoginScreen(isCredentialPresent = vm.isCredentialPresent(),
+                            vm = vm,
+                            modifier = Modifier.padding(innerpadding),
+                            snackbarDelegate = snackbarDelegate,
                             onSuccess = {
                                 val intent = Intent(this, MainActivity::class.java)
                                 startActivity(intent)
                                 finish()
-                            },
-                            login = { username, password -> vm.saveCredential(username, password) })
+                            })
                     }
                 }
             }
         }
     }
-
-
 }
 
 

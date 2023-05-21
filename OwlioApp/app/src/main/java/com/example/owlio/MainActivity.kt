@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     OwlioApp(onLogout = {
                         val intent = Intent(this, LoginActivity::class.java)
-                        intent.putExtra("isClearCredential", true)
+                        intent.putExtra("isLogout", true)
                         startActivity(intent)
                         finish()
                     })

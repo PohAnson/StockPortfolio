@@ -35,34 +35,56 @@ import com.example.owlio.ui.SnackbarState
 @Composable
 fun LoginScreen(
     isCredentialPresent: Boolean,
-    checkCredential: (String, String) -> Boolean,
-    saveCredential: (String, String) -> Unit,
+    vm: LoginViewModel,
     modifier: Modifier = Modifier,
     snackbarDelegate: SnackbarDelegate,
     onSuccess: () -> Unit,
-    login: (String, String) -> Unit,
 ) {
     var isLoginForm by remember {
         mutableStateOf(true)
     }
+
+
+
     if (isCredentialPresent) {
-        // Auto login
+        // Auto login when there is session cookies stored
         onSuccess()
     } else {
         // Login Form
-        if (isLoginForm) UserAuthForm(login = true,
-            onSubmit = { username, password -> login(username, password) },
-            toggleSignUpSignInForm = { isLoginForm = false })
+        if (isLoginForm) UserAuthForm(login = true, onSubmit = { username, password ->
+            vm.login(username, password).invokeOnCompletion {
+                when (val loginState = vm.authStatusUiState) {
+                    is AuthStatusUiState.Error -> snackbarDelegate.showSnackbar(
+                        SnackbarState.ERROR, loginState.errorMessage
+                    )
+
+                    is AuthStatusUiState.Success -> vm.saveSessionId(loginState.sessionId)
+                        .invokeOnCompletion { onSuccess() }
+
+                    else -> {}
+                }
+            }
+        }, toggleSignUpSignInForm = { isLoginForm = false })
         else
         // Signup Form
             UserAuthForm(login = false, modifier = modifier, onSubmit = { username, password ->
-                if (username.isEmpty() && password.isEmpty()) {
+                if (username.isEmpty() || password.isEmpty()) {
                     snackbarDelegate.showSnackbar(
                         SnackbarState.ERROR, "Username/Password is empty!"
                     )
                 } else {
-                    saveCredential(username, password)
-                    onSuccess()
+                    vm.signup(username, password).invokeOnCompletion {
+                        when (val signupState = vm.authStatusUiState) {
+                            is AuthStatusUiState.Error -> snackbarDelegate.showSnackbar(
+                                SnackbarState.ERROR, signupState.errorMessage
+                            )
+
+                            is AuthStatusUiState.Success -> vm.saveSessionId(signupState.sessionId)
+                                .invokeOnCompletion { onSuccess() }
+
+                            else -> {}
+                        }
+                    }
                 }
             }, toggleSignUpSignInForm = { isLoginForm = true })
     }
