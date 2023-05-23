@@ -2,8 +2,10 @@ package com.example.owlio
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
@@ -11,7 +13,7 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBox
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -106,6 +108,8 @@ fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
         val screens = listOf(Screens.PORTFOLIO, Screens.TRANSACTION, Screens.PNL)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+        var openConfirmLogoutDialog by remember { mutableStateOf(false) }
+
         screens.forEach { screen ->
             BottomNavigationItem(
                 selected = currentRoute == screen.route,
@@ -123,17 +127,29 @@ fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
                 },
                 label = {
                     Text(
-                        text = screen.label, fontWeight = FontWeight.SemiBold, fontSize = 14.sp
+                        text = screen.label, fontWeight = FontWeight.SemiBold, fontSize = 10.sp
                     )
                 },
-                alwaysShowLabel = true,
             )
         }
-        BottomNavigationItem(selected = false, onClick = { onLogout() }, icon = {
-            Icon(
-                imageVector = Icons.Outlined.AccountBox, contentDescription = null
-            )
-        }, label = { Text(text = "Logout") })
+        BottomNavigationItem(selected = false,
+            onClick = { openConfirmLogoutDialog = true },
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.ExitToApp, contentDescription = null
+                )
+            },
+            label = { Text(text = "Logout", fontSize = 10.sp) })
+        if (openConfirmLogoutDialog) AlertDialog(onDismissRequest = {
+            openConfirmLogoutDialog = false
+        },
+            title = { Text(text = "Confirm Logout?") },
+            confirmButton = { Button(onClick = { onLogout() }) { Text("Logout") } },
+            dismissButton = {
+                Button(onClick = {
+                    openConfirmLogoutDialog = false
+                }) { Text("Cancel") }
+            })
 
 
     }
