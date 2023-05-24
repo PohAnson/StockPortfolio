@@ -40,9 +40,13 @@ data class Transaction(
     }
 
     companion object {
+        private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         fun fromTradeDateString(value: String): Date {
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            return LocalDate.parse(value, formatter).toDate()
+            return LocalDate.parse(value, dateTimeFormatter).toDate()
+        }
+
+        fun toTradeDateString(value: Date): String {
+            return value.toLocalDate().format(dateTimeFormatter)
         }
 
         fun validateTradeDateString(value: String): Boolean {

@@ -33,5 +33,6 @@ sealed interface ApiResult {
 
 @Serializable
 data class UserSessionIdResult(@SerialName("sassyid") val sessionid: String)
+
 @Serializable
-data class ServerErrorResult(val error:String)
+data class ServerErrorResult(val error: String)

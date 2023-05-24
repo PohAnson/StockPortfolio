@@ -27,15 +27,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.owlio.ui.SnackbarDelegate
+import com.example.owlio.ui.SnackbarState
 import com.example.owlio.ui.getValue
 import com.example.owlio.ui.screen.PortfolioScreen
 import com.example.owlio.ui.screen.Screens
-import com.example.owlio.ui.screen.form.TransactionFormScreen
+import com.example.owlio.ui.screen.form.EditTransactionFormScreen
+import com.example.owlio.ui.screen.form.NewTransactionFormScreen
 import com.example.owlio.ui.screen.pnl.PnlScreen
 import com.example.owlio.ui.screen.transaction.TransactionScreen
 
@@ -71,22 +75,37 @@ fun OwlioApp(onLogout: () -> Unit) {
             }
             composable(Screens.TRANSACTION.route) {
                 topAppBarTitle = Screens.TRANSACTION.label
-                TransactionScreen(
-                    goToTransactionForm = { navController.navigate(route = Screens.TRANSACTIONFORM.route) },
-                    modifier = Modifier.padding(innerpadding)
-                )
+                TransactionScreen(goToNewTransactionForm = { navController.navigate(route = Screens.NEWTRANSACTION.route) },
+                    modifier = Modifier.padding(innerpadding),
+                    goToEditTransactionForm = { transactionId -> navController.navigate(Screens.EDITTRANSACTION.route + transactionId) })
             }
             composable(Screens.PNL.route) {
                 topAppBarTitle = Screens.PNL.label
                 PnlScreen()
             }
-            composable(Screens.TRANSACTIONFORM.route) {
-                topAppBarTitle = Screens.TRANSACTIONFORM.label
-                TransactionFormScreen(
+            composable(Screens.NEWTRANSACTION.route) {
+                topAppBarTitle = Screens.NEWTRANSACTION.label
+                NewTransactionFormScreen(
                     modifier = Modifier.padding(innerpadding),
                     snackbarDelegate = snackbarDelegate,
                     navigateBack = { navController.popBackStack() },
                 )
+            }
+            composable(
+                Screens.EDITTRANSACTION.route + "{transactionId}",
+                arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
+            ) { backStackEntry ->
+
+                topAppBarTitle = Screens.EDITTRANSACTION.label
+                val transactionId = backStackEntry.arguments?.getString("transactionId")
+                if (transactionId != null) {
+                    EditTransactionFormScreen(transactionId = transactionId,
+                        snackbarDelegate = snackbarDelegate,
+                        navigateBack = { navController.popBackStack() })
+                } else {
+                    snackbarDelegate.showSnackbar(SnackbarState.ERROR, "Error Editing transaction")
+                    navController.popBackStack(route = Screens.TRANSACTION.route, inclusive = false)
+                }
             }
         }
     }

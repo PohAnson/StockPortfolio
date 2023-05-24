@@ -19,5 +19,6 @@ enum class Screens(val label: String, val route: String, val icon: Int? = null) 
         "pnl",
         R.drawable.assessment,
     ),
-    TRANSACTIONFORM("New Transaction", "transactionForm")
+    NEWTRANSACTION("New Transaction", "newTransaction"),
+    EDITTRANSACTION("Edit Transaction", "editTransaction/")
 }
