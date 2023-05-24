@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
-    transactionRepo: TransactionRepo,
-    stockInfoRepo: StockInfoRepo
+    private val transactionRepo: TransactionRepo, stockInfoRepo: StockInfoRepo
 ) : ViewModel() {
     val transactionListState: StateFlow<List<Transaction>> =
         transactionRepo.getAllTransaction().stateIn(
@@ -28,9 +28,13 @@ class TransactionViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val stockInfoMapping: Flow<Map<String, StockInfo>> =
-        stockInfoRepo.getAllStock()
-            .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
+    val stockInfoMapping: Flow<Map<String, StockInfo>> = stockInfoRepo.getAllStock()
+        .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
 
+    fun deleteTransaction(transactionId: Int) {
+        viewModelScope.launch {
+            transactionRepo.deleteTransaction(transactionId)
+        }
+    }
 }
 

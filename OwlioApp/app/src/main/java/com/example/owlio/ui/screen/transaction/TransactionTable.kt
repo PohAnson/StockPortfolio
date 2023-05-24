@@ -14,6 +14,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +49,8 @@ import kotlin.math.roundToInt
 fun TransactionTable(
     transactionList: List<Transaction>,
     stockInfoMapping: Map<String, StockInfo>,
-    goToEditTransactionForm: (Int) -> Unit
+    goToEditTransactionForm: (Int) -> Unit,
+    deleteTransaction: (Int) -> Unit,
 ) {
     val headerTitle: List<String> = listOf("Date", "Type/\nBroker", "Symbol", "Qty/\nPrice")
 
@@ -83,7 +85,8 @@ fun TransactionTable(
                 transaction = it,
                 stockInfoMapping[it.stockCode],
                 cellWidth = ::cellWidth,
-                goToEditTransactionForm = goToEditTransactionForm
+                goToEditTransactionForm = goToEditTransactionForm,
+                deleteTransaction = deleteTransaction,
             )
             Divider()
         }
@@ -96,7 +99,8 @@ fun TransactionRow(
     transaction: Transaction,
     stockInfo: StockInfo?,
     cellWidth: (Int) -> Dp,
-    goToEditTransactionForm: (Int) -> Unit
+    goToEditTransactionForm: (Int) -> Unit,
+    deleteTransaction: (Int) -> Unit,
 ) {
     val cellTextStyle = TextStyle(fontSize = 15.sp)
     var isContextMenuShown by remember { mutableStateOf(false) }
@@ -116,6 +120,9 @@ fun TransactionRow(
                     onClick = { goToEditTransactionForm(transaction.transactionId) },
                 ) {
                     Icon(Icons.Outlined.Edit, contentDescription = "Edit")
+                }
+                IconButton(onClick = { deleteTransaction(transaction.transactionId) }) {
+                    Icon(Icons.Outlined.Delete, contentDescription = "Delete")
                 }
             }
         }
@@ -188,24 +195,29 @@ fun TransactionRow(
 @Composable
 @Preview(showBackground = true)
 fun TransactionTablePreview() {
-    TransactionTable(transactionList = listOf(
-        Transaction(
-            1, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Buy, 1f, 100
-        ), Transaction(
-            2, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Sell, 1f, 100
-        )
-    ), stockInfoMapping = mapOf(
-        "N2IU" to StockInfo(
-            "Mapletree Pan Asia Commercial Trust",
-            "N2IU",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-        )
-    ), goToEditTransactionForm = {})
+    TransactionTable(
+        transactionList = listOf(
+            Transaction(
+                1, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Buy, 1f, 100
+            ), Transaction(
+                2, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Sell, 1f, 100
+            )
+        ),
+        stockInfoMapping = mapOf(
+            "N2IU" to StockInfo(
+                "Mapletree Pan Asia Commercial Trust",
+                "N2IU",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            )
+        ),
+        goToEditTransactionForm = {},
+        deleteTransaction = {},
+    )
 
 }

@@ -29,11 +29,10 @@ fun TransactionScreen(
         modifier = modifier.fillMaxSize(1f)
     ) {
 
-        TransactionTable(
-            transactionList = transactionList,
+        TransactionTable(transactionList = transactionList,
             stockInfoMapping = stockInfoMapping,
-            goToEditTransactionForm = goToEditTransactionForm
-        )
+            goToEditTransactionForm = goToEditTransactionForm,
+            deleteTransaction = { vm.deleteTransaction(it) })
 
         FloatingActionButton(
             onClick = { goToNewTransactionForm() }, modifier = Modifier
