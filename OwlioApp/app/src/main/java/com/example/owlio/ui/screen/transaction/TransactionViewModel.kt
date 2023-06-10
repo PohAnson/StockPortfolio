@@ -31,7 +31,7 @@ class TransactionViewModel @Inject constructor(
     val stockInfoMapping: Flow<Map<String, StockInfo>> = stockInfoRepo.getAllStock()
         .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
 
-    fun deleteTransaction(transactionId: Int) {
+    fun deleteTransaction(transactionId: String) {
         viewModelScope.launch {
             transactionRepo.deleteTransaction(transactionId)
         }

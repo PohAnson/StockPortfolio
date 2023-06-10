@@ -6,11 +6,12 @@ import javax.inject.Inject
 class TransactionRepo @Inject constructor(private val transactionDao: TransactionDao) {
     fun insertTransaction(transaction: Transaction) = transactionDao.insert(transaction)
     fun getAllTransaction() = transactionDao.getAllTransaction()
-    suspend fun getTransactionById(transactionId: Int) =
+    suspend fun getTransactionById(transactionId: String) =
         transactionDao.getTransactionById(transactionId)
 
     suspend fun updateTransaction(transaction: Transaction) =
         transactionDao.updateTransaction(transaction)
 
-    suspend fun deleteTransaction(transactionId: Int) = transactionDao.deleteTransaction(transactionId)
+    suspend fun deleteTransaction(transactionId: String) =
+        transactionDao.deleteTransaction(transactionId)
 }

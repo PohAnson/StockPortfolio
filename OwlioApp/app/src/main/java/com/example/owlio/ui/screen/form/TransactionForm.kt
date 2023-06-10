@@ -72,11 +72,15 @@ fun TransactionForm(
                         vm.submitForm(isEdit)
                     }
                     when (submissionStatus) {
-                        is SubmissionStatus.Success -> snackbarDelegate.showSnackbar(snackbarState = SnackbarState.SUCCESS,
-                            message = if (isEdit) "Transaction Updated" else "Transaction Added",
-                            actionLabel = "View",
-                            duration = SnackbarDuration.Short,
-                            onAction = { navigateBack() })
+                        is SubmissionStatus.Success -> {
+                            snackbarDelegate.showSnackbar(snackbarState = SnackbarState.SUCCESS,
+                                message = if (isEdit) "Transaction Updated" else "Transaction Added",
+                                actionLabel = "View",
+                                duration = SnackbarDuration.Short,
+                                onAction = { navigateBack() })
+                            // clear the field when creating new transaction
+                            if (!isEdit) vm.resetForm()
+                        }
 
                         is SubmissionStatus.Error -> {
                             snackbarDelegate.showSnackbar(

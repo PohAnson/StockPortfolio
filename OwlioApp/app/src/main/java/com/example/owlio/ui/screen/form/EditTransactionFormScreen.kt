@@ -21,7 +21,7 @@ fun EditTransactionFormScreen(
 
     LaunchedEffect(key1 = transactionId) {
         // update the view model with the data for the current transaction
-        vm.fillFormFromId(transactionId.toInt())
+        vm.fillFormFromId(transactionId)
 
     }
 

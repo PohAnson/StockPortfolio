@@ -49,8 +49,8 @@ import kotlin.math.roundToInt
 fun TransactionTable(
     transactionList: List<Transaction>,
     stockInfoMapping: Map<String, StockInfo>,
-    goToEditTransactionForm: (Int) -> Unit,
-    deleteTransaction: (Int) -> Unit,
+    goToEditTransactionForm: (String) -> Unit,
+    deleteTransaction: (String) -> Unit,
 ) {
     val headerTitle: List<String> = listOf("Date", "Type/\nBroker", "Symbol", "Qty/\nPrice")
 
@@ -99,8 +99,8 @@ fun TransactionRow(
     transaction: Transaction,
     stockInfo: StockInfo?,
     cellWidth: (Int) -> Dp,
-    goToEditTransactionForm: (Int) -> Unit,
-    deleteTransaction: (Int) -> Unit,
+    goToEditTransactionForm: (String) -> Unit,
+    deleteTransaction: (String) -> Unit,
 ) {
     val cellTextStyle = TextStyle(fontSize = 15.sp)
     var isContextMenuShown by remember { mutableStateOf(false) }
@@ -198,9 +198,9 @@ fun TransactionTablePreview() {
     TransactionTable(
         transactionList = listOf(
             Transaction(
-                1, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Buy, 1f, 100
+                "1", LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Buy, 1f, 100
             ), Transaction(
-                2, LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Sell, 1f, 100
+                "2", LocalDate.now().toDate(), "N2IU", Broker.Poems, TradeType.Sell, 1f, 100
             )
         ),
         stockInfoMapping = mapOf(

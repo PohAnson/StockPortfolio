@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.Calendar
 import java.util.Date
 
 private const val TAG = "Transaction"
@@ -26,7 +27,7 @@ private const val TAG = "Transaction"
 )
 @TypeConverters(TransactionTypeConverters::class)
 data class Transaction(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "transaction_id") val transactionId: Int = 0,
+    @PrimaryKey @ColumnInfo(name = "transaction_id") var transactionId: String = "",
     @ColumnInfo(name = "trade_date") val tradeDate: Date,
     @ColumnInfo(name = "stock_code", index = true) val stockCode: String,
     val broker: Broker,
@@ -34,6 +35,10 @@ data class Transaction(
     val price: Float = 0f,
     val volume: Int = 0,
 ) {
+    init {
+        // dynamically generate the timestamp id when missing transaction id
+        if (transactionId == "") transactionId = Calendar.getInstance().timeInMillis.toString()
+    }
 
     fun calculateFees(): Float {
         return broker.calculateFees(value = price * volume, date = tradeDate.toLocalDate())

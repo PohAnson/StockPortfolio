@@ -16,11 +16,11 @@ interface TransactionDao {
     fun getAllTransaction(): Flow<List<Transaction>>
 
     @Query("SELECT * FROM 'transaction' WHERE transaction_id=:transactionId")
-    suspend fun getTransactionById(transactionId: Int): Transaction
+    suspend fun getTransactionById(transactionId: String): Transaction
 
     @Update
     suspend fun updateTransaction(transaction: Transaction): Int
 
     @Query("DELETE FROM 'transaction' WHERE transaction_id=:transactionId")
-    suspend fun deleteTransaction(transactionId: Int)
+    suspend fun deleteTransaction(transactionId: String)
 }

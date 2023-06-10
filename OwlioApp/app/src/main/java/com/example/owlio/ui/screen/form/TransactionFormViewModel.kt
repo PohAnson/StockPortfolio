@@ -61,7 +61,7 @@ class TransactionFormViewModel @Inject constructor(
         _uiState.update { it.copy(currentSelectedStockQuery = value) }
     }
 
-    fun fillFormFromId(transactionId: Int) {
+    fun fillFormFromId(transactionId: String) {
         viewModelScope.launch {
             transactionRepo.getTransactionById(transactionId).let { transaction ->
                 val selectedStock = stockInfoRepo.getStockInfoByCode(transaction.stockCode).first()
@@ -73,7 +73,7 @@ class TransactionFormViewModel @Inject constructor(
                         tradeType = transaction.tradeType,
                         price = transaction.price.toString(),
                         volume = transaction.volume.toString(),
-                        transactionId = transactionId.toString(),
+                        transactionId = transactionId,
                         currentSelectedStockQuery = selectedStock.tradingName
                     )
                 }
@@ -91,9 +91,7 @@ class TransactionFormViewModel @Inject constructor(
         return if (submissionStatus is SubmissionStatus.Validated) {
             viewModelScope.launch(Dispatchers.IO) {
                 if (isEdit) {
-                    Log.d("update trans", uiState.value.toTransaction().toString())
                     transactionRepo.updateTransaction(uiState.value.toTransaction())
-                        .let { Log.d("DB UPDATE", it.toString()) }
                 } else {
                     transactionRepo.insertTransaction(uiState.value.toTransaction())
                 }
@@ -143,6 +141,21 @@ class TransactionFormViewModel @Inject constructor(
         return stockInfoRepo.getAllStock()
     }
 
+    fun resetForm() {
+        _uiState.update {
+            it.copy(
+                tradeDate = "",
+                selectedStock = null,
+                broker = null,
+                tradeType = null,
+                price = "",
+                volume = "",
+                submissionStatus = SubmissionStatus.NotSubmitted,
+                transactionId = "",
+                currentSelectedStockQuery = ""
+            )
+        }
+    }
 }
 
 data class TransactionUiFormDataState(
@@ -153,14 +166,14 @@ data class TransactionUiFormDataState(
     val price: String = "",
     val volume: String = "",
     val submissionStatus: SubmissionStatus = SubmissionStatus.NotSubmitted,
-    val transactionId: String = "0",
+    val transactionId: String = "",
     val currentSelectedStockQuery: String = "",
 )
 
 
 fun TransactionUiFormDataState.toTransaction(): Transaction {
     return Transaction(
-        transactionId = this.transactionId.toInt(),
+        transactionId = this.transactionId,
         tradeDate = Transaction.fromTradeDateString(this.tradeDate),
         stockCode = this.selectedStock?.tradingCode ?: "",
         broker = this.broker ?: Broker.INVALID,

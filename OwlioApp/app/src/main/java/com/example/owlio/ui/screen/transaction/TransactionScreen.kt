@@ -18,7 +18,7 @@ import com.example.owlio.model.Transaction
 @Composable
 fun TransactionScreen(
     goToNewTransactionForm: () -> Unit,
-    goToEditTransactionForm: (Int) -> Unit,
+    goToEditTransactionForm: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val vm: TransactionViewModel = hiltViewModel()
