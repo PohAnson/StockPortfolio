@@ -12,15 +12,21 @@ interface TransactionDao {
     @Insert
     fun insert(transaction: Transaction)
 
-    @Query("SELECT * FROM 'transaction'")
+    @Query("SELECT * FROM `transaction`")
     fun getAllTransaction(): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM 'transaction' WHERE transaction_id=:transactionId")
+    @Query("SELECT * FROM `transaction` WHERE transaction_id=:transactionId")
     suspend fun getTransactionById(transactionId: String): Transaction
 
     @Update
     suspend fun updateTransaction(transaction: Transaction): Int
 
-    @Query("DELETE FROM 'transaction' WHERE transaction_id=:transactionId")
+    @Query("DELETE FROM `transaction` WHERE transaction_id=:transactionId")
     suspend fun deleteTransaction(transactionId: String)
+
+    @Query("SELECT * FROM `transaction` WHERE last_modified>:dateTime")
+    suspend fun getTransactionAfter(dateTime: String): List<Transaction>
+
+    @Query("SELECT `transaction_id` FROM `transaction`")
+    suspend fun getAllTransactionId(): List<String>
 }

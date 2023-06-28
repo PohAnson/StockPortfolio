@@ -13,7 +13,7 @@ import retrofit2.http.PUT
 
 interface UserApiService {
     @GET("user")
-    suspend fun userSessionCheck(): ResponseBody
+    suspend fun userSessionCheck(): CheckLoginResult
 
     @POST("user")
     suspend fun userLogin(@Body requestBody: RequestBody): ResponseBody
@@ -33,6 +33,9 @@ sealed interface ApiResult {
 
 @Serializable
 data class UserSessionIdResult(@SerialName("sassyid") val sessionid: String)
+
+@Serializable
+data class CheckLoginResult(val isLogin: Boolean)
 
 @Serializable
 data class ServerErrorResult(val error: String)

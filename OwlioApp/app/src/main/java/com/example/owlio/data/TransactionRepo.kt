@@ -14,4 +14,9 @@ class TransactionRepo @Inject constructor(private val transactionDao: Transactio
 
     suspend fun deleteTransaction(transactionId: String) =
         transactionDao.deleteTransaction(transactionId)
+
+    suspend fun getTransactionModifiedAfter(dateTime: String) =
+        transactionDao.getTransactionAfter(dateTime)
+
+    suspend fun getAllTransactionId() = transactionDao.getAllTransactionId()
 }

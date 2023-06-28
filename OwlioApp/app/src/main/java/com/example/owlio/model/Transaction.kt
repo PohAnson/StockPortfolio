@@ -5,16 +5,22 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.owlio.data.StockInfoRepo
+import com.example.owlio.utils.BrokerStringSerializer
+import com.example.owlio.utils.DateStringSerializer
+import com.example.owlio.utils.TradeTypeStringSerializer
+import com.example.owlio.utils.TransactionTypeConverters
+import com.example.owlio.utils.ZonedDtStringSerializer
 import com.example.owlio.utils.toDate
 import com.example.owlio.utils.toLocalDate
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.util.Calendar
 import java.util.Date
 
 private const val TAG = "Transaction"
@@ -26,18 +32,29 @@ private const val TAG = "Transaction"
     )]
 )
 @TypeConverters(TransactionTypeConverters::class)
+@Serializable
 data class Transaction(
-    @PrimaryKey @ColumnInfo(name = "transaction_id") var transactionId: String = "",
-    @ColumnInfo(name = "trade_date") val tradeDate: Date,
-    @ColumnInfo(name = "stock_code", index = true) val stockCode: String,
+    @PrimaryKey @ColumnInfo(name = "transaction_id") @SerialName("transaction_id")
+    var transactionId: String = "",
+    @ColumnInfo(name = "trade_date") @SerialName("trade_date") @Serializable(with = DateStringSerializer::class)
+    val tradeDate: Date,
+    @ColumnInfo(name = "stock_code", index = true) @SerialName("stock_code")
+    val stockCode: String,
+    @Serializable(with = BrokerStringSerializer::class)
     val broker: Broker,
-    @ColumnInfo(name = "trade_type", typeAffinity = 2) val tradeType: TradeType,
+    @ColumnInfo(
+        name = "trade_type",
+        typeAffinity = 2
+    ) @SerialName("trade_type") @Serializable(with = TradeTypeStringSerializer::class)
+    val tradeType: TradeType,
     val price: Float = 0f,
     val volume: Int = 0,
+    @ColumnInfo(name = "last_modified") @SerialName("last_modified") @Serializable(with = ZonedDtStringSerializer::class)
+    val lastModified: ZonedDateTime = ZonedDateTime.now(),
 ) {
     init {
         // dynamically generate the timestamp id when missing transaction id
-        if (transactionId == "") transactionId = Calendar.getInstance().timeInMillis.toString()
+        if (transactionId == "") transactionId = Instant.now().epochSecond.toString()
     }
 
     fun calculateFees(): Float {
@@ -108,38 +125,3 @@ data class Transaction(
     }
 }
 
-
-class TransactionTypeConverters {
-    @TypeConverter
-    fun fromDateToIsoDateString(date: Date): String {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(
-            DateTimeFormatter.ISO_DATE
-        )
-    }
-
-    @TypeConverter
-    fun fromIsoDateStringToDate(isoString: String): Date {
-        return LocalDate.parse(isoString, DateTimeFormatter.ISO_DATE).toDate()
-    }
-
-    @TypeConverter
-    fun fromBrokerToString(broker: Broker): String {
-        return broker.name
-    }
-
-    @TypeConverter
-    fun fromStringToBroker(value: String): Broker {
-        return Broker.brokerFromString(value)
-    }
-
-    @TypeConverter
-    fun fromTradeTypeToString(tt: TradeType): String {
-        return tt.name
-    }
-
-    @TypeConverter
-    fun fromStringToTradeType(value: String): TradeType {
-        return tradeTypeFromString(value)
-    }
-
-}

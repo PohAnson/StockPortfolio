@@ -45,7 +45,6 @@ fun LoginScreen(
     }
 
 
-
     if (isCredentialPresent) {
         // Auto login when there is session cookies stored
         onSuccess()
