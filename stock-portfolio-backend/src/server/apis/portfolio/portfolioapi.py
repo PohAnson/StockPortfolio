@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from server.apis.transaction.transactiondb import transactiondb
+from server.database.transactiondb import transactiondb
 from server.model.stock_ledger import Ledger
 
 portfolio_api_bp = Blueprint("portfolio", __name__, url_prefix="portfolio")

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from server.apis.transaction.transactiondb import transactiondb
-from server.model.database.stockdb import stockdb
+from server.database.transactiondb import transactiondb
+from server.database.stockdb import stockdb
 from server.model.transaction import Transaction
 
 transaction_api_bp = Blueprint(

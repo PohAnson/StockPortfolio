@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal, Union
 
 from data.stock_code_name_dict import stock_code_name_dict
@@ -18,6 +18,7 @@ class Transaction:
         broker: Literal["poems", "moomoo"],
         _id=None,
         userid=None,
+        last_modified: Union[str, datetime] = None,
     ):
         self.date: datetime = date
         self.code: str = code
@@ -27,11 +28,14 @@ class Transaction:
         self.volume: int = volume
         self._id = _id
         self.userid = userid
+        self.last_modified: datetime = (
+            datetime.utcnow() if last_modified is None else last_modified
+        )
 
     def __repr__(self):
         return (
             f"Transaction {self._id if self._id is not None else ''}"
-            f"({self.date}, {self.code}, "
+            f"({self.date.strftime('%d/%m/%Y')}, {self.code}, "
             f"{self.type_}, {self.price}, {self.volume})"
         )
 
@@ -145,6 +149,31 @@ class Transaction:
             self._volume = int(vol)
 
     @property
+    def last_modified(self):
+        return self._last_modified
+
+    @last_modified.setter
+    def last_modified(self, date: Union[str, datetime]):
+        """Setter for date
+
+        Args:
+            last_modified (Union[str, datetime]): str in the format of
+        """
+
+        if type(date) is str:
+            try:
+                date = datetime.fromisoformat(date)
+            except ValueError:
+                raise ValueError("Invalid ISO Date")
+        # validate that the date is in range
+        if (
+            date.timestamp() <= datetime(2000, 1, 1, tzinfo=timezone.utc).timestamp()
+            or date.timestamp() >= datetime(3000, 1, 1, tzinfo=timezone.utc).timestamp()
+        ):
+            raise ValueError(f"Invalid last_modified date of {date}")
+        self._last_modified: datetime = date
+
+    @property
     def fees(self) -> float:
         return self.calculate_fees()
 
@@ -196,6 +225,9 @@ class Transaction:
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
         return cls(**_dict)
+    
+    def update_last_modified_now(self):
+        self.last_modified = datetime.utcnow()
 
     def to_dict(self) -> dict:
         return {
@@ -207,6 +239,7 @@ class Transaction:
             "volume": self.volume,
             "_id": self._id,
             "userid": self.userid,
+            "last_modified": self.last_modified,
         }
 
     def to_json(self):

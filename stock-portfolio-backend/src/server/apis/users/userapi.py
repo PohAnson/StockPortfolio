@@ -1,7 +1,7 @@
 from argon2.exceptions import VerifyMismatchError
 from flask import Blueprint, jsonify, request
 
-from server.apis.users.userdb import userdb
+from server.database.userdb import userdb
 from server.auth.session_manager import SessionManager
 
 user_api_bp = Blueprint("user", __name__, url_prefix="user")
