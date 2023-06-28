@@ -58,7 +58,7 @@ class _TransactionDb:
         deleted_transaction["last_modified"] = datetime.utcnow()
         self.deleted_coll.insert_one(deleted_transaction)
 
-    def find_all_transaction(self, *, filter_dict={}, projection={}) -> list:
+    def find_all_transaction(self, *, filter_dict={}, projection=None) -> list:
         data = [
             Transaction.from_dict(record, projection)
             for record in self.coll.find(filter_dict, projection).sort(

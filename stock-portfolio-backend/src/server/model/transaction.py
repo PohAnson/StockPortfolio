@@ -203,7 +203,9 @@ class Transaction:
         return cls.from_dict(json.loads(json_str))
 
     @classmethod
-    def from_dict(cls, _dict, projection={}) -> "Transaction":
+    def from_dict(cls, _dict, projection=None) -> "Transaction":
+        if projection is None:
+            projection = {}
         # check if all the required fields is present
         # 1 means must be present
         # 0 means optional
@@ -225,7 +227,7 @@ class Transaction:
         if len(missing_field) != 0:
             raise ValueError(f"Missing fields: {', '.join(missing_field)}")
         return cls(**_dict)
-    
+
     def update_last_modified_now(self):
         self.last_modified = datetime.utcnow()
 
