@@ -79,12 +79,12 @@ class Transaction:
 
         if type(date) is str:
             try:
-                date = datetime.strptime(date, "%d/%m/%Y")
+                date = datetime.strptime(date, "%Y-%m-%d")
             except ValueError:
                 raise ValueError("Invalid Date")
         # validate that the date is in range
         if date <= datetime(2000, 1, 1) or date >= datetime(3000, 1, 1):
-            raise ValueError(f"Invalid Date of {date.strftime('%d/%m/%Y')}")
+            raise ValueError(f"Invalid Date of {date.strftime('%Y-%m-%d')}")
         self._date: datetime = date
 
     @property
