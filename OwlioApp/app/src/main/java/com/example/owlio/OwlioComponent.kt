@@ -1,9 +1,14 @@
 package com.example.owlio
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import com.example.owlio.data.DeletedTransactionDao
 import com.example.owlio.data.OwlioDatabase
 import com.example.owlio.data.StockInfoDao
 import com.example.owlio.data.TransactionDao
+import com.example.owlio.networkapi.TransactionSyncApiService
 import com.example.owlio.networkapi.UserApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Component
@@ -40,6 +45,12 @@ class OwlioActivityModule {
     fun transactionDao(@ApplicationContext context: Context): TransactionDao {
         return owlioDatabase(context).transactionDao()
     }
+
+    @Provides
+    fun deletedTransactionDao(@ApplicationContext context: Context): DeletedTransactionDao {
+        return owlioDatabase(context).deletedTransactionDao()
+    }
+
 }
 
 @Module
@@ -63,5 +74,23 @@ class ApiServiceModule {
         retrofitService.create(UserApiService::class.java)
     }
 
+    @get:Provides
+    val transactionSyncApiRetrofitService: TransactionSyncApiService by lazy {
+        retrofitService.create(TransactionSyncApiService::class.java)
+    }
+}
 
+private val Context.dataStorePreferences: DataStore<Preferences> by preferencesDataStore(
+    name = "UserCredentialDataStore"
+)
+
+
+@Module
+@InstallIn(SingletonComponent::class)
+class DataStorePreferencesModule {
+    @Provides
+    @Singleton
+    fun provideDataStorePreferences(@ApplicationContext appContext: Context): DataStore<Preferences> {
+        return appContext.dataStorePreferences
+    }
 }

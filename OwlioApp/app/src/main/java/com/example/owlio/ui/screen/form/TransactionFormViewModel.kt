@@ -29,7 +29,6 @@ class TransactionFormViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransactionUiFormDataState())
     val uiState: StateFlow<TransactionUiFormDataState> = _uiState.asStateFlow()
 
-
     fun updateTradeDate(tradeDate: String) {
         _uiState.update {
             it.copy(
@@ -58,8 +57,31 @@ class TransactionFormViewModel @Inject constructor(
         _uiState.update { it.copy(volume = volume) }
     }
 
+    fun updateCurrentSelectedStockQuery(value: String) {
+        _uiState.update { it.copy(currentSelectedStockQuery = value) }
+    }
 
-    suspend fun submitForm(): SubmissionStatus {
+    fun fillFormFromId(transactionId: String) {
+        viewModelScope.launch {
+            transactionRepo.getTransactionById(transactionId).let { transaction ->
+                val selectedStock = stockInfoRepo.getStockInfoByCode(transaction.stockCode).first()
+                _uiState.update {
+                    it.copy(
+                        tradeDate = Transaction.toTradeDateString(transaction.tradeDate),
+                        selectedStock = selectedStock,
+                        broker = transaction.broker,
+                        tradeType = transaction.tradeType,
+                        price = transaction.price.toString(),
+                        volume = transaction.volume.toString(),
+                        transactionId = transactionId,
+                        currentSelectedStockQuery = selectedStock.tradingName
+                    )
+                }
+            }
+        }
+    }
+
+    suspend fun submitForm(isEdit: Boolean): SubmissionStatus {
         /**
          * Submit the form, return true if it is submitted         *
          * */
@@ -68,7 +90,12 @@ class TransactionFormViewModel @Inject constructor(
         _uiState.update { it.copy(submissionStatus = submissionStatus) }
         return if (submissionStatus is SubmissionStatus.Validated) {
             viewModelScope.launch(Dispatchers.IO) {
-                transactionRepo.insertTransaction(uiState.value.toTransaction())
+                if (isEdit) {
+                    transactionRepo.updateTransaction(uiState.value.toTransaction())
+                } else {
+                    transactionRepo.insertTransaction(uiState.value.toTransaction())
+                }
+
             }.invokeOnCompletion {
                 _uiState.update { it.copy(submissionStatus = SubmissionStatus.Success) }
             }
@@ -114,6 +141,21 @@ class TransactionFormViewModel @Inject constructor(
         return stockInfoRepo.getAllStock()
     }
 
+    fun resetForm() {
+        _uiState.update {
+            it.copy(
+                tradeDate = "",
+                selectedStock = null,
+                broker = null,
+                tradeType = null,
+                price = "",
+                volume = "",
+                submissionStatus = SubmissionStatus.NotSubmitted,
+                transactionId = "",
+                currentSelectedStockQuery = ""
+            )
+        }
+    }
 }
 
 data class TransactionUiFormDataState(
@@ -123,12 +165,15 @@ data class TransactionUiFormDataState(
     val tradeType: TradeType? = null,
     val price: String = "",
     val volume: String = "",
-    val submissionStatus: SubmissionStatus = SubmissionStatus.NotSubmitted
+    val submissionStatus: SubmissionStatus = SubmissionStatus.NotSubmitted,
+    val transactionId: String = "",
+    val currentSelectedStockQuery: String = "",
 )
 
 
 fun TransactionUiFormDataState.toTransaction(): Transaction {
     return Transaction(
+        transactionId = this.transactionId,
         tradeDate = Transaction.fromTradeDateString(this.tradeDate),
         stockCode = this.selectedStock?.tradingCode ?: "",
         broker = this.broker ?: Broker.INVALID,

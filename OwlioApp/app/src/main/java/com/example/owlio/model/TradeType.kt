@@ -5,9 +5,9 @@ enum class TradeType {
 }
 
 fun tradeTypeFromString(tradeTypeString: String): TradeType {
-    return when (tradeTypeString) {
-        "Sell" -> TradeType.Sell
-        "Buy" -> TradeType.Buy
+    return when (tradeTypeString.lowercase()) {
+        "sell" -> TradeType.Sell
+        "buy" -> TradeType.Buy
         else -> throw Exception("Invalid tradeTypeString '$tradeTypeString' given")
     }
 

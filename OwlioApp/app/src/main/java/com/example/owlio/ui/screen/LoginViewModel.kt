@@ -9,9 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.owlio.data.UserCredentialRepo
 import com.example.owlio.networkapi.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -35,10 +33,7 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
     }
 
     fun isCredentialPresent(): Boolean {
-        return runBlocking(Dispatchers.Default) {
-            !(userCredentialRepo.sessionId.firstOrNull()
-                .isNullOrEmpty())
-        }
+        return !userCredentialRepo.getCurrentSessionId().isNullOrEmpty()
     }
 
     fun login(username: String, password: String): Job {
@@ -79,7 +74,7 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
     }
 
     fun clearCredential() {
-        runBlocking { userCredentialRepo.clearUserCredentials() }
+        runBlocking { userCredentialRepo.clearUserSessionId() }
     }
 
 }
