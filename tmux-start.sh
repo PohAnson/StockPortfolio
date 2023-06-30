@@ -30,5 +30,4 @@ then
     
 fi
 
-tmux send-keys "tmux source-file ~/.tmux.config" C-m
 tmux attach-session -t $SESSION:0
