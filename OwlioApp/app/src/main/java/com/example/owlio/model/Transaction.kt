@@ -1,6 +1,5 @@
 package com.example.owlio.model
 
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -16,14 +15,13 @@ import com.example.owlio.utils.toDate
 import com.example.owlio.utils.toLocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import timber.log.Timber
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Date
-
-private const val TAG = "Transaction"
 
 
 @Entity(
@@ -77,7 +75,7 @@ data class Transaction(
             } catch (e: DateTimeParseException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true
@@ -100,7 +98,7 @@ data class Transaction(
             } catch (e: java.lang.NumberFormatException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true
@@ -117,7 +115,7 @@ data class Transaction(
             } catch (e: java.lang.NumberFormatException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true

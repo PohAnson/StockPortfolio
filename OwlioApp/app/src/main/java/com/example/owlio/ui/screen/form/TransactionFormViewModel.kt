@@ -1,6 +1,5 @@
 package com.example.owlio.ui.screen.form
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.owlio.data.StockInfoRepo
@@ -17,9 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
-
-private const val TAG = "TransactionFormViewModel"
 
 @HiltViewModel
 class TransactionFormViewModel @Inject constructor(
@@ -107,7 +105,7 @@ class TransactionFormViewModel @Inject constructor(
 
     private suspend fun validateAllFields(): SubmissionStatus {
         val validatedResults: Map<String, Boolean> = validateAllFormData()
-        Log.d(TAG.plus(" validateAllFields"), validatedResults.toString())
+        Timber.d(validatedResults.toString())
         return if (validatedResults.all { it.value }) {
             // if all form data is valid
             SubmissionStatus.Validated

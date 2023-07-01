@@ -1,6 +1,5 @@
 package com.example.owlio.data
 
-import android.util.Log
 import com.example.owlio.networkapi.ApiResult
 import com.example.owlio.networkapi.ServerErrorResult
 import com.example.owlio.networkapi.UserApiService
@@ -13,6 +12,7 @@ import kotlinx.serialization.json.put
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.HttpException
+import timber.log.Timber
 import java.net.ConnectException
 import javax.inject.Inject
 
@@ -95,15 +95,15 @@ class UserCredentialRepo @Inject constructor(
     }
 
 
-    suspend fun logout(): ApiResult {
-        return try {
-            userApiService.userLogout().let { ApiResult.ApiSuccess(it) }
-        } catch (e: ConnectException) {
-            Log.e(TAG, "CONNECT EXCEPTION " + e.toString())
-            ApiResult.ApiError(503, "Server Unavailable")
-        } catch (e: Throwable) {
-            Log.e(TAG, "EXCEPTION " + e.toString())
-            ApiResult.ApiError(500, e.toString())
+    fun logout(): ApiResult {
+            try {
+                userApiService.userLogout().let { ApiResult.ApiSuccess(it) }
+            } catch (e: ConnectException) {
+                Timber.e(e)
+                ApiResult.ApiError(503, "Server Unavailable")
+            } catch (e: Throwable) {
+                Timber.e(e)
+                ApiResult.ApiError(500, e.toString())
         }
     }
 }

@@ -1,17 +1,15 @@
 package com.example.owlio.data
 
-import android.util.Log
 import com.example.owlio.model.DividendDateRow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-
-const val TAG = "DividendInfoRepo"
 
 class DividendInfoRepo @Inject constructor() {
     suspend fun getDividendDateRowList(stockCode: String): List<DividendDateRow> {
@@ -44,7 +42,7 @@ class DividendInfoRepo @Inject constructor() {
                         )
                     )
                 } catch (e: NumberFormatException) {
-                    Log.e(TAG, e.toString())
+                    Timber.e(e)
                 }
             }
         }

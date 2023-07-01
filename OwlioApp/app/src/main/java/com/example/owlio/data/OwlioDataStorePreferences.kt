@@ -1,6 +1,5 @@
 package com.example.owlio.data
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
@@ -59,7 +59,7 @@ class OwlioDataStorePreferences @Inject constructor(private val dataStorePrefere
 
     private fun handleIoException(throwable: Throwable) {
         if (throwable is IOException) {
-            Log.e(TAG, "Error reading preferences.", throwable)
+            Timber.e(throwable)
         } else {
             throw throwable
         }
