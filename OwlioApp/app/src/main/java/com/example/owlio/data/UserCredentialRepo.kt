@@ -1,44 +1,50 @@
 package com.example.owlio.data
 
-import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.owlio.networkapi.ApiResult
 import com.example.owlio.networkapi.ServerErrorResult
 import com.example.owlio.networkapi.UserApiService
 import com.example.owlio.networkapi.UserSessionIdResult
 import com.example.owlio.networkapi.catchNoNetworkException
 import com.example.owlio.networkapi.catchUnauthorizedHttpException
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.HttpException
-import java.io.IOException
+import timber.log.Timber
 import java.net.ConnectException
 import javax.inject.Inject
 
-
 class UserCredentialRepo @Inject constructor(
-    private val dataStorePreferences: DataStore<Preferences>,
+    private val owlioDataStorePreferences: OwlioDataStorePreferences,
     private val userApiService: UserApiService
 ) {
-    suspend fun saveSessionId(sessionId: String) {
-        dataStorePreferences.edit { preferences ->
-            preferences[SESSIONID] = sessionId
+    fun getCurrentSessionId(): String? {
+        return owlioDataStorePreferences.sessionId
+    }
+
+    fun login(sessionId: String) {
+        runBlocking(Dispatchers.IO) {
+            owlioDataStorePreferences.saveSessionId(sessionId)
+            owlioDataStorePreferences.resetLastSyncedToEpoch()  // to pull all data
         }
     }
 
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun login(username: String, password: String): ApiResult {
+    suspend fun checkUserSession(): ApiResult {
+        return runCatching {
+            ApiResult.ApiSuccess(
+                userApiService.userSessionCheck().isLogin
+            )
+        }.catchNoNetworkException().catchUnauthorizedHttpException().getOrThrow()
+    }
+
+    suspend fun authLogin(username: String, password: String): ApiResult {
         val jsonObject = buildJsonObject {
             put("username", username)
             put("password", password)
@@ -90,44 +96,19 @@ class UserCredentialRepo @Inject constructor(
     }
 
 
-    suspend fun logout(): ApiResult {
-        clearUserCredentials()
-        return try {
-            userApiService.userLogout().let { ApiResult.ApiSuccess(it) }
-        } catch (e: ConnectException) {
-            Log.e(TAG, "CONNECT EXCEPTION " + e.toString())
-            ApiResult.ApiError(503, "Server Unavailable")
-        } catch (e: Throwable) {
-            Log.e(TAG, "EXCEPTION " + e.toString())
-            ApiResult.ApiError(500, e.toString())
-        }
-    }
-
-
-    suspend fun clearUserCredentials() {
-        dataStorePreferences.edit { it.clear() }
-    }
-
-    val sessionId = dataStorePreferences.data.catch {
-        handleIoException(it)
-        emit(emptyPreferences())
-    }.map { preferences ->
-        preferences[SESSIONID]
-    }
-
-
-    private companion object {
-
-        fun handleIoException(throwable: Throwable) {
-            if (throwable is IOException) {
-                Log.e(TAG, "Error reading preferences.", throwable)
-            } else {
-                throw throwable
+    fun logout(): ApiResult {
+        return runBlocking(Dispatchers.IO) {
+            try {
+                userApiService.userLogout().let { ApiResult.ApiSuccess(it) }
+            } catch (e: ConnectException) {
+                Timber.e(e)
+                ApiResult.ApiError(503, "Server Unavailable")
+            } catch (e: Throwable) {
+                Timber.e(e)
+                ApiResult.ApiError(500, e.toString())
+            } finally {
+                owlioDataStorePreferences.onUserLogout()
             }
         }
-
-        val TAG = "USER SHARED PREF"
-        val SESSIONID = stringPreferencesKey("sessionid")
-
     }
 }

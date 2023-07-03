@@ -31,9 +31,9 @@ export default function TransactionForm({
   const [selectedStock, setSelectedStock] = useState(
     code != "" && name != ""
       ? {
-          TradingCode: code,
-          TradingName: name,
-        }
+        TradingCode: code,
+        TradingName: name,
+      }
       : {}
   );
   const [tradePrice, setTradePrice] = useState(price);
@@ -62,11 +62,6 @@ export default function TransactionForm({
       volume: parseInt(tradeVolume),
     };
 
-    // format the date
-    if (formData.date != null) {
-      let [year, month, date] = formData.date.split("-");
-      formData.date = `${date}/${month}/${year}`;
-    }
 
     fetch(isEdit ? `/api/transaction/${transactionId}` : "/api/transaction", {
       method: isEdit ? "PUT" : "POST",

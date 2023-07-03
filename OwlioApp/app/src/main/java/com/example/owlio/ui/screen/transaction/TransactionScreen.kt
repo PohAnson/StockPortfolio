@@ -16,7 +16,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owlio.model.Transaction
 
 @Composable
-fun TransactionScreen(goToTransactionForm: () -> Unit, modifier: Modifier = Modifier) {
+fun TransactionScreen(
+    goToNewTransactionForm: () -> Unit,
+    goToEditTransactionForm: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val vm: TransactionViewModel = hiltViewModel()
     val transactionList: List<Transaction> = vm.transactionListState.collectAsState(listOf()).value
     val stockInfoMapping = vm.stockInfoMapping.collectAsState(initial = mapOf()).value
@@ -25,10 +29,13 @@ fun TransactionScreen(goToTransactionForm: () -> Unit, modifier: Modifier = Modi
         modifier = modifier.fillMaxSize(1f)
     ) {
 
-        TransactionTable(transactionList = transactionList, stockInfoMapping = stockInfoMapping)
+        TransactionTable(transactionList = transactionList,
+            stockInfoMapping = stockInfoMapping,
+            goToEditTransactionForm = goToEditTransactionForm,
+            deleteTransaction = { vm.deleteTransaction(it) })
 
         FloatingActionButton(
-            onClick = { goToTransactionForm() }, modifier = Modifier
+            onClick = { goToNewTransactionForm() }, modifier = Modifier
                 .align(
                     Alignment.BottomEnd
                 )

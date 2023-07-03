@@ -10,6 +10,9 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
+import com.example.owlio.service.syncDatabaseService.syncDatabaseWorkRequest
 import com.example.owlio.ui.theme.OwlioAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,6 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             OwlioAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,6 +34,13 @@ class MainActivity : ComponentActivity() {
                         intent.putExtra("isLogout", true)
                         startActivity(intent)
                         finish()
+                    }, syncToServer = {
+                        WorkManager.getInstance(this)
+                            .enqueueUniqueWork(
+                                "syncDatabaseWorker",
+                                ExistingWorkPolicy.REPLACE,
+                                syncDatabaseWorkRequest
+                            )
                     })
                 }
             }

@@ -1,22 +1,27 @@
 package com.example.owlio.model
 
-import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.owlio.data.StockInfoRepo
+import com.example.owlio.utils.BrokerStringSerializer
+import com.example.owlio.utils.DateStringSerializer
+import com.example.owlio.utils.TradeTypeStringSerializer
+import com.example.owlio.utils.TransactionTypeConverters
+import com.example.owlio.utils.ZonedDtStringSerializer
 import com.example.owlio.utils.toDate
 import com.example.owlio.utils.toLocalDate
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import timber.log.Timber
+import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Date
-
-private const val TAG = "Transaction"
 
 
 @Entity(
@@ -25,24 +30,43 @@ private const val TAG = "Transaction"
     )]
 )
 @TypeConverters(TransactionTypeConverters::class)
+@Serializable
 data class Transaction(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "transaction_id") val transactionId: Int = 0,
-    @ColumnInfo(name = "trade_date") val tradeDate: Date,
-    @ColumnInfo(name = "stock_code", index = true) val stockCode: String,
+    @PrimaryKey @ColumnInfo(name = "transaction_id") @SerialName("_id")
+    var transactionId: String = "",
+    @ColumnInfo(name = "trade_date") @SerialName("date") @Serializable(with = DateStringSerializer::class)
+    val tradeDate: Date,
+    @ColumnInfo(name = "stock_code", index = true) @SerialName("code")
+    val stockCode: String,
+    @Serializable(with = BrokerStringSerializer::class)
     val broker: Broker,
-    @ColumnInfo(name = "trade_type", typeAffinity = 2) val tradeType: TradeType,
+    @ColumnInfo(
+        name = "trade_type",
+        typeAffinity = 2
+    ) @SerialName("type_") @Serializable(with = TradeTypeStringSerializer::class)
+    val tradeType: TradeType,
     val price: Float = 0f,
     val volume: Int = 0,
+    @ColumnInfo(name = "last_modified") @SerialName("last_modified") @Serializable(with = ZonedDtStringSerializer::class)
+    val lastModified: ZonedDateTime = ZonedDateTime.now(),
 ) {
+    init {
+        // dynamically generate the timestamp id when missing transaction id
+        if (transactionId == "") transactionId = Instant.now().epochSecond.toString()
+    }
 
     fun calculateFees(): Float {
         return broker.calculateFees(value = price * volume, date = tradeDate.toLocalDate())
     }
 
     companion object {
+        private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         fun fromTradeDateString(value: String): Date {
-            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            return LocalDate.parse(value, formatter).toDate()
+            return LocalDate.parse(value, dateTimeFormatter).toDate()
+        }
+
+        fun toTradeDateString(value: Date): String {
+            return value.toLocalDate().format(dateTimeFormatter)
         }
 
         fun validateTradeDateString(value: String): Boolean {
@@ -51,7 +75,7 @@ data class Transaction(
             } catch (e: DateTimeParseException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true
@@ -74,7 +98,7 @@ data class Transaction(
             } catch (e: java.lang.NumberFormatException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true
@@ -91,7 +115,7 @@ data class Transaction(
             } catch (e: java.lang.NumberFormatException) {
                 return false
             } catch (e: Exception) {
-                Log.e(TAG, e.toString())
+                Timber.e(e)
                 return false
             }
             return true
@@ -99,38 +123,3 @@ data class Transaction(
     }
 }
 
-
-class TransactionTypeConverters {
-    @TypeConverter
-    fun fromDateToIsoDateString(date: Date): String {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(
-            DateTimeFormatter.ISO_DATE
-        )
-    }
-
-    @TypeConverter
-    fun fromIsoDateStringToDate(isoString: String): Date {
-        return LocalDate.parse(isoString, DateTimeFormatter.ISO_DATE).toDate()
-    }
-
-    @TypeConverter
-    fun fromBrokerToString(broker: Broker): String {
-        return broker.name
-    }
-
-    @TypeConverter
-    fun fromStringToBroker(value: String): Broker {
-        return Broker.brokerFromString(value)
-    }
-
-    @TypeConverter
-    fun fromTradeTypeToString(tt: TradeType): String {
-        return tt.name
-    }
-
-    @TypeConverter
-    fun fromStringToTradeType(value: String): TradeType {
-        return tradeTypeFromString(value)
-    }
-
-}

@@ -37,15 +37,19 @@ fun StockInfo.containsStringQuery(query: String): Boolean {
 
 @Composable
 fun StockSelectorField(
-    stockList: List<StockInfo>, selectedStock: StockInfo?, updateSelectedStock: (StockInfo?) -> Unit
+    currentQuery: String,
+    updateCurrentQuery: (String) -> Unit,
+    stockList: List<StockInfo>,
+    selectedStock: StockInfo?,
+    updateSelectedStock: (StockInfo?) -> Unit
 ) {
 
-    var currentQuery: String by remember { mutableStateOf("") }
+
     val suggestions = stockList.filter {
         it.containsStringQuery(currentQuery)
     }
 
-    var fieldIsNotEmpty = currentQuery.isNotEmpty()
+    val fieldIsNotEmpty = currentQuery.isNotEmpty()
     var isFieldFocused by remember {
         mutableStateOf(false)
     }
@@ -55,12 +59,15 @@ fun StockSelectorField(
         Column {
             OutlinedTextField(value = currentQuery,
                 onValueChange = {
-                    currentQuery = it
+                    updateCurrentQuery(it)
                 },
                 modifier = Modifier.onFocusChanged { isFieldFocused = it.isFocused },
                 trailingIcon = {
                     if (fieldIsNotEmpty) {
-                        IconButton(onClick = { currentQuery = "";updateSelectedStock(null) }) {
+                        IconButton(onClick = {
+                            updateCurrentQuery("")
+                            updateSelectedStock(null)
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.Clear, contentDescription = "X"
                             )
@@ -77,7 +84,7 @@ fun StockSelectorField(
                         items(suggestions, key = { it.tradingCode }) { stockInfo ->
                             AutocompleteItem(stockInfo = stockInfo, onSelectStock = {
                                 updateSelectedStock(stockInfo)
-                                currentQuery = stockInfo.tradingName
+                                updateCurrentQuery(stockInfo.tradingName)
                                 focusManager.clearFocus()
                             })
                         }

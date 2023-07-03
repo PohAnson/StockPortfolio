@@ -43,8 +43,6 @@ class LoginActivity : ComponentActivity() {
             if (isLogout) vm.logout()
 
 
-
-
             OwlioAppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(

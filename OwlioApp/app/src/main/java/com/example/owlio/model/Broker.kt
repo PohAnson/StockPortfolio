@@ -19,7 +19,7 @@ sealed class Broker(val name: String) {
     }
 
 
-    object Poems : Broker("Poems") {
+    object Poems : Broker("poems") {
         override fun calculateFees(value: Float, date: LocalDate): Float {
             val commission = max(25.0f, 0.28f / 100 * value)
             val settlementInstruction = 0.35f
@@ -28,7 +28,7 @@ sealed class Broker(val name: String) {
         }
     }
 
-    object Moomoo : Broker("Moomoo") {
+    object Moomoo : Broker("moomoo") {
         override fun calculateFees(value: Float, date: LocalDate): Float {
             val commission = max(0.99f, 0.03f / 100 * value)
             val platformFee = commission  // calculated in the same way
@@ -51,9 +51,9 @@ sealed class Broker(val name: String) {
 
     companion object {
         fun brokerFromString(brokerString: String): Broker {
-            return when (brokerString) {
-                "Poems" -> Poems
-                "Moomoo" -> Moomoo
+            return when (brokerString.lowercase()) {
+                "poems" -> Poems
+                "moomoo" -> Moomoo
                 else -> {
                     throw Exception("Invalid Broker String '$brokerString' given.")
                 }
