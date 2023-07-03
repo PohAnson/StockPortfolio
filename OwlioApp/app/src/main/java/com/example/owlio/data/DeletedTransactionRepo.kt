@@ -1,13 +1,11 @@
 package com.example.owlio.data
 
-import kotlinx.serialization.Serializable
+import com.example.owlio.model.DeletedTransaction
 import javax.inject.Inject
 
 class DeletedTransactionRepo @Inject constructor(private val deletedTransactionDao: DeletedTransactionDao) {
-    suspend fun getAllDeletedTransaction(): List<DeletedTransaction> {
-        return deletedTransactionDao.getAllDeletedTransactionId()
+    suspend fun getDeletedTransactionAfter(dateTime: String): List<DeletedTransaction> {
+        return deletedTransactionDao.getDeletedTransactionAfter(dateTime)
     }
 }
 
-@Serializable
-data class DeletedTransaction(val transaction_id: String, val last_modified: String)

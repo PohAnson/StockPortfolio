@@ -77,7 +77,7 @@ class _TransactionDb:
         ]
 
     def find_deleted_after_transaction(self, date: datetime) -> list[str]:
-        return list(
+        return list(i["_id"] for i in
             self.deleted_coll.find({"last_modified": {"$gt": date}}, {"_id": 1})
         )
 

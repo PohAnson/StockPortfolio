@@ -10,7 +10,6 @@ import com.example.owlio.networkapi.ApiResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,18 +25,15 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
     ViewModel() {
     var authStatusUiState: AuthStatusUiState by mutableStateOf(AuthStatusUiState.Default)
 
-    fun saveSessionId(sessionId: String): Job {
-        return viewModelScope.launch { userCredentialRepo.saveSessionId(sessionId) }
-    }
 
     fun isCredentialPresent(): Boolean {
         return !userCredentialRepo.getCurrentSessionId().isNullOrEmpty()
     }
 
-    fun login(username: String, password: String): Job {
+    fun authLogin(username: String, password: String): Job {
         authStatusUiState = AuthStatusUiState.Loading
         return viewModelScope.launch {
-            val loginResult = userCredentialRepo.login(username, password)
+            val loginResult = userCredentialRepo.authLogin(username, password)
             authStatusUiState = when (loginResult) {
                 is ApiResult.ApiError -> AuthStatusUiState.Error(
                     loginResult.message ?: "Login Error"
@@ -47,6 +43,10 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
             }
             Timber.d(authStatusUiState.toString())
         }
+    }
+
+    fun login(sessionId: String) {
+        userCredentialRepo.login(sessionId)
     }
 
     fun signup(username: String, password: String): Job {
@@ -65,14 +65,6 @@ class LoginViewModel @Inject constructor(private val userCredentialRepo: UserCre
     }
 
     fun logout() {
-        viewModelScope.launch {
-            clearCredential()
-            userCredentialRepo.logout()
-        }
+        userCredentialRepo.logout()
     }
-
-    fun clearCredential() {
-        runBlocking { userCredentialRepo.clearUserSessionId() }
-    }
-
 }

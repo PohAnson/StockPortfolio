@@ -21,12 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WorkManager.getInstance(this)
-            .enqueueUniqueWork(
-                "syncDatabaseWorker",
-                ExistingWorkPolicy.REPLACE,
-                syncDatabaseWorkRequest
-            )
+
         setContent {
             OwlioAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -39,6 +34,13 @@ class MainActivity : ComponentActivity() {
                         intent.putExtra("isLogout", true)
                         startActivity(intent)
                         finish()
+                    }, syncToServer = {
+                        WorkManager.getInstance(this)
+                            .enqueueUniqueWork(
+                                "syncDatabaseWorker",
+                                ExistingWorkPolicy.REPLACE,
+                                syncDatabaseWorkRequest
+                            )
                     })
                 }
             }

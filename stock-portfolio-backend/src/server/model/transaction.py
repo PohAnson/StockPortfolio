@@ -246,7 +246,8 @@ class Transaction:
 
     def to_json(self):
         data = self.to_dict()
-        data["date"] = data["date"].strftime("%d/%m/%Y")
+        data["date"] = data["date"].strftime("%Y-%m-%d")
+        data["last_modified"] = data["last_modified"].isoformat() +'Z'
         data["name"] = stock_code_name_dict[self.code]
         data.pop("userid")
         return data

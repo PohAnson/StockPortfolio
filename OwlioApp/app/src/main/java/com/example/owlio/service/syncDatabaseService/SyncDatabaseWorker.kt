@@ -47,14 +47,23 @@ class SyncDatabaseWorker @AssistedInject constructor(
             DateTimeFormatter.ISO_INSTANT
         )
         // gather the deleted transaction
-        val deletedTransaction = deletedTransactionRepo.getAllDeletedTransaction()
+        val deletedTransaction =
+            deletedTransactionRepo.getDeletedTransactionAfter(lastSyncedDateTime)
 
         // gather modified transaction by comparing the last modified date with last synced date
         val modifiedTransaction = transactionRepo.getTransactionModifiedAfter(lastSyncedDateTime)
 
         // create json request body
         val jsonTransactionDelta = buildJsonObject {
-            put("deleted_transaction", Json.encodeToJsonElement(deletedTransaction))
+            put(
+                "deleted_transaction",
+                Json.encodeToJsonElement(deletedTransaction.map {
+                    listOf(
+                        it.transaction_id,
+                        it.last_modified
+                    )
+                })
+            )
             put("modified_transaction", Json.encodeToJsonElement(modifiedTransaction))
             put("last_synced_datetime", Json.encodeToJsonElement(lastSyncedDateTime))
         }
@@ -64,12 +73,21 @@ class SyncDatabaseWorker @AssistedInject constructor(
 
 
         // send all data to server
-        transactionSyncApiService.syncTransaction(requestBody)
+        val response = transactionSyncApiService.syncTransaction(requestBody)
 
-        // TODO: update the new data from server
+        // update the deleted transaction
+        response.deletedTransaction.forEach {
+            transactionRepo.deleteTransaction(it)
+        }
+
+        response.modifiedTransaction.forEach { transaction ->
+            transactionRepo.upsertTransaction(
+                transaction
+            )
+        }
 
         // when success
-        owlioDataStorePreferences.updateLastSyncedToNow()
+        owlioDataStorePreferences.updateLastSyncedTo(response.lastSyncedDateTime)
         return Result.success()
     }
 

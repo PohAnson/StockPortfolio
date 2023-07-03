@@ -51,14 +51,16 @@ fun LoginScreen(
     } else {
         // Login Form
         if (isLoginForm) UserAuthForm(login = true, onSubmit = { username, password ->
-            vm.login(username, password).invokeOnCompletion {
+            vm.authLogin(username, password).invokeOnCompletion {
                 when (val loginState = vm.authStatusUiState) {
                     is AuthStatusUiState.Error -> snackbarDelegate.showSnackbar(
                         SnackbarState.ERROR, loginState.errorMessage
                     )
 
-                    is AuthStatusUiState.Success -> vm.saveSessionId(loginState.sessionId)
-                        .invokeOnCompletion { onSuccess() }
+                    is AuthStatusUiState.Success -> {
+                        vm.login(loginState.sessionId)
+                        onSuccess()
+                    }
 
                     else -> {}
                 }
@@ -78,8 +80,10 @@ fun LoginScreen(
                                 SnackbarState.ERROR, signupState.errorMessage
                             )
 
-                            is AuthStatusUiState.Success -> vm.saveSessionId(signupState.sessionId)
-                                .invokeOnCompletion { onSuccess() }
+                            is AuthStatusUiState.Success -> {
+                                vm.login(signupState.sessionId)
+                                onSuccess()
+                            }
 
                             else -> {}
                         }

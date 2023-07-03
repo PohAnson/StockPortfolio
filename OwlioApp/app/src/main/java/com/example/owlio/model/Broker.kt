@@ -51,9 +51,9 @@ sealed class Broker(val name: String) {
 
     companion object {
         fun brokerFromString(brokerString: String): Broker {
-            return when (brokerString) {
-                "Poems" -> Poems
-                "Moomoo" -> Moomoo
+            return when (brokerString.lowercase()) {
+                "poems" -> Poems
+                "moomoo" -> Moomoo
                 else -> {
                     throw Exception("Invalid Broker String '$brokerString' given.")
                 }

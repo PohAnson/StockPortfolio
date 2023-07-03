@@ -7,6 +7,7 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
@@ -14,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,7 +46,7 @@ import com.example.owlio.ui.screen.pnl.PnlScreen
 import com.example.owlio.ui.screen.transaction.TransactionScreen
 
 @Composable
-fun OwlioApp(onLogout: () -> Unit) {
+fun OwlioApp(onLogout: () -> Unit, syncToServer: () -> Unit) {
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val snackbarDelegate by remember { SnackbarDelegate() }
@@ -57,7 +59,7 @@ fun OwlioApp(onLogout: () -> Unit) {
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            OwlioTopAppBar(title = topAppBarTitle)
+            OwlioTopAppBar(title = topAppBarTitle, syncToServer = syncToServer)
         },
         bottomBar = { OwlioBottonNavBar(navController = navController, onLogout) },
         snackbarHost = {
@@ -113,10 +115,14 @@ fun OwlioApp(onLogout: () -> Unit) {
 
 @Composable
 fun OwlioTopAppBar(
-    title: String, modifier: Modifier = Modifier
+    title: String, modifier: Modifier = Modifier, syncToServer: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(title) }, modifier = modifier
+        title = { Text(title) }, modifier = modifier, actions = {
+            IconButton(onClick = syncToServer) {
+                Icon(Icons.Outlined.Refresh, contentDescription = "Sync to Database")
+            }
+        }
     )
 }
 

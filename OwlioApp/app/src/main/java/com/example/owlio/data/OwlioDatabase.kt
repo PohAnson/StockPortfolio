@@ -5,11 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.owlio.model.DeletedTransaction
 import com.example.owlio.model.StockInfo
 import com.example.owlio.model.Transaction
 
 @Database(
-    entities = [StockInfo::class, Transaction::class], version = 1, exportSchema = false
+    entities = [StockInfo::class, Transaction::class, DeletedTransaction::class],
+    version = 1,
+    exportSchema = false
 )
 abstract class OwlioDatabase : RoomDatabase() {
     abstract fun stockInfoDao(): StockInfoDao
@@ -53,7 +56,11 @@ abstract class OwlioDatabase : RoomDatabase() {
                                     CREATE TRIGGER delete_transaction_trigger
                                     BEFORE DELETE ON "transaction" FOR EACH ROW
                                     BEGIN
-                                        INSERT INTO "deleted_transaction"(transaction_id, last_modified) VALUES(OLD.transaction_id, datetime());
+                                        INSERT INTO "deleted_transaction"(transaction_id, last_modified) 
+                                        VALUES(
+                                            OLD.transaction_id, 
+                                            strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                                        );
                                     END;
                                 """.trimMargin()
                             )

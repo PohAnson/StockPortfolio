@@ -6,6 +6,8 @@ import com.example.owlio.networkapi.UserApiService
 import com.example.owlio.networkapi.UserSessionIdResult
 import com.example.owlio.networkapi.catchNoNetworkException
 import com.example.owlio.networkapi.catchUnauthorizedHttpException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -24,12 +26,11 @@ class UserCredentialRepo @Inject constructor(
         return owlioDataStorePreferences.sessionId
     }
 
-    suspend fun saveSessionId(sessionId: String) {
-        owlioDataStorePreferences.saveSessionId(sessionId)
-    }
-
-    suspend fun clearUserSessionId() {
-        owlioDataStorePreferences.clearUserSessionId()
+    fun login(sessionId: String) {
+        runBlocking(Dispatchers.IO) {
+            owlioDataStorePreferences.saveSessionId(sessionId)
+            owlioDataStorePreferences.resetLastSyncedToEpoch()  // to pull all data
+        }
     }
 
 
@@ -43,7 +44,7 @@ class UserCredentialRepo @Inject constructor(
         }.catchNoNetworkException().catchUnauthorizedHttpException().getOrThrow()
     }
 
-    suspend fun login(username: String, password: String): ApiResult {
+    suspend fun authLogin(username: String, password: String): ApiResult {
         val jsonObject = buildJsonObject {
             put("username", username)
             put("password", password)
@@ -96,6 +97,7 @@ class UserCredentialRepo @Inject constructor(
 
 
     fun logout(): ApiResult {
+        return runBlocking(Dispatchers.IO) {
             try {
                 userApiService.userLogout().let { ApiResult.ApiSuccess(it) }
             } catch (e: ConnectException) {
@@ -104,6 +106,9 @@ class UserCredentialRepo @Inject constructor(
             } catch (e: Throwable) {
                 Timber.e(e)
                 ApiResult.ApiError(500, e.toString())
+            } finally {
+                owlioDataStorePreferences.onUserLogout()
+            }
         }
     }
 }

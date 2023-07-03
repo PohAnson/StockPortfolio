@@ -19,8 +19,6 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class OwlioDataStorePreferences @Inject constructor(private val dataStorePreferences: DataStore<Preferences>) {
-
-
     val sessionId: String?
         get() = getPreferenceFor(SESSIONID_PREFKEY)
     val lastSyncedDateTime: ZonedDateTime
@@ -49,6 +47,11 @@ class OwlioDataStorePreferences @Inject constructor(private val dataStorePrefere
         dataStorePreferences.edit { it.remove(SESSIONID_PREFKEY) }
     }
 
+    suspend fun onUserLogout() {
+        clearUserSessionId()
+        resetLastSyncedToEpoch()
+    }
+
     suspend fun updateLastSyncedToNow() {
         dataStorePreferences.edit { preferences ->
             preferences[LAST_SYNCED_DATETIME_PREFKEY] =
@@ -56,6 +59,21 @@ class OwlioDataStorePreferences @Inject constructor(private val dataStorePrefere
         }
     }
 
+    suspend fun updateLastSyncedTo(dateTimeIsoString: ZonedDateTime) {
+        dataStorePreferences.edit { preferences ->
+            preferences[LAST_SYNCED_DATETIME_PREFKEY] =
+                dateTimeIsoString.format(DateTimeFormatter.ISO_INSTANT)
+        }
+    }
+
+    suspend fun resetLastSyncedToEpoch() {
+        dataStorePreferences.edit { preferences ->
+            preferences[LAST_SYNCED_DATETIME_PREFKEY] =
+                Instant.EPOCH.atZone(ZoneId.of("UTC")).format(
+                    DateTimeFormatter.ISO_INSTANT
+                )
+        }
+    }
 
     private fun handleIoException(throwable: Throwable) {
         if (throwable is IOException) {

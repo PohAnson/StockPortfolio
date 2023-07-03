@@ -5,9 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.owlio.data.DeletedTransactionDao
+import com.example.owlio.data.OwlioDataStorePreferences
 import com.example.owlio.data.OwlioDatabase
 import com.example.owlio.data.StockInfoDao
 import com.example.owlio.data.TransactionDao
+import com.example.owlio.networkapi.NetworkApiSessionCookiesInterceptor
 import com.example.owlio.networkapi.TransactionSyncApiService
 import com.example.owlio.networkapi.UserApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -20,6 +22,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -58,25 +61,45 @@ class OwlioActivityModule {
 class ApiServiceModule {
     private val BASE_URL = "http://192.168.1.200:5000/api/v0/"
 
-    private val jsonCoverterFactory = Json { ignoreUnknownKeys = true }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    @get:Provides
-    val retrofitService: Retrofit = Retrofit.Builder().addConverterFactory(
-        jsonCoverterFactory.asConverterFactory(
-            MediaType.get("application/json")
-        )
-    ).baseUrl(BASE_URL).build()
+    private val jsonConverterFactory = Json { ignoreUnknownKeys = true }
 
 
-    @get:Provides
-    val userRetrofitService: UserApiService by lazy {
-        retrofitService.create(UserApiService::class.java)
+    @Provides
+    @Singleton
+    fun getInterceptor(owlioDataStorePreferences: OwlioDataStorePreferences): NetworkApiSessionCookiesInterceptor {
+        return NetworkApiSessionCookiesInterceptor(owlioDataStorePreferences)
     }
 
-    @get:Provides
-    val transactionSyncApiRetrofitService: TransactionSyncApiService by lazy {
-        retrofitService.create(TransactionSyncApiService::class.java)
+    @Provides
+    @Singleton
+    fun getOkHttpClient(interceptor: NetworkApiSessionCookiesInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .build()
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    @Provides
+    @Singleton
+    fun retrofitService(httpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(
+            jsonConverterFactory.asConverterFactory(MediaType.get("application/json"))
+        )
+        .client(httpClient)
+        .build()
+
+
+    @Provides
+    @Singleton
+    fun userRetrofitService(retrofitService: Retrofit): UserApiService {
+        return retrofitService.create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun transactionSyncApiRetrofitService(retrofitService: Retrofit): TransactionSyncApiService {
+        return retrofitService.create(TransactionSyncApiService::class.java)
     }
 }
 

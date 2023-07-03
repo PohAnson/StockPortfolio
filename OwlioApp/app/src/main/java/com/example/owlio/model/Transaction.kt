@@ -32,18 +32,18 @@ import java.util.Date
 @TypeConverters(TransactionTypeConverters::class)
 @Serializable
 data class Transaction(
-    @PrimaryKey @ColumnInfo(name = "transaction_id") @SerialName("transaction_id")
+    @PrimaryKey @ColumnInfo(name = "transaction_id") @SerialName("_id")
     var transactionId: String = "",
-    @ColumnInfo(name = "trade_date") @SerialName("trade_date") @Serializable(with = DateStringSerializer::class)
+    @ColumnInfo(name = "trade_date") @SerialName("date") @Serializable(with = DateStringSerializer::class)
     val tradeDate: Date,
-    @ColumnInfo(name = "stock_code", index = true) @SerialName("stock_code")
+    @ColumnInfo(name = "stock_code", index = true) @SerialName("code")
     val stockCode: String,
     @Serializable(with = BrokerStringSerializer::class)
     val broker: Broker,
     @ColumnInfo(
         name = "trade_type",
         typeAffinity = 2
-    ) @SerialName("trade_type") @Serializable(with = TradeTypeStringSerializer::class)
+    ) @SerialName("type_") @Serializable(with = TradeTypeStringSerializer::class)
     val tradeType: TradeType,
     val price: Float = 0f,
     val volume: Int = 0,

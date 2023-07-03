@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.example.owlio.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +21,9 @@ interface TransactionDao {
 
     @Update
     suspend fun updateTransaction(transaction: Transaction): Int
+
+    @Upsert
+    suspend fun upsertTransaction(transaction: Transaction)
 
     @Query("DELETE FROM `transaction` WHERE transaction_id=:transactionId")
     suspend fun deleteTransaction(transactionId: String)
