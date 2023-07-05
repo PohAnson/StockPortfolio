@@ -1,5 +1,7 @@
 from datetime import datetime
-from flask import Blueprint, request, jsonify
+
+from flask import Blueprint, jsonify, request
+
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
 
@@ -53,9 +55,7 @@ def sync_transaction():
         # serialise the modified transactions
         transaction = Transaction.from_dict(t)
         transaction.update_last_modified_now()  # update the last modified time
-        transactiondb.upsert_one_transaction_by_id(
-            transaction._id, transaction.to_dict()
-        )
+        transactiondb.upsert_one_transaction_by_id(transaction._id, transaction)
 
     # get updated transactions that is not updated from the current sync
     updated_from_synced_ids = del_transaction_id_set.union(

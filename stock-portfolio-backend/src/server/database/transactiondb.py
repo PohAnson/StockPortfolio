@@ -1,7 +1,7 @@
-from datetime import datetime
 import os
 import secrets
 import string
+from datetime import datetime
 
 import pymongo
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ class _TransactionDb:
             self.coll = client["test_data"]["transactions"]
             self.deleted_coll = client["test_data"]["deleted_transaction"]
 
-    def insert_one_transaction(self, data) -> dict:
+    def insert_one_transaction(self, data: Transaction) -> dict:
         """Insert a transaction into database
 
         Args:
@@ -38,11 +38,20 @@ class _TransactionDb:
         self.coll.insert_one(data)
         return data
 
-    def upsert_one_transaction_by_id(self, transaction_id, data) -> UpdateResult:
+    def update_one_transaction_by_id(
+        self, transaction_id, data: Transaction
+    ) -> UpdateResult:
+        return self.coll.update_one(
+            {"_id": transaction_id}, {"$set": data.to_dict()}
+        )
+
+    def upsert_one_transaction_by_id(
+        self, transaction_id, data: Transaction
+    ) -> UpdateResult:
         # remove deleted instances
         self.deleted_coll.delete_many({"_id": transaction_id})
         return self.coll.update_one(
-            {"_id": transaction_id}, {"$set": data}, upsert=True
+            {"_id": transaction_id}, {"$set": data.to_dict()}, upsert=True
         )
 
     def delete_transaction_by_id(self, transaction_id: str):
@@ -51,34 +60,42 @@ class _TransactionDb:
         Args:
             transaction_id (str): transaction id string to delete
         """
-        deleted_transaction = self.coll.find_one_and_delete({"_id": transaction_id})
+        deleted_transaction = self.coll.find_one_and_delete(
+            {"_id": transaction_id}
+        )
         if deleted_transaction is None:
             return
         # update last_modified to now
         deleted_transaction["last_modified"] = datetime.utcnow()
         self.deleted_coll.insert_one(deleted_transaction)
+        return deleted_transaction
 
-    def find_all_transaction(self, *, filter_dict={}, projection=None) -> list:
+    def find_all_transaction(self, *, filter_dict={}) -> list:
         data = [
-            Transaction.from_dict(record, projection)
-            for record in self.coll.find(filter_dict, projection).sort(
+            Transaction.from_dict(record)
+            for record in self.coll.find(filter_dict).sort(
                 "date", pymongo.ASCENDING
             )
         ]
         return data
 
-    def find_one_transaction_by_id(self, transaction_id, *, projection=None):
-        return self.coll.find_one({"_id": transaction_id}, projection)
+    def find_one_transaction_by_id(self, transaction_id):
+        return self.coll.find_one({"_id": transaction_id})
 
-    def find_last_modified_after_transaction(self, date: datetime) -> list[Transaction]:
+    def find_last_modified_after_transaction(
+        self, date: datetime
+    ) -> list[Transaction]:
         return [
             Transaction.from_dict(record)
             for record in self.coll.find({"last_modified": {"$gt": date}})
         ]
 
     def find_deleted_after_transaction(self, date: datetime) -> list[str]:
-        return list(i["_id"] for i in
-            self.deleted_coll.find({"last_modified": {"$gt": date}}, {"_id": 1})
+        return list(
+            i["_id"]
+            for i in self.deleted_coll.find(
+                {"last_modified": {"$gt": date}}, {"_id": 1}
+            )
         )
 
     @staticmethod
