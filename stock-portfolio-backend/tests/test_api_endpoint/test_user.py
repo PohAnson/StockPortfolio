@@ -20,10 +20,10 @@ class UserApiTestcase(unittest.TestCase):
             # assumed that the username is already present
             return
         if response.status_code == 200:
-            cls.session_id_cookie = response.json().get("sassyid")
+            cls.session_id_cookie = response.json().get("sessionid")
 
     def check_login(self, session_id) -> bool:
-        response = requests.get(self.url, cookies={"sassyid": session_id})
+        response = requests.get(self.url, cookies={"sessionid": session_id})
         return response.json().get("isLogin")
 
     def login_user(self, username, password) -> requests.Response:
@@ -32,7 +32,7 @@ class UserApiTestcase(unittest.TestCase):
         )
 
     def logout_user(self, session_id) -> None:
-        requests.get(self.url + "/logout", cookies={"sassyid": session_id})
+        requests.get(self.url + "/logout", cookies={"sessionid": session_id})
 
     @staticmethod
     def create_user(url, username, password, name) -> requests.Response:
@@ -61,15 +61,15 @@ class UserApiTestcase(unittest.TestCase):
         password = "as"
         # Create user
         response = self.create_user(self.url, username, password, "A")
-        session_id = response.json().get("sassyid")
+        session_id = response.json().get("sessionid")
         self.logout_user(session_id)
 
         response = self.login_user(username, password)
-        assert response.status_code == 200 and "sassyid" in response.json()
+        assert response.status_code == 200 and "sessionid" in response.json()
 
     def test_failedLoginPassword(self):
         response = self.create_user(self.url, "asdf", "a", "A")
-        self.logout_user(response.json().get("sassyid"))
+        self.logout_user(response.json().get("sessionid"))
         response = self.login_user("asdf", "as")
         assert response.status_code == 401 and "error" in response.json()
 
@@ -95,7 +95,7 @@ class UserApiTestcase(unittest.TestCase):
             # Cannot create account properly
             assert False, "Account not created"
 
-        session_id = response.json().get("sassyid")
+        session_id = response.json().get("sessionid")
 
         # Check login before
         assert self.check_login(session_id), "User is not login"
@@ -115,7 +115,7 @@ class UserApiTestcase(unittest.TestCase):
     def test_userSignupPass(self):
         response = self.create_user(self.url, "unique3421", "as", "Unique")
 
-        assert response.status_code == 200 and "sassyid" in response.json()
+        assert response.status_code == 200 and "sessionid" in response.json()
 
     def test_userSignUpDuplicateUsernameError(self):
         self.create_user(self.url, "commonName", "as", "Unique")
@@ -128,4 +128,4 @@ class UserApiTestcase(unittest.TestCase):
         self.create_user(self.url, "uniqueName", "as", "Unique")
         response = self.create_user(self.url, "uniqueName21", "as", "Unique")
 
-        assert response.status_code == 200 and "sassyid" in response.json()
+        assert response.status_code == 200 and "sessionid" in response.json()

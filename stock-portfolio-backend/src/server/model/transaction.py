@@ -4,8 +4,6 @@ import datetime as dt
 import json
 from typing import Literal, Union
 
-from data.stock_code_name_dict import stock_code_name_dict
-
 
 class Transaction:
     def __init__(

@@ -6,6 +6,6 @@ export default async function handler(req, res) {
     process.env.API_URL + "/user",
     req.body
   );
-  res.setHeader("Set-Cookie", `sassyid=${json.sassyid}`);
+  res.setHeader("Set-Cookie", `sessionid=${json.sessionid}`);
   res.status(statusCode).json(json);
 }

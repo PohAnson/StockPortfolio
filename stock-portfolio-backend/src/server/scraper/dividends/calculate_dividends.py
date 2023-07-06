@@ -1,4 +1,3 @@
-from multiprocessing import Value
 import sys
 from dataclasses import dataclass
 from datetime import datetime as dt
@@ -34,7 +33,6 @@ class DividendDateRow(NamedTuple):
 def _parse_table_rows(rows) -> list[DividendDateRow]:
     dividend_payouts: list[DividendDateRow] = []
     for row in rows:
-
         rate, ex_date = row.find_all("td")[-4:-2]
 
         ex_date = dt.strptime(ex_date.get_text(), "%Y-%m-%d")
@@ -67,7 +65,6 @@ class TransactionVolumeRange:
 def _generate_range_list(
     all_transactions: list[Transaction],
 ) -> list[TransactionVolumeRange]:
-
     complete_range_list: list[TransactionVolumeRange] = []
     incomplete_range: TransactionVolumeRange | None = None
 

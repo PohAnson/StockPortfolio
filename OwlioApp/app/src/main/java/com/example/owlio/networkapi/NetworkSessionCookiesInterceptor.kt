@@ -14,7 +14,7 @@ class NetworkApiSessionCookiesInterceptor @Inject constructor(private var owlioD
         val sessionId = owlioDataStorePreferences.sessionId ?: ""
         request =
             request.newBuilder()
-                .headers(Headers.of("Cookie", "sassyid=$sessionId"))
+                .headers(Headers.of("Cookie", "sessionid=$sessionId"))
                 .method(request.method(), request.body())
                 .build()
         return chain.proceed(request)

@@ -4,9 +4,9 @@ import os
 import subprocess
 import sys
 from time import sleep
-from pymongo import MongoClient
 
 import pytest
+from pymongo import MongoClient
 
 sys.path.append("src")
 
