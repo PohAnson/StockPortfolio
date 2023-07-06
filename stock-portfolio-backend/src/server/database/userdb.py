@@ -51,9 +51,7 @@ class _UserDb:
 
         # check if username is already used
         if self.is_username_present(user_data["username"]):
-            raise ValueError(
-                f"Username already exists {user_data['username']}"
-            )
+            raise ValueError(f"Username already exists {user_data['username']}")
 
         hashed_pw = self.ph.hash(user_data["password"])
         user_data["password"] = hashed_pw

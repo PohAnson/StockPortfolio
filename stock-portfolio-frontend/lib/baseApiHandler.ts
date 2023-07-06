@@ -1,7 +1,7 @@
 export async function getJsonHandler(fullUrl: string, sessionId = null) {
   return await fetch(fullUrl, {
     headers: {
-      Cookie: `sassyid=${sessionId}`,
+      Cookie: `sessionid=${sessionId}`,
     },
   }).then(async (r) => [r.status, await r.json()]);
 }
@@ -17,7 +17,7 @@ async function sendJson(
     body: JSON.stringify(json),
     headers: {
       "Content-Type": "application/json",
-      Cookie: `sassyid=${sessionId}`,
+      Cookie: `sessionid=${sessionId}`,
     },
   }).then(async (r) => [r.status, await r.json()]);
 }
@@ -42,7 +42,7 @@ export async function deleteJsonHandler(fullUrl: string, sessionId = null) {
   return await fetch(fullUrl, {
     method: "DELETE",
     headers: {
-      Cookie: `sassyid=${sessionId}`,
+      Cookie: `sessionid=${sessionId}`,
     },
   }).then(async (r) => [r.status, await r.json()]);
 }

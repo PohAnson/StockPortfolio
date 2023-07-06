@@ -32,7 +32,7 @@ sealed interface ApiResult {
 
 
 @Serializable
-data class UserSessionIdResult(@SerialName("sassyid") val sessionid: String)
+data class UserSessionIdResult(@SerialName("sessionid") val sessionid: String)
 
 @Serializable
 data class CheckLoginResult(val isLogin: Boolean)

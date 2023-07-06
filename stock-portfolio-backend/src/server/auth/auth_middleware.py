@@ -14,7 +14,7 @@ class middleware:
     def __call__(self, environ, start_response):
 
         request = Request(environ)
-        sessionid = request.cookies.get("sassyid")
+        sessionid = request.cookies.get("sessionid")
 
         # ignore url that deals with user signup, login, and logout
         whitelist = ["/api/v0/user"]
@@ -31,7 +31,7 @@ class middleware:
             return res(environ, start_response)
 
         environ.update(userid=self.session_manager.get_ses_user(sessionid))
-        environ.update(sassyid=sessionid)
+        environ.update(sessionid=sessionid)
 
         print(
             f"sessionid:\t{sessionid}", f"\nuserid:  \t{environ.get('userid')}"

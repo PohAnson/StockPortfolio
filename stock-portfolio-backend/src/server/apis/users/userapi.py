@@ -1,8 +1,8 @@
 from argon2.exceptions import VerifyMismatchError
 from flask import Blueprint, jsonify, request
 
-from server.database.userdb import userdb
 from server.auth.session_manager import SessionManager
+from server.database.userdb import userdb
 
 user_api_bp = Blueprint("user", __name__, url_prefix="user")
 
@@ -17,7 +17,7 @@ def user_session_available():
         + 200 {"isLogin": boolean}
     """
     return jsonify(
-        {"isLogin": request.environ.get("sassyid") in session_manager}
+        {"isLogin": request.environ.get("sessionid") in session_manager}
     )
 
 
@@ -29,7 +29,7 @@ def user_login():
         json: {"username", "password"}
 
     Json Response:
-        + 200 {"sassyid": str}
+        + 200 {"sessionid": str}
         + 401 {"error", Incorrect Login Credentials}
     """
 
@@ -37,9 +37,7 @@ def user_login():
     try:
         if userdb.authenticate_one_user(user_data):
             result = userdb.find_one_user(user_data["username"])
-            result["sassyid"] = session_manager.new_user_ses(
-                str(result["_id"])
-            )
+            result["sessionid"] = session_manager.new_user_ses(str(result["_id"]))
             result.pop("_id")
 
     except (ValueError, VerifyMismatchError) as e:
@@ -53,12 +51,12 @@ def user_logout():
     """Logout the user
 
     Requires:
-        valid request cookies containing key "sassyid"
+        valid request cookies containing key "sessionid"
 
     Json Response:
         + 200 {"ok": True}
     """
-    session_manager.remove_ses(request.cookies.get("sassyid"))
+    session_manager.remove_ses(request.cookies.get("sessionid"))
     return jsonify({"ok": True})
 
 
@@ -70,7 +68,7 @@ def user_signup():
         json: {"username", "password", "name"}
 
     Json Response:
-        + 200 {"sassyid": str session_id}
+        + 200 {"sessionid": str session_id}
         + 406 {"error": str error_msg}
     """
 
@@ -81,4 +79,4 @@ def user_signup():
         print(e)
         return jsonify({"error": str(e)}), 406
 
-    return jsonify({"sassyid": session_manager.new_user_ses(userid)}), 200
+    return jsonify({"sessionid": session_manager.new_user_ses(userid)}), 200
