@@ -16,9 +16,7 @@ class SortedSet(Sequence, MutableSet, Generic[T]):
         self.__data: list[T] = []
 
     def __contains__(self, value) -> bool:
-        return any(
-            filter(lambda x: x[self.key] == value[self.key], self.__data)
-        )
+        return any(filter(lambda x: x == value, self.__data))
 
     def __delitem__(self, index: Union[slice, Any]):
         if isinstance(index, (slice, int)):
