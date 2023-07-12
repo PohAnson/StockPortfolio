@@ -24,6 +24,7 @@ def get_transaction():
     transactions = transactiondb.find_all_transaction(
         filter_dict={"userid": userid}
     )
+    return jsonify(transaction_schema.dump(transactions, many=True))
     return jsonify(transaction_schema.dumps(transactions, many=True))
 
 
