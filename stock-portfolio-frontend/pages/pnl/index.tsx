@@ -32,30 +32,28 @@ export default function NetPage() {
     totalEarnings = pnlData.reduce((sum, cur) => sum + cur.pnl, 0).toFixed(2);
   }
   let table = (
-    <div className="overflow-auto">
-      <table>
-        <thead>
-          <tr className="border-b-2 border-b-gray-300">
-            <th>Stock Name/Code</th>
-            <th>Transactions</th>
-            <th>Dividend</th>
-            <th>Total Earnings</th>
+    <table className="overflow-auto md:overflow-y-visible md:mb-4">
+      <thead>
+        <tr className="border-b-2 border-b-gray-300">
+          <th>Stock Name/Code</th>
+          <th>Transactions</th>
+          <th>Dividend</th>
+          <th>Total Earnings</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pnlData == null ||
+          pnlData.map((data) => <Row key={data.code} data={data} />)}
+        {pnlData == null || (
+          <tr className="border-t-2 border-black text-end">
+            <td className="text-lg font-bold">Total:</td>
+            <td>{totalTransaction}</td>
+            <td>{totalDividend}</td>
+            <td>{totalEarnings}</td>
           </tr>
-        </thead>
-        <tbody>
-          {pnlData == null ||
-            pnlData.map((data) => <Row key={data.code} data={data} />)}
-          {pnlData == null || (
-            <tr className="border-t-2 border-black text-end">
-              <td className="text-lg font-bold">Total:</td>
-              <td>{totalTransaction}</td>
-              <td>{totalDividend}</td>
-              <td>{totalEarnings}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+        )}
+      </tbody>
+    </table>
   );
   let loadedPage =
     pnlData == null || pnlData.length === 0 ? (

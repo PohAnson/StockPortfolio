@@ -24,7 +24,6 @@ export default function TransactionPage() {
       .then(() => setIsStale(false));
   }, [isStale, router]);
   let table = (
-    <div className="overflow-auto">
       <table className="text-xs md:text-base">
         <thead>
           <tr className="border-b-2 border-b-gray-300">
@@ -43,7 +42,6 @@ export default function TransactionPage() {
             ))}
         </tbody>
       </table>
-    </div>
   );
   let loadedPage =
     transactionData == null || transactionData.length === 0 ? (

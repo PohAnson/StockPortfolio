@@ -28,9 +28,14 @@ export default function TransactionFormPageFactory(
       // Error
       setMessage(<ErrorBanner errorText={json_data["error"]} />);
     }
+    setIsToastVisisble(true)
+    setTimeout(() => {
+      setIsToastVisisble(false)
+    }, 3000);
   }
 
   let [message, setMessage] = useState(null);
+  let [isToastVisible, setIsToastVisisble] = useState(false)
 
   return (
     <div className="relative">
@@ -43,7 +48,7 @@ export default function TransactionFormPageFactory(
         />
       </Card>
       <div className="fixed w-3/4 left-[12.5%] md:left-[calc(12.5%+7.5rem)] bottom-12">
-        {message}
+        {isToastVisible && message}
       </div>
     </div>
   );

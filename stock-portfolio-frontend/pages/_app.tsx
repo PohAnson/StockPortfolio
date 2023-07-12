@@ -17,11 +17,11 @@ function MyApp({ Component, pageProps }) {
         <Component {...pageProps} />
       ) : (
         <div
-          className="flex flex-col min-h-screen text-black md:flex-row"
+          className="flex flex-col min-h-screen text-black md:flex-row md:h-screen"
           style={{ backgroundColor: "#f8fbff" }}
         >
           <SideBar />
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 md:overflow-y-scroll">
             <Component {...pageProps} />
           </div>
         </div>
