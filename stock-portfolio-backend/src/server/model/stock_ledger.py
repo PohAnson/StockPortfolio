@@ -143,7 +143,7 @@ class _StockRecord:
             "cost": calculated_data["cost"],
             "avg_price": self.avg_price,
             "pnl": calculated_data["pnl"] + dividends_sum,
-            # transactions_breakdown: list[list]]
+            # transactions_breakdown: list[list]
             # [date, buy/sell, price, volume, value, net]
             "transactions_breakdown": calculated_data["transactions"],
             "transactions_sum": calculated_data["pnl"],

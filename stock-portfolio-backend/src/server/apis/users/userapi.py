@@ -14,7 +14,7 @@ def user_session_available():
     """Check if user session is available
 
     Json Response:
-        + 200 {"isLogin": boolean}
+        + 200 {"isLogin": bool}
     """
     return jsonify(
         {"isLogin": request.environ.get("sessionid") in session_manager}
@@ -30,14 +30,16 @@ def user_login():
 
     Json Response:
         + 200 {"sessionid": str}
-        + 401 {"error", Incorrect Login Credentials}
+        + 401 {"error", "Incorrect Login Credentials"}
     """
 
     user_data = request.json
     try:
         if userdb.authenticate_one_user(user_data):
             result = userdb.find_one_user(user_data["username"])
-            result["sessionid"] = session_manager.new_user_ses(str(result["_id"]))
+            result["sessionid"] = session_manager.new_user_ses(
+                str(result["_id"])
+            )
             result.pop("_id")
 
     except (ValueError, VerifyMismatchError) as e:

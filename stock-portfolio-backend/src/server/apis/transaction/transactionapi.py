@@ -17,7 +17,13 @@ transaction_schema = TransactionSchema(exclude=["userid"])
 
 @transaction_api_bp.get("")
 def get_transaction():
-    # get all transaction
+    """Get all the transaction for a user.
+
+    The user is gotten indirectly from session linked to a user.
+
+    Json Response:
+        + 200 [{_id, date, code, type_, price, volume, broker, last_modified}]
+    """
     userid = request.environ.get("userid", None)
     if userid is None:
         return jsonify({"error": "No valid user"})
@@ -25,12 +31,19 @@ def get_transaction():
         filter_dict={"userid": userid}
     )
     return jsonify(transaction_schema.dump(transactions, many=True))
-    return jsonify(transaction_schema.dumps(transactions, many=True))
 
 
 @transaction_api_bp.post("")
 def post_transaction():
-    # create new transaction
+    """Create new transaction.
+
+    Requires:
+        json: {date, code, type_, price, volume, broker, last_modified}
+
+    Json Response:
+        + 200 {_id, date, code, type_, price, volume, broker, last_modified}
+        + 406 {"error": str}
+    """
     try:
         transaction = TransactionSchema().load(
             request.json, partial=["_id", "userid"]
@@ -45,13 +58,19 @@ def post_transaction():
 
 @transaction_api_bp.get("/<transaction_id>")
 def get_transaction_by_id(transaction_id):
+    """Get a single transaction based on the id
+
+    Json Response:
+        + 200 {_id, date, code, type_, price, volume, broker, last_modified, name}
+        + 404 {error: "No such transaction `transaction_id` was found"}
+    """
     result = transactiondb.find_one_transaction_by_id(
         transaction_id,
     )
     if result is None:
         return (
             jsonify(
-                {"Error": f"No such transaction '{transaction_id}' was found."}
+                {"error": f"No such transaction '{transaction_id}' was found."}
             ),
             404,
         )
@@ -62,14 +81,27 @@ def get_transaction_by_id(transaction_id):
 
 @transaction_api_bp.delete("/<transaction_id>")
 def delete_transaction(transaction_id):
+    """Delete a transaction
+
+    Json Response:
+        + 200 {"ok": bool (whether transaction is deleted)}
+    """
     result = transactiondb.delete_transaction_by_id(transaction_id)
     return jsonify({"ok": result is not None})
 
 
 @transaction_api_bp.put("/<transaction_id>")
 def put_transaction(transaction_id):
-    # Only support full replacement
-    # i.e. even fields that are not changed must still be provided
+    """Fully replace a transaction id with the current data
+
+    Even fields that are not changed must still be provided
+
+    Requires:
+        + json: {date, code, type_, price, volume, broker, last_modified}
+
+    Json Response:
+        + 200 {"ok": bool (whether it is updated)}
+    """
     transaction: Transaction = transaction_schema.load(
         request.json, partial=["_id", "userid"]
     )
