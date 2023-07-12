@@ -1,12 +1,15 @@
-from collections.abc import MutableSet, Sequence
-from typing import Any, Generator, Generic, Mapping, TypeVar, Union
+from collections.abc import Mapping, MutableSet, Sequence, Generator
+from typing import Any, Generic, TypeVar, Union
 
 T = TypeVar("T", bound=Mapping)
 
 
 class SortedSet(Sequence, MutableSet, Generic[T]):
     """Sort by an key in ascending order,
-    and ensure that all the elements are unique."""
+    and ensure that all the elements are unique.
+
+    Data added must have a `__getitem__` dunder.
+    """
 
     def __init__(self, key: Union[str, int]) -> None:
         self.key = key

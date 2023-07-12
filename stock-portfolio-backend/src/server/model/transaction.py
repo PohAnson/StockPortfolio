@@ -54,6 +54,22 @@ class Transaction:
         elif isinstance(__o, Transaction):
             return self._id == __o._id
 
+    def __getitem__(self, key):
+        if key in [
+            "date",
+            "code",
+            "broker",
+            "type_",
+            "price",
+            "volume",
+            "_id",
+            "userid",
+            "last_modified",
+        ]:
+            return self.__getattribute__(key)
+        else:
+            raise LookupError(f"Invalid key {key} is given.")
+
     def __hash__(self) -> int:
         _id_num_str = ""
         for c in self._id:
