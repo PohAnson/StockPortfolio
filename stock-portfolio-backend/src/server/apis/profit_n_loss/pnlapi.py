@@ -35,10 +35,10 @@ def get_pnl_breakdown_by_code(code):
     # format the dates
     transactions_breakdown = results.get("transactions_breakdown", [])
     for result in transactions_breakdown:
-        result[0] = result[0].strftime("%d/%m/%Y")
+        result[0] = result[0].strftime("%Y-%m-%d")
 
     dividends_breakdown = results.get("dividends_breakdown", [])
     for result in dividends_breakdown:
-        result[0] = result[0].strftime("%d/%m/%Y")
+        result[0] = result[0].strftime("%Y-%m-%d")
 
     return jsonify(results)
