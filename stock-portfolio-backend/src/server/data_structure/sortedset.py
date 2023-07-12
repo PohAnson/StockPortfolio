@@ -1,4 +1,4 @@
-from collections.abc import Mapping, MutableSet, Sequence, Generator
+from collections.abc import Generator, Mapping, MutableSet, Sequence
 from typing import Any, Generic, TypeVar, Union
 
 T = TypeVar("T", bound=Mapping)

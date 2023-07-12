@@ -36,8 +36,8 @@ class Transaction:
         return (
             f"Transaction {self._id if self._id is not None else ''}"
             f"({self.date.strftime('%Y-%m-%d')}, {self.code}, "
-            f"{self.broker}, {self.type_}, {self.price}, {self.volume})"
-            f"{self.userid}"
+            f"{self.broker}, {self.type_}, {self.price}, {self.volume}, "
+            f"{self.userid})"
         )
 
     def __eq__(self, __o: Union[str, Transaction]) -> bool:
