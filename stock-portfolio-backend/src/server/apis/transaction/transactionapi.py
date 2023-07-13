@@ -5,6 +5,7 @@ from server.apis.transaction.transaction_schema import (
     TransactionSchema,
 )
 from server.database.stockdb import stockdb
+from data.stock_code_name_dict import stock_code_name_dict
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
 
@@ -22,7 +23,7 @@ def get_transaction():
     The user is gotten indirectly from session linked to a user.
 
     Json Response:
-        + 200 [{_id, date, code, type_, price, volume, broker, last_modified}]
+        + 200 [{_id, date, code, name, type_, price, volume, broker, last_modified}]
     """
     userid = request.environ.get("userid", None)
     if userid is None:
@@ -30,7 +31,14 @@ def get_transaction():
     transactions = transactiondb.find_all_transaction(
         filter_dict={"userid": userid}
     )
-    return jsonify(transaction_schema.dump(transactions, many=True))
+    detailed_transactions =[]
+    for t in transactions:
+        name = stock_code_name_dict[t.code]
+        td = t.to_dict()
+        td.update(name=name)
+        detailed_transactions.append(td)
+
+    return jsonify(DetailedTransactionSchema(exclude=["userid"]).dump(detailed_transactions, many=True))
 
 
 @transaction_api_bp.post("")
