@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
+from server.apis.transaction.transaction_schema import TransactionSchema
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
 
@@ -32,6 +33,9 @@ def sync_transaction():
         request.json["last_synced_datetime"]
     )
 
+    # get the userid
+    userid = request.environ.get("userid")
+
     # search for duplicate id and remove transaction from one of them
     # lastest last_modified take precedence
     # if both have same, update takes precedence
@@ -61,15 +65,17 @@ def sync_transaction():
     for transaction_id in del_transaction_id_modified_map:
         transactiondb.delete_transaction_by_id(transaction_id)
 
-    # get the userid
-    userid = request.environ.get("userid")
     # update/insert the modified transactions
     for t in mod_transaction_id_map.values():
         t.update(userid=userid)
-        # serialise the modified transactions
-        transaction = Transaction.from_dict(t)
+        transaction: Transaction = TransactionSchema().load(t)
         transaction.update_last_modified_now()  # update the last modified time
-        transactiondb.upsert_one_transaction_by_id(transaction._id, transaction)
+        transactiondb.upsert_one_transaction_by_id_before_datetime(
+            transaction_id=transaction._id,
+            userid=transaction.userid,
+            last_modified=transaction.last_modified,
+            data=transaction,
+        )
 
     # get updated transactions that is not updated from the current sync
     updated_from_synced_ids = del_transaction_id_set.union(
@@ -79,7 +85,7 @@ def sync_transaction():
     unsynced_modified_transactions = list(
         transaction
         for transaction in transactiondb.find_last_modified_after_transaction(
-            last_synced_datetime
+            userid=userid, date=last_synced_datetime
         )
         if transaction._id not in updated_from_synced_ids
     )
@@ -99,7 +105,7 @@ def sync_transaction():
     unsynced_modified_transactions = list(
         transaction
         for transaction in transactiondb.find_last_modified_after_transaction(
-            last_synced_datetime
+            userid=userid, date=last_synced_datetime
         )
         if transaction._id not in updated_from_synced_ids
     )
