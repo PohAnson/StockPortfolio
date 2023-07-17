@@ -11,7 +11,7 @@ def get_portfolio():
     """Get the outstanding current holdings. ie. volume is not 0
 
     Json Response:
-        + 200 [{avg_price, code, cost, dividends_breakdown, dividends_sum, name, pnl, transactions_breakdown, transactions_sum, volume}]
+        + 200 [{avg_price, code, cost, name, pnl, transactions_breakdown, transactions_sum, volume}]
         + 400 {"error": "No valid user"}
 
 
@@ -24,5 +24,10 @@ def get_portfolio():
     ledger.add_transactions(
         transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
-
-    return jsonify([rec for rec in ledger.to_json() if rec["volume"] != 0])
+    return jsonify(
+        [
+            rec
+            for rec in ledger.tabulate_transactions().values()
+            if rec["volume"] != 0
+        ]
+    )

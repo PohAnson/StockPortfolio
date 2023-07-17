@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 
+from data.stock_code_name_dict import stock_code_name_dict
 from server.apis.transaction.transaction_schema import (
     DetailedTransactionSchema,
     TransactionSchema,
@@ -13,6 +14,7 @@ transaction_api_bp = Blueprint(
 )
 
 transaction_schema = TransactionSchema(exclude=["userid"])
+detailed_transaction_schema = DetailedTransactionSchema(exclude=["userid"])
 
 
 @transaction_api_bp.get("")
@@ -22,7 +24,7 @@ def get_transaction():
     The user is gotten indirectly from session linked to a user.
 
     Json Response:
-        + 200 [{_id, date, code, type_, price, volume, broker, last_modified}]
+        + 200 [{_id, date, code, name, type_, price, volume, broker, last_modified}]
     """
     userid = request.environ.get("userid", None)
     if userid is None:
@@ -30,7 +32,16 @@ def get_transaction():
     transactions = transactiondb.find_all_transaction(
         filter_dict={"userid": userid}
     )
-    return jsonify(transaction_schema.dump(transactions, many=True))
+    detailed_transactions = []
+    for t in transactions:
+        name = stock_code_name_dict[t.code]
+        td = t.to_dict()
+        td.update(name=name)
+        detailed_transactions.append(td)
+
+    return jsonify(
+        detailed_transaction_schema.dump(detailed_transactions, many=True)
+    )
 
 
 @transaction_api_bp.post("")
@@ -76,7 +87,7 @@ def get_transaction_by_id(transaction_id):
         )
     stock_name = stockdb.find_one_stock(result["code"])["TradingName"]
     result["name"] = stock_name
-    return jsonify(DetailedTransactionSchema().dumps(result))
+    return jsonify(detailed_transaction_schema.dumps(result))
 
 
 @transaction_api_bp.delete("/<transaction_id>")

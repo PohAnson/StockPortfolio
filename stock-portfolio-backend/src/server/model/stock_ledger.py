@@ -1,3 +1,4 @@
+import concurrent.futures
 from typing import Any
 
 from data.stock_code_name_dict import stock_code_name_dict
@@ -42,7 +43,7 @@ class _StockRecord:
         """Single pass to tabulate the transactions.
 
         Returns:
-            dict[str, Any]: has keys: "volume", "cost", "pnl", "transactions"
+            dict[str, Any]: has keys: "code", "name", "volume", "cost", "transactions_sum", "transactions_breakdown"
         """
         # sum of all the transactions till sold fully.
         cur_total_cost = 0
@@ -106,10 +107,15 @@ class _StockRecord:
                 )
 
         return {
+            "code": self.code,
+            "name": stock_code_name_dict[self.code],
             "volume": cur_total_volume,
             "cost": cur_total_cost,
-            "pnl": pnl,
-            "transactions": transactions,
+            "avg_price": self.avg_price,
+            "transactions_sum": pnl,
+            # transactions_breakdown: list[list]
+            # [date, buy/sell, price, volume, value, net]
+            "transactions_breakdown": transactions,
         }
 
     @property
@@ -142,11 +148,11 @@ class _StockRecord:
             "volume": calculated_data["volume"],
             "cost": calculated_data["cost"],
             "avg_price": self.avg_price,
-            "pnl": calculated_data["pnl"] + dividends_sum,
+            "pnl": calculated_data["transactions_sum"] + dividends_sum,
             # transactions_breakdown: list[list]
             # [date, buy/sell, price, volume, value, net]
-            "transactions_breakdown": calculated_data["transactions"],
-            "transactions_sum": calculated_data["pnl"],
+            "transactions_breakdown": calculated_data["transactions_breakdown"],
+            "transactions_sum": calculated_data["transactions_sum"],
             # dividend breakdown: list[list]][ex-date, rate, volume, value]
             "dividends_breakdown": dividends_breakdown,
             "dividends_sum": dividends_sum,
@@ -178,7 +184,12 @@ class Ledger:
         }
 
     def to_dict(self) -> dict[str, dict[str, Any]]:
-        return {k: v.to_dict() for k, v in self.stock_recs.items()}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            result = executor.map(
+                lambda v: v.to_dict(), self.stock_recs.values()
+            )
+
+        return {k: v for k, v in zip(self.stock_recs.keys(), result)}
 
     def to_json(self) -> list[dict]:
         return self.to_dict().values()
