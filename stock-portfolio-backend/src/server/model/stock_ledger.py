@@ -1,3 +1,4 @@
+import concurrent.futures
 from typing import Any
 
 from data.stock_code_name_dict import stock_code_name_dict
@@ -183,7 +184,12 @@ class Ledger:
         }
 
     def to_dict(self) -> dict[str, dict[str, Any]]:
-        return {k: v.to_dict() for k, v in self.stock_recs.items()}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            result = executor.map(
+                lambda v: v.to_dict(), self.stock_recs.values()
+            )
+
+        return {k: v for k, v in zip(self.stock_recs.keys(), result)}
 
     def to_json(self) -> list[dict]:
         return self.to_dict().values()
