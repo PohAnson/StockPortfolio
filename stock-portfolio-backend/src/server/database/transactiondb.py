@@ -45,13 +45,23 @@ class _TransactionDb:
             {"_id": transaction_id}, {"$set": data.to_dict()}
         )
 
-    def upsert_one_transaction_by_id(
-        self, transaction_id, data: Transaction
+    def upsert_one_transaction_by_id_before_datetime(
+        self,
+        transaction_id: str,
+        userid: str,
+        last_modified: datetime,
+        data: Transaction,
     ) -> UpdateResult:
         # remove deleted instances
         self.deleted_coll.delete_many({"_id": transaction_id})
         return self.coll.update_one(
-            {"_id": transaction_id}, {"$set": data.to_dict()}, upsert=True
+            {
+                "_id": transaction_id,
+                "last_modified": {"$lt": last_modified},
+                "userid": userid,
+            },
+            {"$set": data.to_dict()},
+            upsert=True,
         )
 
     def delete_transaction_by_id(self, transaction_id: str):
@@ -83,11 +93,13 @@ class _TransactionDb:
         return self.coll.find_one({"_id": transaction_id})
 
     def find_last_modified_after_transaction(
-        self, date: datetime
+        self, userid: str, date: datetime
     ) -> list[Transaction]:
         return [
             Transaction.from_dict(record)
-            for record in self.coll.find({"last_modified": {"$gt": date}})
+            for record in self.coll.find(
+                {"last_modified": {"$gt": date}, "userid": userid}
+            )
         ]
 
     def find_deleted_after_transaction(self, date: datetime) -> list[str]:
