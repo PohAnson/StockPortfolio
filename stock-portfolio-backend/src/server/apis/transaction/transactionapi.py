@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, request
 
+from data.stock_code_name_dict import stock_code_name_dict
 from server.apis.transaction.transaction_schema import (
     DetailedTransactionSchema,
     TransactionSchema,
 )
 from server.database.stockdb import stockdb
-from data.stock_code_name_dict import stock_code_name_dict
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
 
@@ -14,6 +14,7 @@ transaction_api_bp = Blueprint(
 )
 
 transaction_schema = TransactionSchema(exclude=["userid"])
+detailed_transaction_schema = DetailedTransactionSchema(exclude=["userid"])
 
 
 @transaction_api_bp.get("")
@@ -31,14 +32,16 @@ def get_transaction():
     transactions = transactiondb.find_all_transaction(
         filter_dict={"userid": userid}
     )
-    detailed_transactions =[]
+    detailed_transactions = []
     for t in transactions:
         name = stock_code_name_dict[t.code]
         td = t.to_dict()
         td.update(name=name)
         detailed_transactions.append(td)
 
-    return jsonify(DetailedTransactionSchema(exclude=["userid"]).dump(detailed_transactions, many=True))
+    return jsonify(
+        detailed_transaction_schema.dump(detailed_transactions, many=True)
+    )
 
 
 @transaction_api_bp.post("")
@@ -84,7 +87,7 @@ def get_transaction_by_id(transaction_id):
         )
     stock_name = stockdb.find_one_stock(result["code"])["TradingName"]
     result["name"] = stock_name
-    return jsonify(DetailedTransactionSchema().dumps(result))
+    return jsonify(detailed_transaction_schema.dumps(result))
 
 
 @transaction_api_bp.delete("/<transaction_id>")
