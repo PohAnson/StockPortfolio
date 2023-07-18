@@ -2,21 +2,22 @@ package com.example.owlio
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,24 +49,22 @@ import com.example.owlio.ui.screen.transaction.TransactionScreen
 @Composable
 fun OwlioApp(onLogout: () -> Unit, syncToServer: () -> Unit) {
     val navController = rememberNavController()
-    val scaffoldState = rememberScaffoldState()
-    val snackbarDelegate by remember { SnackbarDelegate() }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarDelegate by remember { SnackbarDelegate(snackbarHostState = snackbarHostState) }
     snackbarDelegate.apply {
-        snackbarHostState = scaffoldState.snackbarHostState
         coroutineScope = rememberCoroutineScope()
     }
     var topAppBarTitle by remember { mutableStateOf("Owlio") }
 
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
             OwlioTopAppBar(title = topAppBarTitle, syncToServer = syncToServer)
         },
         bottomBar = { OwlioBottonNavBar(navController = navController, onLogout) },
         snackbarHost = {
-            SnackbarHost(it) { snackbarData ->
+            SnackbarHost(snackbarHostState) { snackbarData ->
                 Snackbar(
-                    snackbarData, backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
+                    snackbarData, containerColor = snackbarDelegate.msnackbarState.backgroundColor
                 )
             }
         },
@@ -113,11 +112,12 @@ fun OwlioApp(onLogout: () -> Unit, syncToServer: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OwlioTopAppBar(
     title: String, modifier: Modifier = Modifier, syncToServer: () -> Unit
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = { Text(title) }, modifier = modifier, actions = {
             IconButton(onClick = syncToServer) {
                 Icon(Icons.Outlined.Refresh, contentDescription = "Sync to Database")
@@ -129,14 +129,14 @@ fun OwlioTopAppBar(
 
 @Composable
 fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
-    BottomNavigation {
+    NavigationBar {
         val screens = listOf(Screens.PORTFOLIO, Screens.TRANSACTION, Screens.PNL)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         var openConfirmLogoutDialog by remember { mutableStateOf(false) }
 
         screens.forEach { screen ->
-            BottomNavigationItem(
+            NavigationBarItem(
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.popBackStack()
@@ -157,7 +157,7 @@ fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
                 },
             )
         }
-        BottomNavigationItem(selected = false,
+        NavigationBarItem(selected = false,
             onClick = { openConfirmLogoutDialog = true },
             icon = {
                 Icon(

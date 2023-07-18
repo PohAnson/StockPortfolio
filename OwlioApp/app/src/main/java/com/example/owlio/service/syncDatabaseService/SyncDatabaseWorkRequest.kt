@@ -6,10 +6,6 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import java.util.concurrent.TimeUnit
 
-//val syncDatabaseWorkRequest: WorkRequest =
-//    OneTimeWorkRequestBuilder<SyncDatabaseWorker>().setConstraints(
-//        Constraints(requiredNetworkType = NetworkType.UNMETERED)
-//    ).build()
 
 val syncDatabaseWorkRequest =
     OneTimeWorkRequestBuilder<SyncDatabaseWorker>().setConstraints(

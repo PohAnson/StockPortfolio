@@ -1,8 +1,8 @@
 package com.example.owlio.ui
 
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -14,8 +14,9 @@ enum class SnackbarState(val backgroundColor: Color) {
 }
 
 class SnackbarDelegate(
-    var snackbarHostState: SnackbarHostState? = null, var coroutineScope: CoroutineScope? = null
+    val snackbarHostState: SnackbarHostState,
 ) {
+    lateinit var coroutineScope: CoroutineScope
     var msnackbarState: SnackbarState = SnackbarState.DEFAULT
     fun showSnackbar(
         snackbarState: SnackbarState,
@@ -25,8 +26,10 @@ class SnackbarDelegate(
         onAction: () -> Unit = {}
     ) {
         msnackbarState = snackbarState
-        coroutineScope?.launch {
-            snackbarHostState?.showSnackbar(message, actionLabel, duration).let { snackbarResult ->
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message, actionLabel = actionLabel, duration = duration,
+            ).let { snackbarResult ->
                 if (snackbarResult == SnackbarResult.ActionPerformed) {
                     onAction()
                 }

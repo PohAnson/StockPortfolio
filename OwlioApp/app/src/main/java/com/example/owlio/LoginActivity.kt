@@ -6,12 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Surface
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,10 +31,14 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val snackbarDelegate by remember { SnackbarDelegate() }
-            val scaffoldState = rememberScaffoldState()
+
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarDelegate by remember {
+                SnackbarDelegate(
+                    snackbarHostState = snackbarHostState,
+                )
+            }
             snackbarDelegate.apply {
-                snackbarHostState = scaffoldState.snackbarHostState
                 coroutineScope = rememberCoroutineScope()
             }
             val vm: LoginViewModel = hiltViewModel()
@@ -47,14 +50,12 @@ class LoginActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background,
                 ) {
-
-                    Scaffold(scaffoldState = scaffoldState, snackbarHost = {
-                        SnackbarHost(it) { snackbarData ->
+                    Scaffold(snackbarHost = {
+                        SnackbarHost(snackbarDelegate.snackbarHostState) { snackbarData ->
                             Snackbar(
                                 snackbarData,
-                                backgroundColor = snackbarDelegate.msnackbarState.backgroundColor
+                                containerColor = snackbarDelegate.msnackbarState.backgroundColor
                             )
                         }
                     }) { innerpadding ->

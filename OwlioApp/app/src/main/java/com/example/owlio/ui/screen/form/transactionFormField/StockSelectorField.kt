@@ -7,15 +7,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,7 +78,10 @@ fun StockSelectorField(
 
             // Show autocomplete list only when it is in focus
             if (isFieldFocused) {
-                Card(modifier = Modifier.padding(2.dp, 4.dp), elevation = 4.dp) {
+                Card(
+                    modifier = Modifier.padding(2.dp, 4.dp),
+                    elevation = CardDefaults.elevatedCardElevation()
+                ) {
                     LazyColumn(
                         modifier = Modifier.heightIn(max = TextFieldDefaults.MinHeight * 4)
                     ) {

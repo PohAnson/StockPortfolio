@@ -1,5 +1,6 @@
 package com.example.owlio.ui.screen.form
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -37,6 +38,8 @@ fun NewTransactionFormScreen(
 @Composable
 fun TransactionFormScreenPreview() {
     OwlioAppTheme {
-        NewTransactionFormScreen(snackbarDelegate = SnackbarDelegate(), navigateBack = {})
+        NewTransactionFormScreen(
+            snackbarDelegate = SnackbarDelegate(SnackbarHostState()),
+            navigateBack = {})
     }
 }
