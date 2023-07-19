@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +30,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -63,32 +65,36 @@ fun TransactionTable(
             else -> 0.dp
         }
     }
-    LazyColumn(
+    Column(
         Modifier
             .fillMaxSize()
             .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Row {
-                headerTitle.forEachIndexed { index, title ->
-                    Text(
-                        title,
-                        modifier = Modifier.width(cellWidth(index)),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+        Row {
+            headerTitle.forEachIndexed { index, title ->
+                Text(
+                    title,
+                    modifier = Modifier.width(cellWidth(index)),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
-            Divider(Modifier.padding(top = 8.dp))
         }
-        items(transactionList, key = { it.transactionId }) {
-            TransactionRow(
-                transaction = it,
-                stockInfoMapping[it.stockCode],
-                cellWidth = ::cellWidth,
-                goToEditTransactionForm = goToEditTransactionForm,
-                deleteTransaction = deleteTransaction,
-            )
-            Divider()
+        Divider(Modifier.padding(top = 8.dp))
+        LazyColumn {
+            items(transactionList, key = { it.transactionId }) {
+                TransactionRow(
+                    transaction = it,
+                    stockInfoMapping[it.stockCode],
+                    cellWidth = ::cellWidth,
+                    goToEditTransactionForm = goToEditTransactionForm,
+                    deleteTransaction = deleteTransaction,
+                )
+                Divider()
+            }
+            item {
+                // Empty spacer item to prevent the last item in the column from being blocked.
+                Spacer(modifier = Modifier.height(64.dp))
+            }
         }
     }
 }
@@ -102,7 +108,7 @@ fun TransactionRow(
     goToEditTransactionForm: (String) -> Unit,
     deleteTransaction: (String) -> Unit,
 ) {
-    val cellTextStyle = TextStyle(fontSize = 15.sp)
+    val cellTextStyle = MaterialTheme.typography.bodyLarge
     var isContextMenuShown by remember { mutableStateOf(false) }
     var offset by remember { mutableStateOf(Offset.Unspecified) }
 
@@ -163,7 +169,7 @@ fun TransactionRow(
             Column(
                 modifier = Modifier.width(cellWidth(2))
             ) {
-                val fontSz = if ((stockInfo?.tradingName ?: "").length < 14) 15.sp else 12.sp
+                val fontSz = if ((stockInfo?.tradingName ?: "").length < 14) 16.sp else 12.sp
 
                 Text(
                     text = stockInfo?.tradingName ?: "NIL",

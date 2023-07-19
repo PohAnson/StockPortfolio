@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,37 +37,38 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
 
     val headerTitle: List<String> = listOf("Symbol", "Avg Price", "Volume", "Cost")
 
-    LazyColumn(
+    Column(
         modifier
             .fillMaxSize()
             .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Row {
-                headerTitle.forEachIndexed { index, title ->
-                    Text(
-                        title,
-                        modifier = Modifier.width(cellWidth(index)),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+        Row {
+            headerTitle.forEachIndexed { index, title ->
+                Text(
+                    title,
+                    modifier = Modifier.width(cellWidth(index)),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
-            Divider(Modifier.padding(top = 8.dp))
         }
-        items(portfolioRowDataList, key = { it.stockCode }) {
-            PortfolioRow(it, cellWidth = ::cellWidth)
-            Divider()
+        Divider(Modifier.padding(top = 8.dp))
+        LazyColumn {
+            items(portfolioRowDataList, key = { it.stockCode }) {
+                PortfolioRow(it, cellWidth = ::cellWidth)
+                Divider()
+            }
         }
     }
 }
 
 @Composable
 fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
-    val cellTextStyle = TextStyle(fontSize = 15.sp)
+    val cellTextStyle = MaterialTheme.typography.bodyLarge
     Row(Modifier.padding(vertical = 10.dp)) {
         // Stock Name/Code
         Column(modifier = Modifier.width(cellWidth(0))) {
-            val fontSz = if ((portfolioRowData.stockName).length < 14) 15.sp else 12.sp
+            val fontSz =
+                if ((portfolioRowData.stockName).length < 14) 16.sp else 12.sp
 
             Text(
                 text = portfolioRowData.stockName,

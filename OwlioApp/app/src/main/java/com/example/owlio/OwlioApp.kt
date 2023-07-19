@@ -11,6 +11,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,7 +85,7 @@ fun OwlioApp(onLogout: () -> Unit, syncToServer: () -> Unit) {
             }
             composable(Screens.PNL.route) {
                 topAppBarTitle = Screens.PNL.label
-                PnlScreen()
+                PnlScreen(modifier = Modifier.padding(innerpadding))
             }
             composable(Screens.NEWTRANSACTION.route) {
                 topAppBarTitle = Screens.NEWTRANSACTION.label
@@ -101,6 +104,7 @@ fun OwlioApp(onLogout: () -> Unit, syncToServer: () -> Unit) {
                 val transactionId = backStackEntry.arguments?.getString("transactionId")
                 if (transactionId != null) {
                     EditTransactionFormScreen(transactionId = transactionId,
+                        modifier = Modifier.padding(innerpadding),
                         snackbarDelegate = snackbarDelegate,
                         navigateBack = { navController.popBackStack() })
                 } else {
@@ -118,22 +122,31 @@ fun OwlioTopAppBar(
     title: String, modifier: Modifier = Modifier, syncToServer: () -> Unit
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(title) }, modifier = modifier, actions = {
+        title = {
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineSmall,
+            )
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        modifier = modifier,
+        actions = {
             IconButton(onClick = syncToServer) {
                 Icon(Icons.Outlined.Refresh, contentDescription = "Sync to Database")
             }
-        }
+        },
     )
 }
 
 
 @Composable
 fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
-    NavigationBar {
+    NavigationBar(tonalElevation = 8.dp) {
         val screens = listOf(Screens.PORTFOLIO, Screens.TRANSACTION, Screens.PNL)
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         var openConfirmLogoutDialog by remember { mutableStateOf(false) }
+        val navigationItemLabelStyle = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp)
 
         screens.forEach { screen ->
             NavigationBarItem(
@@ -146,13 +159,13 @@ fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
                 icon = {
                     screen.icon?.let { painterResource(id = it) }?.let {
                         Icon(
-                            painter = it, contentDescription = null, modifier = Modifier.size(28.dp)
+                            painter = it, contentDescription = null, modifier = Modifier.size(24.dp)
                         )
                     }
                 },
                 label = {
                     Text(
-                        text = screen.label, fontWeight = FontWeight.SemiBold, fontSize = 10.sp
+                        text = screen.label, style = navigationItemLabelStyle
                     )
                 },
             )
@@ -161,14 +174,21 @@ fun OwlioBottonNavBar(navController: NavController, onLogout: () -> Unit) {
             onClick = { openConfirmLogoutDialog = true },
             icon = {
                 Icon(
-                    imageVector = Icons.Outlined.ExitToApp, contentDescription = null
+                    imageVector = Icons.Outlined.ExitToApp,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
                 )
             },
-            label = { Text(text = "Logout", fontSize = 10.sp) })
+            label = { Text(text = "Logout", style = navigationItemLabelStyle) })
         if (openConfirmLogoutDialog) AlertDialog(onDismissRequest = {
             openConfirmLogoutDialog = false
         },
-            title = { Text(text = "Confirm Logout?") },
+            title = {
+                Text(
+                    text = "Confirm Logout?",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
             confirmButton = { Button(onClick = { onLogout() }) { Text("Logout") } },
             dismissButton = {
                 Button(onClick = {

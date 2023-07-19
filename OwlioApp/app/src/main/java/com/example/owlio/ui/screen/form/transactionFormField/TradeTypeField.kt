@@ -25,7 +25,6 @@ fun TradeTypeField(tradeType: TradeType?, updateTradeType: (TradeType) -> Unit) 
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
-//            tradeType == TradeType.Buy
             OutlinedButton(
                 onClick = { updateTradeType(TradeType.Buy) },
                 modifier = Modifier.padding(8.dp),

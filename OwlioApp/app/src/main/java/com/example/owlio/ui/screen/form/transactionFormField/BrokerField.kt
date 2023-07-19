@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +22,8 @@ fun BrokerField(selectedBroker: Broker?, updateBroker: (Broker) -> Unit) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             val selectedButtonColors = ButtonDefaults.outlinedButtonColors(
-//                containerColor = MaterialTheme.colorScheme.primary,
-//                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
             OutlinedButton(
                 onClick = { updateBroker(Broker.Poems) },
