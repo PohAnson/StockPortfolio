@@ -33,7 +33,11 @@ class DividendDateRow(NamedTuple):
 def _parse_table_rows(rows) -> list[DividendDateRow]:
     dividend_payouts: list[DividendDateRow] = []
     for row in rows:
-        rate, ex_date = row.find_all("td")[-4:-2]
+        td_rows = row.find_all("td")
+        if len(td_rows) < 4:
+            # invalid row (example '1A4' ticker)
+            continue
+        rate, ex_date = td_rows[-4:-2]
 
         ex_date = dt.strptime(ex_date.get_text(), "%Y-%m-%d")
         if ex_date >= dt(2015, 1, 1) and rate.get_text().strip() != "-":
