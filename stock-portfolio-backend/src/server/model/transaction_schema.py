@@ -1,6 +1,7 @@
 import datetime as dt
 
-from marshmallow import Schema, fields, post_dump, post_load, pre_load, validate
+from marshmallow import (Schema, fields, post_dump, post_load, pre_load,
+                         validate)
 
 from data.stock_code_name_dict import stock_code_name_dict
 from server.model.transaction import Transaction
@@ -11,15 +12,19 @@ class TransactionSchema(Schema):
     date = fields.Date("iso", required=True)
     code = fields.String(
         required=True,
-        validate=validate.OneOf(stock_code_name_dict.keys()),
+        validate=validate.OneOf(
+            stock_code_name_dict.keys(), error="Invalid stock code given."
+        ),
     )
     type_ = fields.String(
         required=True,
-        validate=validate.OneOf(["buy", "sell"]),
+        validate=validate.OneOf(
+            ["buy", "sell"], error="Invalid type_ selected."
+        ),
     )
     price = fields.Float(
         required=True,
-        validate=validate.Range(min=0),
+        validate=validate.Range(min=0, error="Price should not be negative"),
     )
     volume = fields.Integer(
         required=True,
@@ -45,6 +50,6 @@ class TransactionSchema(Schema):
         return data
 
 
-class DetailedTransactionSchema(TransactionSchema):
+class NamedTransactionSchema(TransactionSchema):
     # Includes the name of the stock
     name = fields.String(required=True)

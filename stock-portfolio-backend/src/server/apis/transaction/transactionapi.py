@@ -1,20 +1,19 @@
 from flask import Blueprint, jsonify, request
+from marshmallow import ValidationError
 
 from data.stock_code_name_dict import stock_code_name_dict
-from server.apis.transaction.transaction_schema import (
-    DetailedTransactionSchema,
-    TransactionSchema,
-)
 from server.database.stockdb import stockdb
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
+from server.model.transaction_schema import (NamedTransactionSchema,
+                                             TransactionSchema)
 
 transaction_api_bp = Blueprint(
     "transaction", __name__, url_prefix="transaction"
 )
 
 transaction_schema = TransactionSchema(exclude=["userid"])
-detailed_transaction_schema = DetailedTransactionSchema(exclude=["userid"])
+named_transaction_schema = NamedTransactionSchema(exclude=["userid"])
 
 
 @transaction_api_bp.get("")
@@ -40,7 +39,7 @@ def get_transaction():
         detailed_transactions.append(td)
 
     return jsonify(
-        detailed_transaction_schema.dump(detailed_transactions, many=True)
+        named_transaction_schema.dump(detailed_transactions, many=True)
     )
 
 
@@ -60,7 +59,7 @@ def post_transaction():
             request.json, partial=["_id", "userid"]
         )
         transaction.userid = request.environ.get("userid")
-    except ValueError as e:
+    except ValidationError as e:
         print(e)
         return jsonify({"error": str(e)}), 406
     data = transactiondb.insert_one_transaction(transaction)
@@ -75,7 +74,7 @@ def get_transaction_by_id(transaction_id):
         + 200 {_id, date, code, type_, price, volume, broker, last_modified, name}
         + 404 {error: "No such transaction `transaction_id` was found"}
     """
-    result = transactiondb.find_one_transaction_by_id(
+    result = transactiondb.find_one_transaction(
         transaction_id,
     )
     if result is None:
@@ -87,7 +86,7 @@ def get_transaction_by_id(transaction_id):
         )
     stock_name = stockdb.find_one_stock(result["code"])["TradingName"]
     result["name"] = stock_name
-    return jsonify(detailed_transaction_schema.dumps(result))
+    return jsonify(named_transaction_schema.dumps(result))
 
 
 @transaction_api_bp.delete("/<transaction_id>")
@@ -97,7 +96,7 @@ def delete_transaction(transaction_id):
     Json Response:
         + 200 {"ok": bool (whether transaction is deleted)}
     """
-    result = transactiondb.delete_transaction_by_id(transaction_id)
+    result = transactiondb.delete_transaction(transaction_id)
     return jsonify({"ok": result is not None})
 
 
@@ -118,8 +117,6 @@ def put_transaction(transaction_id):
     )
     transaction._id = transaction_id
     transaction.userid = request.environ.get("userid")
-    result = transactiondb.update_one_transaction_by_id(
-        transaction_id, transaction
-    )
+    result = transactiondb.update_one_transaction(transaction_id, transaction)
 
     return jsonify({"ok": result.acknowledged})

@@ -1,3 +1,6 @@
+"""Run the file to port the stock data into the mongo database, 
+assuming that the mongod server is already running"""
+
 import numpy as np
 import pandas as pd
 import pymongo

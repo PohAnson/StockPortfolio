@@ -1,3 +1,6 @@
+"""Run the file to generate a json file containing objects with 
+keys being the stock code, and the value the corresponding stock name"""
+
 import json
 
 import pandas as pd

@@ -2,9 +2,9 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
-from server.apis.transaction.transaction_schema import TransactionSchema
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
+from server.model.transaction_schema import TransactionSchema
 
 sync_transaction_api_bp = Blueprint(
     "sync_transaction", __name__, url_prefix="sync/transaction"
@@ -63,7 +63,7 @@ def sync_transaction():
 
     # delete transactions in the db
     for transaction_id in del_transaction_id_modified_map:
-        transactiondb.delete_transaction_by_id(transaction_id)
+        transactiondb.delete_transaction(transaction_id)
 
     # update/insert the modified transactions
     for t in mod_transaction_id_map.values():

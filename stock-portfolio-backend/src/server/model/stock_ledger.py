@@ -4,9 +4,8 @@ from typing import Any
 from data.stock_code_name_dict import stock_code_name_dict
 from server.data_structure import SortedSet
 from server.model.transaction import Transaction
-from server.scraper.dividends.calculate_dividends import (
-    calc_total_dividend_earnings,
-)
+from server.scraper.dividends.calculate_dividends import \
+    calc_total_dividend_earnings
 
 
 class _StockRecord:
@@ -16,6 +15,9 @@ class _StockRecord:
         self.code = code
 
         self.transaction_set: SortedSet[Transaction] = SortedSet("date")
+
+    def __repr__(self) -> str:
+        return f"StockRecord{self.code} [{self.transaction_set}]"
 
     @property
     def avg_price(self):

@@ -81,6 +81,11 @@ class Transaction:
         return self.calculate_fees()
 
     def calculate_fees(self) -> float:
+        """Calculate all the additional fees imposed by the broker.
+
+        Returns:
+            float: the total amount of the fees
+        """
         value = self.price * self.volume
         clearing = round(0.0325 / 100 * value, 2)
         trading_access = round(0.0075 / 100 * value, 2)
@@ -97,7 +102,7 @@ class Transaction:
             platform_fee = commission  # calculated in the same way
             sub_sum = sum([commission, platform_fee, clearing, trading_access])
 
-        tax_rate_percentage = 7 if self.date < dt.datetime(2023, 1, 1) else 8
+        tax_rate_percentage = 7 if self.date < dt.date(2023, 1, 1) else 8
         tax = round(tax_rate_percentage / 100 * sub_sum, 2)
         return sum([sub_sum, tax])
 

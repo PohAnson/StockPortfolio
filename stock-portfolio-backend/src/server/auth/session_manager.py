@@ -9,7 +9,7 @@ class SessionManager:
     """Singleton Class"""
 
     ses_user_fp = "./src/server/auth/ses_user.json"
-    _sessionid_user = {}
+    _sessionid_user = {}  # sessionid: userid
 
     _instance = None
     _lock: Lock = Lock()
@@ -55,19 +55,45 @@ class SessionManager:
         return str(self.__repr__())
 
     @save_to_json
-    def new_user_ses(self, userid):
+    def new_user_ses(self, userid: str) -> str:
+        """Create a new user session
+
+        Args:
+            userid (str): userid, not username
+
+        Returns:
+            str: sessionid
+        """
         session_id = self.gen_session_id()
-        self._sessionid_user[session_id] = str(userid)
+        self._sessionid_user[session_id] = userid
         return session_id
 
-    def get_ses_user(self, session_id):
+    def get_ses_user(self, session_id: str) -> str:
+        """Get the userid of the session user.
+
+        Args:
+            session_id (str): session id given
+
+        Returns:
+            str: userid of the session
+        """
         return self._sessionid_user.get(session_id)
 
     @save_to_json
-    def remove_ses(self, session_id):
+    def remove_ses(self, session_id: str):
+        """Remove a session from being logged on by its id
+
+        Args:
+            session_id (str): session id of the session to logout
+        """
         self._sessionid_user.pop(session_id)
 
-    def gen_session_id(self):
+    def gen_session_id(self) -> str:
+        """Randomly generate a valid session id
+
+        Returns:
+            str: session id
+        """
         session_id = secrets.token_urlsafe()
         while session_id in self._sessionid_user:
             session_id = secrets.token_urlsafe()

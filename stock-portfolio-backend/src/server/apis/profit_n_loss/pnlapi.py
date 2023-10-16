@@ -47,7 +47,6 @@ def get_pnl_breakdown_by_code(code):
     ledger.add_transactions(all_transactions)
 
     results = ledger.to_dict().get(code)
-    print(results)
 
     # format the dates
     transactions_breakdown = results.get("transactions_breakdown", [])

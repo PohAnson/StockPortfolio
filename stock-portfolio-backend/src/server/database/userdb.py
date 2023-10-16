@@ -19,7 +19,7 @@ class _UserDb:
 
     @staticmethod
     def check_missing_fields(user_data: dict, required_fields: list):
-        """Checks for missing fields and return a list of the missing fields.
+        """Checks for missing fields and raises error for missing fields.
 
         Args:
             user_data (dict): the data to check
@@ -45,7 +45,18 @@ class _UserDb:
         """
         return self.coll.count_documents({"username": username}) != 0
 
-    def insert_one_user(self, user_data):
+    def insert_one_user(self, user_data: dict) -> str:
+        """Validates and insert user
+
+        Args:
+            user_data (dict): contains keys ["username", "password", "name"]
+
+        Raises:
+            ValueError: Username is already used or field is missing
+
+        Returns:
+            str: _id of the user
+        """
         # validation of data
         self.check_missing_fields(user_data, ["username", "password", "name"])
 
@@ -56,14 +67,37 @@ class _UserDb:
         hashed_pw = self.ph.hash(user_data["password"])
         user_data["password"] = hashed_pw
         result = self.coll.insert_one(user_data)
-        return result.inserted_id
+        return str(result.inserted_id)
 
     def find_one_user(self, username: str, show_password=False) -> dict:
+        """Find and returns a user based on username
+
+        Args:
+            username (str): username to find
+            show_password (bool, optional): whether password is shown.
+                Defaults to False.
+
+        Returns:
+            dict: the user data
+        """
         return self.coll.find_one(
             {"username": username}, {"password": show_password}
         )
 
-    def authenticate_one_user(self, user_data) -> bool:
+    def authenticate_one_user(self, user_data: dict) -> bool:
+        """Authenticate the user, True if it has the correct credentials
+
+        Args:
+            user_data (dict): should minimally contains username and password
+
+        Raises:
+            ValueError: If username or password is not present,
+                or username does not exist
+            VerifyMismatchError: If the login is incorrect
+
+        Returns:
+            bool: if credential is correct
+        """
         # validation of the data
         self.check_missing_fields(user_data, ["username", "password"])
         if not self.is_username_present(user_data["username"]):

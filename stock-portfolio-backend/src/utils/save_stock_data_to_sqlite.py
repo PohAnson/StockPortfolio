@@ -1,3 +1,5 @@
+"""Port the stock data into sqlite database"""
+
 import sqlite3
 
 import pandas as pd

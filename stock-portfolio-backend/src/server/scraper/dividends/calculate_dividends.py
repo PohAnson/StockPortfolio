@@ -1,6 +1,6 @@
+import datetime as dt
 import sys
 from dataclasses import dataclass
-from datetime import datetime as dt
 from typing import NamedTuple
 
 import requests
@@ -27,7 +27,7 @@ def _get_dividend_table_rows(stock_code) -> ResultSet:
 
 class DividendDateRow(NamedTuple):
     rate: float
-    exdate: dt
+    exdate: dt.date
 
 
 def _parse_table_rows(rows) -> list[DividendDateRow]:
@@ -39,12 +39,15 @@ def _parse_table_rows(rows) -> list[DividendDateRow]:
             continue
         rate, ex_date = td_rows[-4:-2]
 
-        ex_date = dt.strptime(ex_date.get_text(), "%Y-%m-%d")
-        if ex_date >= dt(2015, 1, 1) and rate.get_text().strip() != "-":
+        ex_date = dt.datetime.strptime(ex_date.get_text(), "%Y-%m-%d")
+        if (
+            ex_date >= dt.datetime(2015, 1, 1)
+            and rate.get_text().strip() != "-"
+        ):
             try:
                 dividend_payouts.append(
                     DividendDateRow(
-                        float(rate.get_text().strip("SGD ")), ex_date
+                        float(rate.get_text().strip("SGD ")), ex_date.date()
                     )
                 )
             except ValueError:
@@ -58,8 +61,8 @@ def _parse_table_rows(rows) -> list[DividendDateRow]:
 class TransactionVolumeRange:
     """Range is inclusive of start and exclusive of end"""
 
-    start: dt
-    end: dt
+    start: dt.date
+    end: dt.date
     volume: int
 
     def __contains__(self, value: DividendDateRow):
@@ -104,7 +107,9 @@ def _generate_range_list(
     if incomplete_range is not None:
         complete_range_list.append(
             TransactionVolumeRange(
-                incomplete_range.start, dt(5000, 1, 1), incomplete_range.volume
+                incomplete_range.start,
+                dt.date(5000, 1, 1),
+                incomplete_range.volume,
             )
         )
 
@@ -154,6 +159,15 @@ def get_dividends_earnings_breakdown(
 def calc_total_dividend_earnings(
     code: str, all_transactions: list[Transaction]
 ) -> tuple:
+    """Calculate and return the total sum from dividends and exact breakdown
+
+    Args:
+        code (str): the stock code
+        all_transactions (list[Transaction]): list of all transactions of that stock for that user
+
+    Returns:
+        tuple: index 0 is the total sum. index 1 is the detailed breakdown
+    """
     breakdown = get_dividends_earnings_breakdown(code, all_transactions)
     total_sum = sum(row[3] for row in breakdown)
     return (total_sum, breakdown)
