@@ -30,6 +30,7 @@ export default function BsTransactionTable({ transactions_breakdown }) {
     </div>
   );
 }
+
 function TransactionRow({ transactionBreakdown }) {
   let [date, type_, price, volume, value, net] = transactionBreakdown;
   price = price.toFixed(3);

@@ -26,6 +26,7 @@ export default function DividendTable({ dividends_breakdown }) {
     </div>
   );
 }
+
 function DividendRow({ dividendBreakdown }) {
   let [date, rate, volume, value] = dividendBreakdown;
   value = value.toFixed(2);

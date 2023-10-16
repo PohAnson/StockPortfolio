@@ -8,7 +8,7 @@ import TransactionForm from "./TransactionForm";
 export default function TransactionFormPageFactory(
   isEdit: boolean,
   data = null,
-  transactionId = null
+  transactionId = null,
 ) {
   function showMessage(status_code, json_data) {
     // Success
@@ -22,20 +22,20 @@ export default function TransactionFormPageFactory(
           <Link href="/transaction">
             <p className="inline-block font-bold cursor-pointer">VIEW</p>
           </Link>
-        </div>
+        </div>,
       );
     } else {
       // Error
       setMessage(<ErrorBanner errorText={json_data["error"]} />);
     }
-    setIsToastVisisble(true)
+    setIsToastVisisble(true);
     setTimeout(() => {
-      setIsToastVisisble(false)
+      setIsToastVisisble(false);
     }, 3000);
   }
 
   let [message, setMessage] = useState(null);
-  let [isToastVisible, setIsToastVisisble] = useState(false)
+  let [isToastVisible, setIsToastVisisble] = useState(false);
 
   return (
     <div className="relative">

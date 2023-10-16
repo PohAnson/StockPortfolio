@@ -12,7 +12,7 @@ export async function getServerSideProps({ req, params }) {
     `${process.env.FRONTEND_SERVER_URL}/api/transaction/${transactionId}`,
     {
       headers: { Cookie: `sessionid=${sessionid}` },
-    }
+    },
   ).then((r) => r.json());
   if ("error" in data) {
     return { redirect: { destination: "/login", permanent: false } };

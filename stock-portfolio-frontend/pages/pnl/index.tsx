@@ -31,6 +31,7 @@ export default function NetPage() {
       .toFixed(2);
     totalEarnings = pnlData.reduce((sum, cur) => sum + cur.pnl, 0).toFixed(2);
   }
+
   let table = (
     <table className="overflow-auto md:overflow-y-visible md:mb-4">
       <thead>
@@ -55,6 +56,7 @@ export default function NetPage() {
       </tbody>
     </table>
   );
+
   let loadedPage =
     pnlData == null || pnlData.length === 0 ? (
       <Card>
@@ -70,6 +72,7 @@ export default function NetPage() {
         {table}
       </>
     );
+
   return (
     <>
       <h1>Net Profit/Loss</h1>

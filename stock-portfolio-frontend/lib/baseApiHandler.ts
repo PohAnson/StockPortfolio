@@ -10,7 +10,7 @@ async function sendJson(
   fullUrl: string,
   method: "PUT" | "POST",
   json: JSON,
-  sessionId
+  sessionId,
 ) {
   return await fetch(fullUrl, {
     method: method,
@@ -25,7 +25,7 @@ async function sendJson(
 export async function postJsonHandler(
   fullUrl: string,
   json: JSON,
-  sessionId = null
+  sessionId = null,
 ) {
   return await sendJson(fullUrl, "POST", json, sessionId);
 }
@@ -33,7 +33,7 @@ export async function postJsonHandler(
 export async function putJsonHandler(
   fullUrl: string,
   json: JSON,
-  sessionId = null
+  sessionId = null,
 ) {
   return await sendJson(fullUrl, "PUT", json, sessionId);
 }

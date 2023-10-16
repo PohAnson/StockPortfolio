@@ -12,7 +12,7 @@ export default function StockCodeSearch(props) {
       : allStocks.filter(({ TradingCode, TradingName }) =>
           `${TradingName} ${TradingCode}`
             .toLowerCase()
-            .includes(query.toLowerCase())
+            .includes(query.toLowerCase()),
         );
   return (
     <>

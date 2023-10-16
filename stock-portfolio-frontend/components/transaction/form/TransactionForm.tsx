@@ -31,10 +31,10 @@ export default function TransactionForm({
   const [selectedStock, setSelectedStock] = useState(
     code != "" && name != ""
       ? {
-        TradingCode: code,
-        TradingName: name,
-      }
-      : {}
+          TradingCode: code,
+          TradingName: name,
+        }
+      : {},
   );
   const [tradePrice, setTradePrice] = useState(price);
   const [tradeVolume, setTradeVolume] = useState(volume);
@@ -61,7 +61,6 @@ export default function TransactionForm({
       price: parseFloat(tradePrice),
       volume: parseInt(tradeVolume),
     };
-
 
     fetch(isEdit ? `/api/transaction/${transactionId}` : "/api/transaction", {
       method: isEdit ? "PUT" : "POST",

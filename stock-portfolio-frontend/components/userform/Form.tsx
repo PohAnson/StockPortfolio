@@ -9,7 +9,7 @@ import PasswordField from "./PasswordField";
 import SubmitButton from "./SubmitButton";
 import UsernameField from "./UsernameField";
 
-export default function FormFactory(formType: "Login" | "Sign Up") {
+export default function LoginSignupFormFactory(formType: "Login" | "Sign Up") {
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -36,6 +36,7 @@ export default function FormFactory(formType: "Login" | "Sign Up") {
       }
     });
   }
+
   function submitFormSignup(e: FormEvent) {
     e.preventDefault();
 
@@ -56,9 +57,10 @@ export default function FormFactory(formType: "Login" | "Sign Up") {
       }
     });
   }
+
   return (
     <FormPageLayout>
-      <h1>{formType} Page</h1>
+      <h1>{formType}</h1>
       {errorMessage == null || (
         <div className="w-4/5 m-auto">
           <ErrorBanner errorText={errorMessage} />

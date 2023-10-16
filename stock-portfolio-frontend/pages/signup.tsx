@@ -1,5 +1,5 @@
-import FormFactory from "../components/userform/Form";
+import LoginSignupFormFactory from "../components/userform/Form";
 
 export default function LoginPage() {
-  return FormFactory("Sign Up");
+  return LoginSignupFormFactory("Sign Up");
 }

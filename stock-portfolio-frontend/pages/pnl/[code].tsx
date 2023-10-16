@@ -8,9 +8,7 @@ export default function Page() {
   const router = useRouter();
   let code = router.query.code;
   const [pnlData, setPnlData] = useState(null);
-  console.log(pnlData);
   useEffect(() => {
-    console.log(code);
     if (code != undefined)
       fetch(`/api/pnl/${code}`)
         .then((r) => r.json())

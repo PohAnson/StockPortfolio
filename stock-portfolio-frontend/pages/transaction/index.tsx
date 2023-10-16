@@ -9,6 +9,7 @@ export default function TransactionPage() {
   const router = useRouter();
 
   const [transactionData, setTransactionData] = useState(null);
+  // isStale is used to reload the page when a transaction row is deleted.
   const [isStale, setIsStale] = useState(false);
 
   useEffect(() => {
@@ -24,24 +25,24 @@ export default function TransactionPage() {
       .then(() => setIsStale(false));
   }, [isStale, router]);
   let table = (
-      <table className="text-xs md:text-base">
-        <thead>
-          <tr className="border-b-2 border-b-gray-300">
-            <th className="md:w-32">Date (D/M/Y)</th>
-            <th className="md:w-32">Trade Type</th>
-            <th>Stock Name/Code</th>
-            <th>Price</th>
-            <th>Volume</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactionData == null ||
-            transactionData.map((data) => (
-              <Transaction key={data._id} data={data} setIsStale={setIsStale} />
-            ))}
-        </tbody>
-      </table>
+    <table className="text-xs md:text-base">
+      <thead>
+        <tr className="border-b-2 border-b-gray-300">
+          <th className="md:w-32">Date (D/M/Y)</th>
+          <th className="md:w-32">Trade Type</th>
+          <th>Stock Name/Code</th>
+          <th>Price</th>
+          <th>Volume</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactionData == null ||
+          transactionData.map((data) => (
+            <Transaction key={data._id} data={data} setIsStale={setIsStale} />
+          ))}
+      </tbody>
+    </table>
   );
   let loadedPage =
     transactionData == null || transactionData.length === 0 ? (
@@ -113,7 +114,7 @@ function Transaction({ data, setIsStale }) {
                 confirm(
                   `Confirm delete: 
         Date: ${date}
-        Code/Name: ${code} / ${name}`
+        Code/Name: ${code} / ${name}`,
                 )
               ) {
                 fetch(`/api/transaction/${_id}`, { method: "DELETE" });
