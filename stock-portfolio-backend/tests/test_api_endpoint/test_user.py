@@ -14,11 +14,20 @@ class UserApiTestcase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        username = "asdfjkl"
+        password = "pass"
         # create new user and get a session id
-        response = cls.create_user(cls.url, "a", "pass", "A")
+        response = cls.create_user(cls.url, username, password, "A")
         if response.status_code == 406:
             # assumed that the username is already present
-            return
+            # get the session id with the associate username
+            cls.session_id_cookie = (
+                requests.post(
+                    cls.url, json={"username": username, "password": password}
+                )
+                .json()
+                .get("sessionid")
+            )
         if response.status_code == 200:
             cls.session_id_cookie = response.json().get("sessionid")
 

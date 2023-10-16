@@ -15,7 +15,7 @@ class SortedSetTestCase(unittest.TestCase):
         ss.add({"name": "randc", "other": 3})
         ss.add({"name": "randc", "other": 3})
         ss.add({"name": "randa", "other": 2})
-        self.assertEqual(len(ss), 2)
+        self.assertEqual(len(ss), 3)
 
     def test_add_order(self):
         ss = SortedSet("name")

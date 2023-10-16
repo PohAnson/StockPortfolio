@@ -2,12 +2,14 @@ import datetime
 import unittest
 
 from server.model.stock_ledger import Ledger
-from server.model.transaction import Transaction
+from server.model.transaction_schema import TransactionSchema
+
+transaction_schema = TransactionSchema()
 
 _transactions = [
-    Transaction.from_dict(
+    transaction_schema.load(
         {
-            "date": datetime.datetime(2020, 12, 11, 0, 0),
+            "date": "2020-12-11",
             "code": "AZG",
             "type_": "buy",
             "price": 1.1,
@@ -17,9 +19,9 @@ _transactions = [
             "broker": "poems",
         }
     ),
-    Transaction.from_dict(
+    transaction_schema.load(
         {
-            "date": datetime.datetime(2020, 12, 12, 0, 0),
+            "date": "2020-12-12",
             "code": "AZG",
             "type_": "sell",
             "price": 1.5,
@@ -29,9 +31,9 @@ _transactions = [
             "broker": "poems",
         }
     ),
-    Transaction.from_dict(
+    transaction_schema.load(
         {
-            "date": datetime.datetime(2020, 12, 14, 0, 0),
+            "date": "2020-12-14",
             "code": "AZG",
             "type_": "buy",
             "price": 1.5,
@@ -41,9 +43,9 @@ _transactions = [
             "broker": "poems",
         }
     ),
-    Transaction.from_dict(
+    transaction_schema.load(
         {
-            "date": datetime.datetime(2020, 2, 11, 0, 0),
+            "date": "2020-02-11",
             "code": "BLU",
             "type_": "buy",
             "price": 1.1,
@@ -53,9 +55,9 @@ _transactions = [
             "broker": "poems",
         }
     ),
-    Transaction.from_dict(
+    transaction_schema.load(
         {
-            "date": datetime.datetime(2020, 12, 11, 0, 0),
+            "date": "2020-12-11",
             "code": "BLU",
             "type_": "buy",
             "price": 1.1,
@@ -78,9 +80,9 @@ class StockLedgerTestCase(unittest.TestCase):
         ledger = Ledger()
         self.assertEqual(ledger.to_dict(), {})
         ledger.add_transaction(
-            Transaction.from_dict(
+            transaction_schema.load(
                 {
-                    "date": datetime.datetime(2020, 12, 11, 0, 0),
+                    "date": "2020-12-11",
                     "code": "AZG",
                     "type_": "buy",
                     "price": 1.1,
@@ -129,20 +131,20 @@ class StockLedgerTestCase(unittest.TestCase):
         # BLU
         self.assertAlmostEqual(result["BLU"]["volume"], 3000)
         self.assertAlmostEqual(result["BLU"]["cost"], 3355.66)
-        self.assertAlmostEqual(result["BLU"]["pnl"], 0)
+        self.assertAlmostEqual(result["BLU"]["transactions_sum"], 0)
 
         # AZG
         self.assertAlmostEqual(result["AZG"]["volume"], 1000)
         self.assertAlmostEqual(result["AZG"]["cost"], 1527.77)
-        self.assertAlmostEqual(result["AZG"]["pnl"], 344.63)
+        self.assertAlmostEqual(result["AZG"]["transactions_sum"], 344.63)
 
     def test_to_dict(self):
         ledger = Ledger()
         ledger.add_transactions(
             [
-                Transaction.from_dict(
+                transaction_schema.load(
                     {
-                        "date": datetime.datetime(2016, 1, 1, 0, 0),
+                        "date": "2016-1-1",
                         "code": "BSL",
                         "type_": "buy",
                         "price": 1.1,
@@ -152,9 +154,9 @@ class StockLedgerTestCase(unittest.TestCase):
                         "broker": "poems",
                     }
                 ),
-                Transaction.from_dict(
+                transaction_schema.load(
                     {
-                        "date": datetime.datetime(2018, 1, 1, 0, 0),
+                        "date": "2018-1-1",
                         "code": "BSL",
                         "type_": "buy",
                         "price": 1.5,
@@ -164,9 +166,9 @@ class StockLedgerTestCase(unittest.TestCase):
                         "broker": "poems",
                     }
                 ),
-                Transaction.from_dict(
+                transaction_schema.load(
                     {
-                        "date": datetime.datetime(2020, 1, 1, 0, 0),
+                        "date": "2020-1-1",
                         "code": "BSL",
                         "type_": "sell",
                         "price": 1.5,
