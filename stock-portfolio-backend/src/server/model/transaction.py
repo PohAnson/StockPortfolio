@@ -112,6 +112,11 @@ class Transaction:
 
     @classmethod
     def from_dict(cls, _dict) -> "Transaction":
+        # Ensure that date is of type date
+        # It might be in datetime type when being retrieved from database
+        if isinstance(_dict.get("date"), dt.datetime):
+            _dict["date"] = _dict["date"].date()
+
         return cls(**_dict)
 
     def update_last_modified_now(self):
