@@ -1,7 +1,6 @@
 import datetime as dt
 
-from marshmallow import (Schema, fields, post_dump, post_load, pre_load,
-                         validate)
+from marshmallow import Schema, fields, post_dump, post_load, validate
 
 from data.stock_code_name_dict import stock_code_name_dict
 from server.model.transaction import Transaction

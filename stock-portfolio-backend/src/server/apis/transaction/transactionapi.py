@@ -5,8 +5,10 @@ from data.stock_code_name_dict import stock_code_name_dict
 from server.database.stockdb import stockdb
 from server.database.transactiondb import transactiondb
 from server.model.transaction import Transaction
-from server.model.transaction_schema import (NamedTransactionSchema,
-                                             TransactionSchema)
+from server.model.transaction_schema import (
+    NamedTransactionSchema,
+    TransactionSchema,
+)
 
 transaction_api_bp = Blueprint(
     "transaction", __name__, url_prefix="transaction"

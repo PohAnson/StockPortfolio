@@ -9,7 +9,11 @@ export default function Page() {
   let code = router.query.code;
   const [pnlData, setPnlData] = useState(null);
   useEffect(() => {
-    if (code != undefined)
+    if (code == undefined) return;
+    code = String(code);
+    if (code.toUpperCase() != code)
+      router.replace(`/pnl/${code.toUpperCase()}`);
+    else
       fetch(`/api/pnl/${code}`)
         .then((r) => r.json())
         .then((json) => {

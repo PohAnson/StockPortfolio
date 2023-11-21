@@ -30,7 +30,7 @@ table {
 }
 
 th {
-  @apply border-x p-2 text-start text-gray-700 md:text-lg;
+  @apply border-x p-2 text-start text-gray-700 lg:text-lg;
 }
 
 td {

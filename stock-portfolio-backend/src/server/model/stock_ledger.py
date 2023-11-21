@@ -4,8 +4,9 @@ from typing import Any
 from data.stock_code_name_dict import stock_code_name_dict
 from server.data_structure import SortedSet
 from server.model.transaction import Transaction
-from server.scraper.dividends.calculate_dividends import \
-    calc_total_dividend_earnings
+from server.scraper.dividends.calculate_dividends import (
+    calc_total_dividend_earnings,
+)
 
 
 class _StockRecord:

@@ -14,6 +14,7 @@ export async function getServerSideProps({ req, params }) {
       headers: { Cookie: `sessionid=${sessionid}` },
     },
   ).then((r) => r.json());
+  data = JSON.parse(data)
   if ("error" in data) {
     return { redirect: { destination: "/login", permanent: false } };
   }

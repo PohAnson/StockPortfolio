@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from yfinance import Tickers
 
 from server.database.transactiondb import transactiondb
 from server.model.stock_ledger import Ledger
@@ -24,10 +25,19 @@ def get_portfolio():
     ledger.add_transactions(
         transactiondb.find_all_transaction(filter_dict={"userid": userid})
     )
-    return jsonify(
-        [
-            rec
-            for rec in ledger.tabulate_transactions().values()
-            if rec["volume"] != 0
-        ]
-    )
+
+    json_data = []
+    tickers = []
+    # Filter out for current holdings
+    for v in ledger.tabulate_transactions().values():
+        if v["volume"] == 0:
+            continue
+        tickers.append(v["code"] + ".SI")
+        json_data.append(v)
+
+    tickers = Tickers(" ".join(tickers))
+
+    for data in json_data:
+        code = data["code"] + ".SI"
+        data["last"] = tickers.tickers[code].basic_info["lastPrice"]
+    return jsonify(json_data)
