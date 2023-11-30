@@ -23,10 +23,10 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PortfolioViewModel @Inject constructor(
-    stockInfoRepo: StockInfoRepo, val transactionRepo: TransactionRepo
+    private val stockInfoRepo: StockInfoRepo, private val transactionRepo: TransactionRepo
 ) : ViewModel() {
     var isLoading by mutableStateOf(true)
-    val stockInfoMapping: Flow<Map<String, StockInfo>> = stockInfoRepo.getAllStock()
+    private val stockInfoMapping: Flow<Map<String, StockInfo>> = stockInfoRepo.getAllStock()
         .mapLatest { stockInfo -> stockInfo.associateBy { it.tradingCode } }
     val portfolioRowDataState = getPortfolioRows(tabulateTransactions(), stockInfoMapping)
 
@@ -53,6 +53,7 @@ class PortfolioViewModel @Inject constructor(
                     it.key,
                     it.value["volume"] as Int,
                     it.value["cost"] as Float,
+                    stockInfoRepo.getCurrentPrice(it.key)
                 )
             }.also { isLoading = false }
 

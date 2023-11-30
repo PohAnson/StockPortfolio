@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,14 +36,19 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
         }
     }
 
-    val headerTitle: List<String> = listOf("Symbol", "Avg Price", "Volume", "Cost")
+    val headerTitle: List<String> =
+        listOf("Symbol", "Last /\nAvg", "MV /\nQty", "Unrealised P/L")
 
     Column(
         modifier
             .fillMaxSize()
             .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row {
+        Row(
+            modifier = Modifier.padding(
+                0.dp
+            )
+        ) {
             headerTitle.forEachIndexed { index, title ->
                 Text(
                     title,
@@ -82,26 +88,54 @@ fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
             Text(text = portfolioRowData.stockCode, style = cellTextStyle)
         }
 
-        // Avg Price
-        Text(
-            "%.3f".format(portfolioRowData.avgPrice),
+        // Last/Avg Price
+        Column(
             modifier = Modifier.width(cellWidth(1)),
-            style = cellTextStyle
-        )
+        ) {
+            // Last
+            if (portfolioRowData.lastPrice < 0)
+                Text("--", color = Color.Gray)
+            else
+                Text(
+                    "%.3f".format(portfolioRowData.lastPrice),
+                    style = cellTextStyle
+                )
+            // Avg
+            Text(
+                "%.3f".format(portfolioRowData.avgPrice),
+                style = cellTextStyle
+            )
+        }
 
-        // Volume
-        Text(
-            portfolioRowData.volume.toString(),
-            modifier = Modifier.width(cellWidth(2)),
-            style = cellTextStyle
-        )
+        // MV/Volume
+        Column(
+            modifier = Modifier.width(cellWidth(1)),
+        ) {
+            // Market Value
+            if (portfolioRowData.lastPrice < 0)
+                Text("--", color = Color.Gray)
+            else
+                Text(
+                    "%.2f".format(portfolioRowData.marketValue),
+                    style = cellTextStyle
+                )
+            // Volume
+            Text(
+                portfolioRowData.volume.toString(),
+                style = cellTextStyle
+            )
+        }
 
-        // Total Cost
-        Text(
-            "%.2f".format(portfolioRowData.cost),
-            modifier = Modifier.width(cellWidth(3)),
-            style = cellTextStyle
-        )
+        // Unrealised P/L
+        if (portfolioRowData.lastPrice < 0)
+            Text("--", color = Color.Gray)
+        else
+            Text(
+                "%.2f".format(portfolioRowData.unrealisedPnl),
+                modifier = Modifier.width(cellWidth(3)),
+                style = cellTextStyle,
+                color = if (portfolioRowData.unrealisedPnl < 0) Color.Red else Color.Green
+            )
 
 
     }
@@ -112,7 +146,7 @@ fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
 fun PortfolioTablePreview() {
     PortfolioTable(
         listOf(
-            PortfolioRowData("Mapletree PanAsia Com Tr", "N2IU", 100, 1.143f)
+            PortfolioRowData("Mapletree PanAsia Com Tr", "N2IU", 100, 1.143f, 1.55f)
         )
     )
 }
