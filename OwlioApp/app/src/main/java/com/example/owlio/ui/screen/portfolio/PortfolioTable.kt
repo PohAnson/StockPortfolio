@@ -29,7 +29,7 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
     fun cellWidth(index: Int): Dp {
         return when (index) {
             0 -> 140.dp
-            1 -> 70.dp
+            1 -> 75.dp
             2 -> 70.dp
             3 -> 80.dp
             else -> 0.dp
@@ -42,7 +42,8 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
     Column(
         modifier
             .fillMaxSize()
-            .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(2.dp, 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             modifier = Modifier.padding(
@@ -58,7 +59,7 @@ fun PortfolioTable(portfolioRowDataList: List<PortfolioRowData>, modifier: Modif
             }
         }
         Divider(Modifier.padding(top = 8.dp))
-        LazyColumn {
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
             items(portfolioRowDataList, key = { it.stockCode }) {
                 PortfolioRow(it, cellWidth = ::cellWidth)
                 Divider()
@@ -90,7 +91,9 @@ fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
 
         // Last/Avg Price
         Column(
-            modifier = Modifier.width(cellWidth(1)),
+            modifier = Modifier
+                .width(cellWidth(1))
+                .padding(1.dp, 0.dp),
         ) {
             // Last
             if (portfolioRowData.lastPrice < 0)
@@ -128,7 +131,7 @@ fun PortfolioRow(portfolioRowData: PortfolioRowData, cellWidth: (Int) -> Dp) {
 
         // Unrealised P/L
         if (portfolioRowData.lastPrice < 0)
-            Text("--", color = Color.Gray)
+            Text("--", color = Color.Gray, modifier = Modifier.width(cellWidth(3)))
         else
             Text(
                 "%.2f".format(portfolioRowData.unrealisedPnl),

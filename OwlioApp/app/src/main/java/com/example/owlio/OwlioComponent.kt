@@ -10,6 +10,7 @@ import com.example.owlio.data.OwlioDatabase
 import com.example.owlio.data.StockInfoDao
 import com.example.owlio.data.TransactionDao
 import com.example.owlio.networkapi.NetworkApiSessionCookiesInterceptor
+import com.example.owlio.networkapi.StockPriceApiService
 import com.example.owlio.networkapi.TransactionSyncApiService
 import com.example.owlio.networkapi.UserApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -19,7 +20,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -78,7 +78,6 @@ class ApiServiceModule {
             .build()
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
     @Provides
     @Singleton
     fun retrofitService(httpClient: OkHttpClient): Retrofit = Retrofit.Builder()
@@ -100,6 +99,18 @@ class ApiServiceModule {
     @Singleton
     fun transactionSyncApiRetrofitService(retrofitService: Retrofit): TransactionSyncApiService {
         return retrofitService.create(TransactionSyncApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun stockPriceApiService(): StockPriceApiService {
+        val retrofitService = Retrofit.Builder()
+            .baseUrl("https://query1.finance.yahoo.com/v8/finance/chart/")
+            .addConverterFactory(
+                jsonConverterFactory.asConverterFactory(MediaType.get("application/json"))
+            )
+            .build()
+        return retrofitService.create(StockPriceApiService::class.java)
     }
 }
 

@@ -1,27 +1,26 @@
 package com.example.owlio.data
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
+import com.example.owlio.networkapi.StockPriceApiService
+import timber.log.Timber
 import javax.inject.Inject
 
-class StockInfoRepo @Inject constructor(private val stockInfoDao: StockInfoDao) {
+class StockInfoRepo @Inject constructor(
+    private val stockInfoDao: StockInfoDao,
+    private val stockPriceApiService: StockPriceApiService
+) {
     fun getAllStock() = stockInfoDao.getAllStockInfo()
     suspend fun getStockInfoByCode(tradingCode: String) =
         stockInfoDao.getStockInfoByCode(tradingCode = tradingCode)
 
-    fun getCurrentPrice(stockCode: String): Float {
-        // assumed that negative current price means that it cannot be found
-        val symbol = "$stockCode.SI"
-        val doc = runBlocking {
-            withContext(Dispatchers.Default) {
-                Jsoup.connect("https://finance.yahoo.com/quote/${symbol}").get()
-            }
+    suspend fun getCurrentPrice(stockCode: String): Float {
+        return try {
+            val response = stockPriceApiService.getCurrentPrice("$stockCode.SI")
+            response.body()?.chart?.result?.firstOrNull()?.meta?.regularMarketPrice
+                ?: -1f
+        } catch (e: Exception) {
+            Timber.e(e, "getCurrentPrice $stockCode")
+            -1f
         }
-        return doc.selectXpath("//fin-streamer[@data-field='regularMarketPrice'][@data-symbol='${symbol}']")
-            .text().ifEmpty { "-1" }.toFloat()
+
     }
-
-
 }

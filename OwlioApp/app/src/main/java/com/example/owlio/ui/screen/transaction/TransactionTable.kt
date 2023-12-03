@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -58,17 +57,18 @@ fun TransactionTable(
 
     fun cellWidth(index: Int): Dp {
         return when (index) {
-            0 -> 70.dp
+            0 -> 85.dp
             1 -> 70.dp
             2 -> 140.dp
-            3 -> 50.dp
+            3 -> 60.dp
             else -> 0.dp
         }
     }
     Column(
         Modifier
             .fillMaxSize()
-            .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(2.dp, 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row {
             headerTitle.forEachIndexed { index, title ->
@@ -80,7 +80,7 @@ fun TransactionTable(
             }
         }
         Divider(Modifier.padding(top = 8.dp))
-        LazyColumn {
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
             items(transactionList, key = { it.transactionId }) {
                 TransactionRow(
                     transaction = it,
